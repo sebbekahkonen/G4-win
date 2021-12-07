@@ -1,14 +1,18 @@
 const express = require('express');
 const app = express();
+//Behövs för SQlite
 const driver = require('better-sqlite3');
+//För att connecta till databasen
 const db = driver('./database/traindb.sqlite3');
-const bodyParser = require('body-parser');
 
+//Bodyparser för att parsa ihop object
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
 	extended: false
 }));
 app.use(bodyParser.json());
 
+//Listen on localhost:8080 and start webserver
 app.listen(8080, () => {
 	console.log("Server running on port 8080");
 });
@@ -20,6 +24,7 @@ app.get('/', (req, res) => {
 	});
 });
 
+//Dynamic rest route:POST
 app.post('/api/:table', (req, res) => {
 	// let data = {
 	// 	name: req.body.name,
@@ -44,13 +49,69 @@ app.post('/api/:table', (req, res) => {
 	});
 })
 
+//Dynamic rest route:GET ALL
 app.get('/api/:table', (req, res) => {
 	let preparedStatement = db.prepare(`
 	SELECT * FROM ${req.params.table}
 	`);
 	let result = preparedStatement.all();
 	res.status(200).json({
-		message: 'testar get',
+		message: 'success',
+		data: result
+	});
+})
+
+//Dynamic rest route:GET:ID
+app.get('/api/:table/:id', (req, res) => {
+	let preparedStatement = db.prepare(`
+	SELECT *
+	FROM ${req.params.table}
+	WHERE id = :id
+	`);
+	let result = preparedStatement.all({
+		id: req.params.id
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
+
+//Dynamic rest route:PUT (update)
+app.put('/api/:table/:id', (req, res) => {
+	let updateParameters = Object.keys(req.body).map(parameter =>
+		parameter + ' = :' + parameter
+	);
+
+	let preparedStatement = db.prepare(`
+	UPDATE ${req.params.table}
+	SET ${updateParameters}
+	WHERE id = :id
+	`);
+
+	req.body.id = req.params.id;
+	preparedStatement.run(req.body);
+
+	res.status(200).json({
+		message: 'success',
+		data: req.body
+	});
+});
+
+
+app.delete('/api/:table/:id', (req, res) => {
+	let preparedStatement = db.prepare(`
+	DELETE
+	FROM ${req.params.table}
+	WHERE id = :id
+	`);
+	let result = preparedStatement.run({
+		id: req.params.id
+	});
+
+	res.status(200).json({
+		message: 'success',
 		data: result
 	});
 })
