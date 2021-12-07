@@ -99,7 +99,7 @@ app.put('/api/:table/:id', (req, res) => {
 	});
 });
 
-
+//Dynamic rest route:DELETE:ID
 app.delete('/api/:table/:id', (req, res) => {
 	let preparedStatement = db.prepare(`
 	DELETE
