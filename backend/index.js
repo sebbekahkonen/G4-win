@@ -26,6 +26,7 @@ app.post('/api/:table', (req, res) => {
 	// 	email: req.body.email,
 	// 	password: req.body.password
 	// };
+	/*test*/
 	let columnNames = Object.keys(req.body);
 	let columnParamaters = columnNames.map((colName) => ':' + colName);
 	let query =
