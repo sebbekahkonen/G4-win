@@ -12,6 +12,7 @@
 ## Teknisk dokumentation
 ### Länkar till diverse tekniker som kommer användas.
 - API: https://api.trafikinfo.trafikverket.se/API (Ej 100% bestämt)
+- API: http://tagtider.net/api/
 - Vue: https://vuejs.org/v2/guide/
 - Vuetify: https://vuetifyjs.com/en/getting-started/installation/
 - ESLint: https://eslint.org/docs/user-guide/getting-started
