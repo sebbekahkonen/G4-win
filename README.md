@@ -3,15 +3,18 @@
 ## Vilka tekniker har vi bestämt?
 - Backend: Node.js, express, sqlite3. (Kan tillkomma ORM, eller annat)
 - Frontend: VUE.
-- CSS: Inget bestämt ännu.
+- CSS: Vuetify.
 - REST: Vi bygger egna REST-routes
 - Kryptering: Node.js crypto(finns inbyggd)? bCrypt? md5? 
-- NPM-moduler/bibliotek: Specifikationer kommer under projektets gång.
+- NPM-moduler/bibliotek: Express, better-sqlite3.
 
 #
 ## Teknisk dokumentation
 ### Länkar till diverse tekniker som kommer användas.
 - API: https://api.trafikinfo.trafikverket.se/API (Ej 100% bestämt)
+- Vue: https://vuejs.org/v2/guide/
+- Vuetify: https://vuetifyjs.com/en/getting-started/installation/
+- ESLint: https://eslint.org/docs/user-guide/getting-started
 - Fyller på allt eftersom
 
 # 

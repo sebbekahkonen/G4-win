@@ -49,6 +49,7 @@ app.post('/api/:table', (req, res) => {
 	});
 })
 
+
 //Dynamic rest route:GET ALL
 app.get('/api/:table', (req, res) => {
 	let preparedStatement = db.prepare(`
@@ -89,7 +90,6 @@ app.put('/api/:table/:id', (req, res) => {
 	SET ${updateParameters}
 	WHERE id = :id
 	`);
-
 	req.body.id = req.params.id;
 	preparedStatement.run(req.body);
 
