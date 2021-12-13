@@ -12,9 +12,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-//Listen on localhost:8080 and start webserver
-app.listen(8080, () => {
-	console.log("Server running on port 8080");
+//Listen on localhost:4000 and start webserver
+app.listen(4000, () => {
+	console.log("Server running on port 4000");
 });
 
 app.get('/', (req, res) => {
