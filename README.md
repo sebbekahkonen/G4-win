@@ -2,7 +2,7 @@
 
 ## Vilka tekniker har vi bestämt?
 - Backend: Node.js, express, sqlite3. (Kan tillkomma ORM, eller annat)
-- Frontend: Inget bestämt ännu.
+- Frontend: VUE.
 - CSS: Inget bestämt ännu.
 - REST: Vi bygger egna REST-routes
 - Kryptering: Node.js crypto(finns inbyggd)? bCrypt? md5? 
