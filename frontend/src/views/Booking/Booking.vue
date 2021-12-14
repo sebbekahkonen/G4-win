@@ -1,14 +1,13 @@
 <template>
-	<v-card> 
-		<h1>Boka din resa här!</h1>
-		<form @submit.prevent="testSearch">
-			<div>
-				<label for="sök">Sök</label>
-				<input v-model="search.stationSearch" name="sök" placeholder="sök">
-			</div>
+	<v-card class="justify-center mx-auto mt-6" width="50%"> 
+		<h1 class="text-center">Boka din resa här!</h1>
+		<form>
+			<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
+			<v-text-field label="Från" outlined clearable />
 		</form>
-		<div>
-			{{ singleStation }}
+		<v-btn color="red" @click="testSearch">Sök resa</v-btn>
+		<div v-for="(stationSingle, i) in singleStation" :key="i">
+			{{ stationSingle.AdvertisedLocationName }}
 		</div>
 		<v-list>
 			<v-list-item v-for="(stations, i) in trainStations" :key="i">
@@ -18,6 +17,7 @@
 			</v-list-item>
 		</v-list>
 		<v-btn color="blue" @click="testApi">Testa apiet</v-btn>
+		<v-btn color="blue" @click="testFetch">Testa apiet</v-btn>
 	</v-card>
 </template>
 
@@ -65,7 +65,7 @@ export default {
        ' <FILTER>' +
            ' <AND> ' +
                ' <EQ name=\'Advertised\' value=\'true\' />' +
-                '<IN name=\'AdvertisedLocationName\' value=\'Alingsås\' />' +
+                `<IN name='AdvertisedLocationName' value='${this.search.stationSearch}' />` +
             '</AND> ' +
         '</FILTER>' +
             '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
@@ -80,6 +80,16 @@ export default {
 				body: body
 			}).then(res => res.json())
 				.then(data => this.singleStation = data.RESPONSE.RESULT[0].TrainStation);
+		},
+		testFetch() {
+			fetch('http://api.tagtider.net/v1//stations/243/transfers/arrivals.json', {
+				headers: {
+					'Användarnamn': 'tagtider',
+					'Lösenord': 'codemocracy'
+				}
+			})
+				.then(res => res.json())
+				.then(data => console.log(data)); 
 		}
 	}
 };
