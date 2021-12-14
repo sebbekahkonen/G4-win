@@ -1,15 +1,17 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Booking from '@/views/Booking/routes.js';
 
-Vue.use(Router)
+Vue.use(VueRouter);
 
-export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
-  ]
-})
+const routes = [
+	...Booking
+];
+const router = new VueRouter({
+	mode: 'history',
+	base: process.env.BASE_URL,
+	routes
+
+});
+
+export default router;
