@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Booking from '@/views/Booking/routes.js';
+import TestAPI from '@/views/TestAPI/routes.js';
 
 Vue.use(VueRouter);
 
 const routes = [
-	...Booking
+	...Booking, ...TestAPI
 ];
 const router = new VueRouter({
 	mode: 'history',
