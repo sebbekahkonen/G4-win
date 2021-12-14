@@ -1,27 +1,53 @@
 <template>
-	<v-card class="justify-center mx-auto mt-6" width="50%"> 
-		<h1 class="text-center">Boka din resa här!</h1>
-		<form>
-			<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
-			<v-text-field label="Från" outlined clearable />
-		</form>
-		<v-btn color="red" @click="testSearch">Sök resa</v-btn>
-		<div v-for="(stationSingle, i) in singleStation" :key="i">
-			{{ stationSingle.AdvertisedLocationName }}
-		</div>
-		<v-list>
-			<v-list-item v-for="(stations, i) in trainStations" :key="i">
-				<v-list-item-title>
-					{{ stations.AdvertisedLocationName }}
-				</v-list-item-title>
-			</v-list-item>
-		</v-list>
-		<vc-date-picker v-model="date" class="text-center" @dayclick="testClick" />
+	<v-card class="justify-center mx-auto mt-6" width="80%"> 
+		<v-card class="justify-center mx-auto" width="60%">
+			<h1 class="text-center">Boka din resa här!</h1>
+			<form>
+				<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
+				<v-text-field label="Från" outlined clearable />
+			</form>
+			<v-col align="center">
+				<v-btn color="red" @click="testSearch">Sök resa</v-btn>
+			</v-col>
+			<div v-for="(stationSingle, i) in singleStation" :key="i">
+				{{ stationSingle.AdvertisedLocationName }}
+			</div>
+			<v-list>
+				<v-list-item v-for="(stations, i) in trainStations" :key="i">
+					<v-list-item-title>
+						{{ stations.AdvertisedLocationName }}
+					</v-list-item-title>
+				</v-list-item>
+			</v-list>
+		</v-card>
+		<v-container fluid style="margin: 0px; padding: 0px; width: 60%" class="justify-center mx-auto">
+			<v-row>
+				<v-col>
+					<v-card>
+						<v-radio-group row>
+							<p class="mb-0">Inresa</p>
+							<v-radio label="Avgång" value="Avgång" />
+							<v-radio label="Ankomst" value="Ankomst" />
+						</v-radio-group>
+						<vc-date-picker v-model="date" is-expanded @dayclick="testClick" />
+					</v-card>
+				</v-col>
+				<v-col align="center">
+					<v-card>
+						<v-radio-group row>
+							<p class="mb-0">Utresa</p>
+							<v-radio label="Avgång" value="radio-1" />
+							<v-radio label="Ankomst" value="radio-2" />
+						</v-radio-group>
+						<vc-date-picker v-model="date" class="mt-0" is-expanded @dayclick="testClick" />
+					</v-card>
+				</v-col>
+			</v-row>
+		</v-container>
 	</v-card>
 </template>
 
 <script>
-import vue from 'vue';
 export default {
 	data: () => ({
 		trainStations: [],
@@ -32,7 +58,6 @@ export default {
 		date: new Date()
 	}),
 	created() {
-		vue.nextTick(this.testApi());
 	},
 	methods: {
 		testClick() {
@@ -67,4 +92,9 @@ export default {
 </script>
 
 <style>
+.flex-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 </style>
