@@ -1,14 +1,45 @@
 <template>
 	<v-app>
-		<v-app-bar
-			app
-			color="grey darken-3"
-			dark
-			class="elevation-15"
-		>
-			<h1>G4-Win</h1>
-			<v-spacer />
-		</v-app-bar>
+		<div>
+			<v-toolbar
+				dark
+				prominent
+				src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
+			>
+				<v-app-bar-nav-icon @click="drawer = true" />
+				<v-toolbar-title class="text-xs-center">G4Win - Get your tickets today!</v-toolbar-title>
+				<v-spacer />
+			</v-toolbar>
+			<v-navigation-drawer
+				v-model="drawer"
+				absolute
+				temporary
+			>
+				<v-list
+					nav
+					dense
+				>
+					<v-list-item-group
+						v-model="group"
+						active-class="deep-purple--text text--accent-4"
+					>
+						<v-list-item>
+							<v-list-item-icon>
+								<v-icon>mdi-home</v-icon>
+							</v-list-item-icon>
+							<v-list-item-title>Home</v-list-item-title>
+						</v-list-item>
+
+						<v-list-item>
+							<v-list-item-icon>
+								<v-icon>mdi-account</v-icon>
+							</v-list-item-icon>
+							<v-list-item-title>Account</v-list-item-title>
+						</v-list-item>
+					</v-list-item-group>
+				</v-list>
+			</v-navigation-drawer>
+		</div>
 
 		<v-main>
 			<router-view />
@@ -25,7 +56,8 @@ export default {
 	},
 
 	data: () => ({
-		//
+		drawer: false,
+		group: null
 	})
 };
 </script>
