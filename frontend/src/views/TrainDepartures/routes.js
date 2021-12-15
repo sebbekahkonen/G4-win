@@ -2,7 +2,7 @@ import TrainDepartures from './TrainDepartures.vue';
 
 export default [
 	{
-		path: '/traindepartures',
+		path: '/departures',
 		name: 'TrainDepartures',
 		component: TrainDepartures
 	}];
