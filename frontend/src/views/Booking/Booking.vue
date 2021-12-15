@@ -3,8 +3,8 @@
 		<v-card class="justify-center mx-auto" width="60%">
 			<h1 class="text-center">Boka din resa här!</h1>
 			<form>
-				<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
-				<v-text-field label="Från" outlined clearable />
+				<v-text-field v-model="search.stationSearch" label="Från" outlined clearable />
+				<v-text-field label="Till" outlined clearable />
 			</form>
 			<v-col align="center">
 				<v-btn color="red" @click="testSearch">Sök resa</v-btn>
@@ -20,7 +20,7 @@
 				</v-list-item>
 			</v-list>
 		</v-card>
-		<v-container fluid style="margin: 0px; padding: 0px; width: 60%" class="justify-center mx-auto">
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px; width: 60%" class="justify-center mx-auto">
 			<v-row>
 				<v-col>
 					<v-card>
@@ -55,15 +55,20 @@ export default {
 			stationSearch: ''
 		},
 		singleStation: '',
-		date: new Date()
+		date: new Date('2021-12-14'),
+		isClicked: false
 	}),
 	created() {
 	},
 	methods: {
 		testClick() {
-			console.log(this.date.toDateString());
+			console.log(this.date.toLocaleDateString());
 		},
 		testSearch() {
+			if (!this.isClicked && this.search.stationSearch.length > 0) {
+				this.isClicked = true;
+			}
+			
 			let body =
      '<REQUEST>' +
      '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
@@ -96,5 +101,11 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.v-radio-group {
+	min-width: 100%;
+}
+.v-input--radio-group__input {
+	justify-content: center;
 }
 </style>
