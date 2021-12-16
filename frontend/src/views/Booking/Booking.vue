@@ -1,5 +1,5 @@
 <template>
-	<v-card class="justify-center mx-auto mt-6" width="80%"> 
+	<v-card class="justify-center mx-auto mt-6" width="80%">
 		<v-card class="justify-center mx-auto" width="60%">
 			<h1 class="text-center">Boka din resa här!</h1>
 			<form>
@@ -68,7 +68,7 @@ export default {
 			if (!this.isClicked && this.search.stationSearch.length > 0) {
 				this.isClicked = true;
 			}
-			
+
 			let body =
      '<REQUEST>' +
      '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
@@ -81,7 +81,7 @@ export default {
         '</FILTER>' +
             '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
       '</QUERY> ' +
-     '</REQUEST> '; 
+     '</REQUEST> ';
 
 			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
 				method: 'POST',
@@ -92,7 +92,7 @@ export default {
 			}).then(res => res.json())
 				.then(data => this.singleStation = data.RESPONSE.RESULT[0].TrainStation);
 		}
-	}
+	} //Hej
 };
 </script>
 
