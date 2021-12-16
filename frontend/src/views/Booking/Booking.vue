@@ -7,7 +7,7 @@
 				<v-text-field label="Till" outlined clearable />
 			</form>
 			<v-col align="center">
-				<v-btn color="red" @click="testSearch">Sök resa</v-btn>
+				<v-btn color="red" @click="testWithStore">Sök resa</v-btn>
 			</v-col>
 			<div v-for="(stationSingle, i) in singleStation" :key="i">
 				{{ stationSingle.AdvertisedLocationName }}
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex';
 export default {
 	data: () => ({
 		trainStations: [],
@@ -60,7 +61,18 @@ export default {
 	}),
 	created() {
 	},
+	computed: {
+		...mapGetters('bookingStore', ['getAllStations'])
+	},
 	methods: {
+		...mapActions('bookingStore', ['getStations']),
+
+		testWithStore() {
+			this.getStations(this.search.stationSearch);
+			console.log(this.getAllStations);
+		},
+		
+
 		testClick() {
 			console.log(this.date.toLocaleDateString());
 		},
@@ -70,18 +82,18 @@ export default {
 			}
 
 			let body =
-     '<REQUEST>' +
-     '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
-     ' <QUERY objecttype=\'TrainStation\' schemaversion=\'1\'>' +
-       ' <FILTER>' +
-           ' <AND> ' +
-               ' <EQ name=\'Advertised\' value=\'true\' />' +
-                `<IN name='AdvertisedLocationName' value='${this.search.stationSearch}' />` +
-            '</AND> ' +
-        '</FILTER>' +
-            '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
-      '</QUERY> ' +
-     '</REQUEST> ';
+		'<REQUEST>' +
+		'<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
+		' <QUERY objecttype=\'TrainStation\' schemaversion=\'1\'>' +
+		' <FILTER>' +
+		' <AND> ' +
+					' <EQ name=\'Advertised\' value=\'true\' />' +
+		`<IN name='AdvertisedLocationName' value='${this.search.stationSearch}' />` +
+		'</AND> ' +
+		'</FILTER>' +
+		'<INCLUDE>AdvertisedLocationName</INCLUDE>' +
+		'</QUERY> ' +
+		'</REQUEST> ';
 
 			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
 				method: 'POST',
