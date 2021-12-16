@@ -92,7 +92,7 @@ export default {
 			}).then(res => res.json())
 				.then(data => this.singleStation = data.RESPONSE.RESULT[0].TrainStation);
 		}
-	} //Hej
+	}
 };
 </script>
 
