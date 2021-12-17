@@ -1,76 +1,124 @@
 <template>
-	<v-card class="justify-center mx-auto mt-6" width="50%">
-		<h1 class="text-center">Boka din resa här!</h1>
-		<form>
-			<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
-			<v-text-field label="Från" outlined clearable />
-		</form>
-		<v-btn color="red" @click="testSearch">Sök resa</v-btn>
-		<div v-for="(stationSingle, i) in singleStation" :key="i">
-			{{ stationSingle.AdvertisedLocationName }}
-		</div>
-		<v-list>
-			<v-list-item v-for="(stations, i) in trainStations" :key="i">
-				<v-list-item-title>
-					{{ stations.AdvertisedLocationName }}
-				</v-list-item-title>
-			</v-list-item>
-		</v-list>
-		<v-btn color="blue" @click="testApi">Testa apiet</v-btn>
-		<v-btn color="blue" @click="testFetch">Testa apiet</v-btn>
-	</v-card>
+	<v-container> 
+		<v-card class="justify-center mx-auto" width="100%">
+			<h1 class="text-center">Boka din resa här!</h1>
+			<form>
+				<v-text-field v-model="search.stationSearch" class="pa-1" label="Från" outlined clearable />
+				<v-text-field label="Till" class="pa-1" outlined clearable />
+			</form>
+			<v-col align="center">
+				<v-btn color="red" @click="testWithStore">Sök resa</v-btn>
+			</v-col>
+			<div v-for="(stationSingle, i) in singleStation" :key="i">
+				{{ stationSingle.AdvertisedLocationName }}
+			</div>			
+		</v-card>
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">	
+			<v-col class="pa-0 mt-3">
+				<v-card>
+					<div class="flex-center">
+						<p class="mb-0 mt-2 ml-2 font-italic">Utresa</p>
+						<v-select :items="timePick" :label="timeFormatted" dense solo />
+					</div>
+					<v-radio-group row class="ma-0 pa-0">
+						<v-radio label="Avgång" value="Avgång" />
+						<v-radio label="Ankomst" value="Ankomst" />
+					</v-radio-group>
+					<vc-date-picker v-model="date" is-expanded @dayclick="testClick" />
+				</v-card>
+			</v-col>
+			<v-col class="pa-0 mt-3">
+				<v-card>
+					<v-card>
+						<div class="flex-center">
+							<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
+							<v-select :items="timePick" :label="timeFormatted" dense solo />
+						</div>
+						<v-radio-group row class="ma-3">
+							<p class="mb-0">Återresa</p>
+							<v-radio label="Avgång" value="radio-1" />
+							<v-radio label="Ankomst" value="radio-2" />
+						</v-radio-group>
+						<vc-date-picker v-model="date" class="mt-0" is-expanded @dayclick="testClick" />
+					</v-card>
+				</v-card>
+			</v-col>
+		</v-container>
+	</v-container>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
-		trainStations: [],
 		search: {
 			stationSearch: ''
 		},
-		singleStation: ''
+		singleStation: '',
+		date: new Date(),
+		isClicked: false,
+		timeFormatted: '',
+		timePick: []
 	}),
 	created() {
-		vue.nextTick(this.testApi());
+		vue.nextTick(this.showTimeLabel());
+	},
+	computed: {
+		...mapGetters('bookingStore', ['getAllStations'])
 	},
 	methods: {
-		testApi() {
-			let body =
-     '<REQUEST>' +
-      '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
-      '<QUERY objecttype=\'TrainStation\' schemaversion=\'1\' limit=\'5\'>' +
-     '<FILTER>' +
-      '<EQ name=\'Advertised\' value=\'true\' />' +
-     '</FILTER>' +
-     '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
-     ' </QUERY>' +
-     '</REQUEST>';
+		...mapActions('bookingStore', ['getStations']),
 
-			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/xml'
-				},
-				body: body
-			}).then(res => res.json())
-				.then(data => this.trainStations = data.RESPONSE.RESULT[0].TrainStation);
-			//  console.log('Trainstations ',this.trainStations);
+		testWithStore() {
+			this.getStations(this.search.stationSearch);
+			console.log(this.getAllStations);
+		},
+		
+
+		showTimeLabel() {
+			let hours = new Date().getHours();
+			let minutes = new Date().getMinutes();
+
+			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+			
+			for (let i=hours; i<24; i++) {
+				this.timePick.push(`${hours++}:00`);
+			}
+
+			// if (this.date !== new Date()) {
+			// 	for (let i=0; i<24; i++) {
+			// 		this.timePick.push(i);
+			// 	}
+			// }
+			
+			console.log(this.timeFormatted);
+			console.log(this.timePick);
+
+		},
+		testClick() {
+			console.log(this.date.toLocaleDateString());
+			// this.showTimeLabel();
+		
 		},
 		testSearch() {
+			if (!this.isClicked && this.search.stationSearch.length > 0) {
+				this.isClicked = true;
+			}
+
 			let body =
-     '<REQUEST>' +
-     '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
-     ' <QUERY objecttype=\'TrainStation\' schemaversion=\'1\'>' +
-       ' <FILTER>' +
-           ' <AND> ' +
-               ' <EQ name=\'Advertised\' value=\'true\' />' +
-                `<IN name='AdvertisedLocationName' value='${this.search.stationSearch}' />` +
-            '</AND> ' +
-        '</FILTER>' +
-            '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
-      '</QUERY> ' +
-     '</REQUEST> ';
+		'<REQUEST>' +
+		'<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
+		' <QUERY objecttype=\'TrainStation\' schemaversion=\'1\'>' +
+		' <FILTER>' +
+		' <AND> ' +
+					' <EQ name=\'Advertised\' value=\'true\' />' +
+		`<IN name='AdvertisedLocationName' value='${this.search.stationSearch}' />` +
+		'</AND> ' +
+		'</FILTER>' +
+		'<INCLUDE>AdvertisedLocationName</INCLUDE>' +
+		'</QUERY> ' +
+		'</REQUEST> ';
 
 			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
 				method: 'POST',
@@ -80,20 +128,24 @@ export default {
 				body: body
 			}).then(res => res.json())
 				.then(data => this.singleStation = data.RESPONSE.RESULT[0].TrainStation);
-		},
-		testFetch() {
-			fetch('http://api.tagtider.net/v1//stations/243/transfers/arrivals.json', {
-				headers: {
-					'Användarnamn': 'tagtider',
-					'Lösenord': 'codemocracy'
-				}
-			})
-				.then(res => res.json())
-				.then(data => console.log(data));
 		}
 	}
 };
 </script>
 
 <style>
+.flex-center {
+  display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 10px;
+}
+.time-input {
+	align-content: right;
+}
+.v-radio-group {
+	min-width: 100%;
+}
+.v-input--radio-group__input {
+	justify-content: center;
+}
 </style>
