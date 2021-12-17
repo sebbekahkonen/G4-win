@@ -38,7 +38,7 @@ export default {
 			let body = 
      '<REQUEST>' +
       '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
-      '<QUERY objecttype=\'TrainStation\' schemaversion=\'1\' limit=\'5\'>' +
+      '<QUERY objecttype=\'TrainStation\' schemaversion=\'1\' limit=\'20\'>' +
      '<FILTER>' +
       '<EQ name=\'Advertised\' value=\'true\' />' +
      '</FILTER>' +
