@@ -93,7 +93,7 @@ export default {
 			if (!this.isClicked && this.search.stationSearch.length > 0) {
 				this.isClicked = true;
 			}
-			
+
 			let body =
      '<REQUEST>' +
      '<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
@@ -106,7 +106,7 @@ export default {
         '</FILTER>' +
             '<INCLUDE>AdvertisedLocationName</INCLUDE>' +
       '</QUERY> ' +
-     '</REQUEST> '; 
+     '</REQUEST> ';
 
 			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
 				method: 'POST',
