@@ -7,7 +7,8 @@
 				<v-text-field label="Till" class="pa-1" outlined clearable />
 			</form>
 			<v-col align="center">
-				<v-btn color="red" @click="testWithStore">Sök resa</v-btn>
+				<v-btn color="red" @click="testWithStore">Testa store</v-btn>
+				<v-btn color="red" @click="testSearch">Sök resa</v-btn>
 			</v-col>
 			<div v-for="(stationSingle, i) in singleStation" :key="i">
 				{{ stationSingle.AdvertisedLocationName }}
@@ -24,23 +25,26 @@
 						<v-radio label="Avgång" value="Avgång" />
 						<v-radio label="Ankomst" value="Ankomst" />
 					</v-radio-group>
-					<vc-date-picker v-model="date" is-expanded @dayclick="testClick" />
+					<vc-date-picker v-model="departureDate" is-expanded @dayclick="departureDateClick" />
 				</v-card>
 			</v-col>
 			<v-col class="pa-0 mt-3">
-				<v-card>
-					<v-card>
-						<div class="flex-center">
-							<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
-							<v-select :items="timePick" :label="timeFormatted" dense solo />
-						</div>
-						<v-radio-group row class="ma-3">
-							<p class="mb-0">Återresa</p>
-							<v-radio label="Avgång" value="radio-1" />
-							<v-radio label="Ankomst" value="radio-2" />
-						</v-radio-group>
-						<vc-date-picker v-model="date" class="mt-0" is-expanded @dayclick="testClick" />
-					</v-card>
+				<v-card-actions class="justify-center">
+					<v-btn color="black" text @click="displayArrivalCalendar">
+						Vill du boka återresa?
+						<v-icon>{{ displayArrival ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+					</v-btn>
+				</v-card-actions>
+				<v-card v-if="displayArrival">
+					<div class="flex-center">
+						<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
+						<v-select :items="timePick" :label="timeFormatted" dense solo />
+					</div>
+					<v-radio-group row class="ma-3">
+						<v-radio label="Avgång" value="radio-1" />
+						<v-radio label="Ankomst" value="radio-2" />
+					</v-radio-group>
+					<vc-date-picker v-model="arrivalDate" class="mt-0" is-expanded @dayclick="arrivalDateClick" />
 				</v-card>
 			</v-col>
 		</v-container>
@@ -56,16 +60,18 @@ export default {
 			stationSearch: ''
 		},
 		singleStation: '',
-		date: new Date(),
+		departureDate: new Date(),
+		arrivalDate: new Date(),
 		isClicked: false,
+		displayArrival: false,
 		timeFormatted: '',
 		timePick: []
 	}),
-	created() {
-		vue.nextTick(this.showTimeLabel());
-	},
 	computed: {
 		...mapGetters('bookingStore', ['getAllStations'])
+	},
+	created() {
+		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations']),
@@ -74,8 +80,15 @@ export default {
 			this.getStations(this.search.stationSearch);
 			console.log(this.getAllStations);
 		},
-		
-
+		displayArrivalCalendar() {
+			if (!this.displayArrival) {
+				this.displayArrival = true;
+			} else {
+				this.displayArrival = false;
+			}
+			
+			console.log(this.displayArrival);
+		},
 		showTimeLabel() {
 			let hours = new Date().getHours();
 			let minutes = new Date().getMinutes();
@@ -85,21 +98,24 @@ export default {
 			for (let i=hours; i<24; i++) {
 				this.timePick.push(`${hours++}:00`);
 			}
-
-			// if (this.date !== new Date()) {
-			// 	for (let i=0; i<24; i++) {
-			// 		this.timePick.push(i);
-			// 	}
-			// }
-			
-			console.log(this.timeFormatted);
-			console.log(this.timePick);
-
 		},
-		testClick() {
-			console.log(this.date.toLocaleDateString());
-			// this.showTimeLabel();
-		
+		departureDateClick() {
+			console.log(`Utresa: ${this.departureDate.toLocaleDateString()}`);
+			let timePickReplace = [];
+
+			for (let i=0; i<24; i++) {
+				timePickReplace.push(this.timeFormatted = i < 10 ? `0${i}:00` : `${i}:00`);
+				this.timePick = timePickReplace.slice(0);
+			}
+		},
+		arrivalDateClick() {
+			console.log(`Återresa: ${this.arrivalDate.toLocaleDateString()}`);
+			let timePickReplace = [];
+
+			for (let i=0; i<24; i++) {
+				timePickReplace.push(this.timeFormatted = i < 10 ? `0${i}:00` : `${i}:00`);
+				this.timePick = timePickReplace.slice(0);
+			}				
 		},
 		testSearch() {
 			if (!this.isClicked && this.search.stationSearch.length > 0) {
