@@ -19,9 +19,9 @@
 - Nodemon (För att starta Backend)
     * cd backend 
     * npm install
-    * istället för 'npm start' skriv 'nodemon index.js' alternativt den .js fil du vill starta.
-    * Om du får Execution Policy problem: Öppna Powershell i admin-läge => Klistra in följande kod och tryck enter: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-    * Därefter kan du köra kommandot igen: nodemon index.js
+    * istället för **npm start** skriv **nodemon index.js** alternativt den .js fil du vill starta.
+    * Om du får Execution Policy problem: Öppna Powershell i admin-läge (högerklicka, kör i administratörsläge) => Klistra in följande kod och tryck enter: **Set-ExecutionPolicy RemoteSigned -Scope CurrentUser**
+    * Därefter kan du köra kommandot igen: **nodemon index.js**
 
 # 
 ## Kodstandard och arbetsverktyg
