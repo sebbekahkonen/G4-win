@@ -1,5 +1,5 @@
 <template>
-	<v-container> 
+	<v-container>
 		<v-card class="justify-center mx-auto" width="100%">
 			<h1 class="text-center">Boka din resa här!</h1>
 			<form>
@@ -11,9 +11,9 @@
 			</v-col>
 			<div v-for="(stationSingle, i) in singleStation" :key="i">
 				{{ stationSingle.AdvertisedLocationName }}
-			</div>			
+			</div>
 		</v-card>
-		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">	
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
 			<v-col class="pa-0 mt-3">
 				<v-card>
 					<div class="flex-center">
@@ -61,11 +61,11 @@ export default {
 		timeFormatted: '',
 		timePick: []
 	}),
-	created() {
-		vue.nextTick(this.showTimeLabel());
-	},
 	computed: {
 		...mapGetters('bookingStore', ['getAllStations'])
+	},
+	created() {
+		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations']),
@@ -74,14 +74,14 @@ export default {
 			this.getStations(this.search.stationSearch);
 			console.log(this.getAllStations);
 		},
-		
+
 
 		showTimeLabel() {
 			let hours = new Date().getHours();
 			let minutes = new Date().getMinutes();
 
 			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
-			
+
 			for (let i=hours; i<24; i++) {
 				this.timePick.push(`${hours++}:00`);
 			}
@@ -91,7 +91,7 @@ export default {
 			// 		this.timePick.push(i);
 			// 	}
 			// }
-			
+
 			console.log(this.timeFormatted);
 			console.log(this.timePick);
 
@@ -99,7 +99,7 @@ export default {
 		testClick() {
 			console.log(this.date.toLocaleDateString());
 			// this.showTimeLabel();
-		
+
 		},
 		testSearch() {
 			if (!this.isClicked && this.search.stationSearch.length > 0) {
