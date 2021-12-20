@@ -1,5 +1,5 @@
 <template>
-	<v-container> 
+	<v-container>
 		<v-card class="justify-center mx-auto" width="100%">
 			<h1 class="text-center">Boka din resa här!</h1>
 			<form>
@@ -12,9 +12,9 @@
 			</v-col>
 			<div v-for="(stationSingle, i) in singleStation" :key="i">
 				{{ stationSingle.AdvertisedLocationName }}
-			</div>			
+			</div>
 		</v-card>
-		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">	
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
 			<v-col class="pa-0 mt-3">
 				<v-card>
 					<div class="flex-center">
@@ -122,7 +122,7 @@ export default {
 			let minutes = new Date().getMinutes();
 
 			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
-			
+
 			for (let i=hours; i<24; i++) {
 				this.timePick.push(`${hours++}:00`);
 			}
