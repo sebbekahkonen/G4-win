@@ -16,7 +16,12 @@
 - Vue: https://vuejs.org/v2/guide/
 - Vuetify: https://vuetifyjs.com/en/getting-started/installation/
 - ESLint: https://eslint.org/docs/user-guide/getting-started
-- Fyller på allt eftersom
+- Nodemon (För att starta Backend)
+    * cd backend 
+    * npm install
+    * istället för **npm start** skriv **nodemon index.js** alternativt den .js fil du vill starta.
+    * Om du får Execution Policy problem: Öppna Powershell i admin-läge (högerklicka, kör i administratörsläge) => Klistra in följande kod och tryck enter: **Set-ExecutionPolicy RemoteSigned -Scope CurrentUser**
+    * Därefter kan du köra kommandot igen: **nodemon index.js**
 
 # 
 ## Kodstandard och arbetsverktyg
