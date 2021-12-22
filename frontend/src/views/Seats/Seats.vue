@@ -18,7 +18,10 @@
 		</v-card>
 		<div class="seat-container">
 			<div v-for="seats in nrOfSeats" :key="seats" class="seat-booking">
-				<v-icon v-model="specificSeat" :color="icon.color" @click="testFunction(seats)">{{ icon.name }}</v-icon>
+				<div :id="seats" class="seat-availability" @click="setClicked">
+					<span>{{ seats + 1 }}</span>
+				</div>
+				<!-- <v-icon :id="seats" v-model="specificSeat" :color="isClicked?'red':'green'" @click="setClicked">{{ icon.name }}</v-icon> -->
 			</div>
 		</div>
 	</v-container>
@@ -29,15 +32,15 @@ export default {
 	data: () =>  ({
 		noOfWagons: 1,
 		nrOfSeats: [],
-		specificSeat: '',
-		icon: {
-			name: 'mdi-checkbox-blank-circle-outline',
-			color: 'green'
-		},
-		colors: {
-			green: 'green',
-			red: 'red'
-		}
+		isClicked: false
+		// icon: {
+		// 	name: 'mdi-checkbox-blank-circle-outline',
+		// 	color: 'green'
+		// },
+		// colors: {
+		// 	green: 'green',
+		// 	red: 'red'
+		// }
 	}),
 	created() {
 		vue.nextTick(this.fillSeatArr());
@@ -48,29 +51,21 @@ export default {
 				this.nrOfSeats.push(i);
 			}
 		},
-		testFunction(seats) {
-			this.specificSeat = seats;
-			// console.log(e.target.value);
-			// if(seats) {
-			// 	this.specificSeat = seats; 
-			// }
-			
-			// if(this.specificSeat === seats) {
-			// 	this.icon.color = this.colors.red;
-			// } else if (this.specificSeat !== seats) {
-			// 	this.icon.color = this.colors.green;
-			// }
+		setClicked(event) {
+			let seatID = event.currentTarget.id;
+			let seatToChange = document.getElementById(`${seatID}`);
 
-			console.log(this.specificSeat);
-		},
-		bookSeats() {
-
-			if(this.icon.color === this.colors.green) {
-				this.icon.color = this.colors.red;
+			if(!this.isClicked) {
+				this.isClicked = true;
+				seatToChange.style.backgroundColor = 'red';
 			} else {
-				this.icon.color = this.colors.green;
-			}
+				this.isClicked = false;
+				seatToChange.style.backgroundColor = 'green';
+			}	
+
+			console.log(this.isClicked);
 		},
+		
 		increaseWagons() {	
 			if(this.noOfWagons != 7) 
 				this.noOfWagons += 1;		
@@ -93,7 +88,7 @@ export default {
 	display: grid;
 	grid-template-columns: 12px 50px 12px 12px;
 	grid-template-rows: 40px 10px 40px 10px 40px 10px 40px 10px;
-	column-gap: 10px;
+	column-gap: 15px;
 	row-gap: 20px;
 	justify-content: center;
 }
@@ -103,5 +98,17 @@ export default {
 }
 .seats {
 	cursor: pointer;
+}
+.seat-availability {
+	display: flex;
+	justify-content: center;
+	background-color: green;
+	min-width: 25px;
+	border: 1px solid rgb(107, 107, 107);
+	border-bottom-right-radius: 40%;
+	border-bottom-left-radius: 40%;
+}
+.seat-availability > span {
+	color: white;
 }
 </style>
