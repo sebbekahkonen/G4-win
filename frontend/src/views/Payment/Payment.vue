@@ -17,28 +17,30 @@
 					<h3 class="text-center">Ankomst: {{ arrival }}</h3>
 				</v-flex>
 			</v-layout>
-			<StripeElementCard />
-			<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
-			<!-- <stripe-checkout
-				ref="checkoutRef"
-				mode="payment"
-				:pk="publishableKey"
-				:line-items="lineItems"
-				:success-url="successURL"
-				:cancel-url="cancelURL"
-				@loading="v => loading = v"
-			/> -->
+			<v-col>
+				<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
+			</v-col>
+			<v-col class="text-center">
+				<stripe-checkout v-if="isTrue"
+					ref="checkoutRef"
+					mode="payment"
+					:pk="publishableKey"
+					:line-items="lineItems"
+					:success-url="successUrl"
+					:cancel-url="cancelUrl"
+					@loading="v => loading = v"
+				/>
+				<v-btn color="primary" @click="redirect">Betala</v-btn>
+			</v-col>
 		</v-card>
 	</div>
 </template>
 <script>
-// import { StripeCheckout } from '@vue-stripe/vue-stripe';
-import { StripeElementCard } from '@vue-stripe/vue-stripe';
+import { StripeCheckout } from '@vue-stripe/vue-stripe';
+import { publishableKey } from '@/../shared/config.json';
 export default {
-	
 	components: {
-		// StripeCheckout,
-		StripeElementCard
+		StripeCheckout
 	},
 	data: () => ({
 		from: 'Stockholm',
@@ -46,17 +48,25 @@ export default {
 		date: '2021-12-14',
 		departure: '10:00',
 		arrival: '13:00',
-		loading: false,
-		lineItems: [
-			{
-				price: 'some-price-id', // The id of the one-time price you created in your Stripe dashboard
-				quantity: 1
-			}
-		],
-		successURL: 'your-success-url',
-		cancelURL: 'your-cancel-url',
-		publishableKey: process.env.STRIPE_PUBLISHABLE_KEY
-	})
+		isTrue: false,
+		successUrl: 'http://localhost:8080/confirmation',
+		cancelUrl: 'http://localhost:8080/payment',
+		lineItems: [{
+			price: 'price_1K9YroAsS2e6kWH4bq2NgQkO',
+			quantity: 1
+		}],
+		publishableKey:  publishableKey
+	}),
+
+	mounted() {
+		this.isTrue = true;
+	},
+	methods: {
+		redirect() {
+			this.$refs.checkoutRef.redirectToCheckout();
+		}
+	}
+
 };
 </script>
 <style scoped>
