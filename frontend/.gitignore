@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+frontend/shared/config.json
+
 
 
 # local env files

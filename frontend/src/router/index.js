@@ -3,13 +3,16 @@ import VueRouter from 'vue-router';
 import Booking from '@/views/Booking/routes.js';
 import TrainDepartures from '@/views/TrainDepartures/routes.js';
 import TestAPI from '@/views/TestAPI/routes.js';
+import Payment from '@/views/Payment/routes.js';
+
 
 Vue.use(VueRouter);
 
 const routes = [
 	...Booking,
 	...TrainDepartures,
-	...TestAPI
+	...TestAPI,
+	...Payment
 ];
 const router = new VueRouter({
 	mode: 'history',

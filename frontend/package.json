@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@vue-stripe/vue-stripe": "^4.2.9",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "v-calendar": "^2.3.4",
