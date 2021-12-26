@@ -1,5 +1,9 @@
 <template>
 	<v-container>
+		<v-btn depressed small class="mb-4 pl-0 white" @click="nextPage()">
+			<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
+			Tillbaka
+		</v-btn>
 		<v-row>
 			<v-col align="center">
 				Från: Göteborg C
@@ -32,7 +36,9 @@ export default {
 	data: () =>  ({
 		noOfWagons: 1,
 		nrOfSeats: [],
-		isClicked: false
+		isClicked: false,
+		nrOfTickets: 3,
+		chosenSeats: []
 		// icon: {
 		// 	name: 'mdi-checkbox-blank-circle-outline',
 		// 	color: 'green'
@@ -46,6 +52,9 @@ export default {
 		vue.nextTick(this.fillSeatArr());
 	},
 	methods: {
+		nextPage() {
+			this.$router.push('/departures');
+		},
 		fillSeatArr() {
 			for(let i=0; i<40; i++) {
 				this.nrOfSeats.push(i);
@@ -55,15 +64,26 @@ export default {
 			let seatID = event.currentTarget.id;
 			let seatToChange = document.getElementById(`${seatID}`);
 
-			if(!this.isClicked) {
-				this.isClicked = true;
-				seatToChange.style.backgroundColor = 'red';
+			// if(!this.isClicked) {
+			// 	this.isClicked = true;
+			// 	seatToChange.style.backgroundColor = 'red';
+			// } else {
+			// 	this.isClicked = false;
+			// 	seatToChange.style.backgroundColor = 'green';
+			// }
+			if(this.chosenSeats.indexOf(seatID) === -1) {
+				if(this.chosenSeats.length < this.nrOfTickets) {
+					seatToChange.style.backgroundColor = 'red';
+					this.chosenSeats.push(seatID);
+				} else {
+					confirm(`Du kan bara välja ${this.nrOfTickets}`);
+				} 
 			} else {
-				this.isClicked = false;
 				seatToChange.style.backgroundColor = 'green';
-			}	
-
-			console.log(this.isClicked);
+				this.chosenSeats.splice(this.chosenSeats.indexOf(seatID), 1);
+			}
+	
+			console.log(this.chosenSeats);
 		},
 		
 		increaseWagons() {	
@@ -88,8 +108,8 @@ export default {
 	display: grid;
 	grid-template-columns: 12px 50px 12px 12px;
 	grid-template-rows: 40px 10px 40px 10px 40px 10px 40px 10px;
-	column-gap: 15px;
-	row-gap: 20px;
+	column-gap: 25px;
+	row-gap: 25px;
 	justify-content: center;
 }
 .seat-booking {
@@ -103,7 +123,7 @@ export default {
 	display: flex;
 	justify-content: center;
 	background-color: green;
-	min-width: 25px;
+	min-width: 35px;
 	border: 1px solid rgb(107, 107, 107);
 	border-bottom-right-radius: 40%;
 	border-bottom-left-radius: 40%;
