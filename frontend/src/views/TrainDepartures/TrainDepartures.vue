@@ -10,45 +10,48 @@
 				</v-flex>
 			</v-layout>
 			<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
-
 			<v-data-table
 				dark
 				:headers="trainHeaders"
 				:items="train"
+				:single-expand="singleExpand"
 				:expanded.sync="expanded"
 				item-key="name"
 				show-expand
 				class="elevation-10 ma-2"
+				@click:row="expandRow"
+				@item-expanded="onExpand"
+				@row-clicked="onExpand"
 			>
 				<template v-slot:expanded-item="{ headers }">
 					<td :colspan="headers.length" width="400">
 						<v-col>
 							<v-layout row wrap class="pt-5 flex text-right" justify-space-between>
 								<h4>Ungdom/Student(100kr/st):</h4>
-								<v-icon value="-100" @click="changePrice($event)">mdi-account-minus-outline</v-icon>
-								{{ student }}
-								<v-icon value="+100" @click="changePrice($event)">mdi-account-plus-outline</v-icon>
+								<v-icon ref="student" value="-100" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
+								{{ tickets.student.value }}
+								<v-icon ref="student" value="+100" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
 							</v-layout>
 						</v-col>
 						<v-col>
 							<v-layout row wrap class="pt-5 flex text-right" justify-space-between>
 								<h4 class="mr-16">Vuxen(139kr/st):</h4>
-								<v-icon value="-139" @click="changePrice($event)">mdi-account-minus-outline</v-icon>
-								{{ adults }}
-								<v-icon value="+139" @click="changePrice($event)">mdi-account-plus-outline</v-icon>
+								<v-icon ref="adult" value="-139" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
+								{{ tickets.adult.value }}
+								<v-icon ref="adult" value="+139" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
 							</v-layout>
 						</v-col>
 						<v-col>
 							<v-layout row wrap class="pt-5 flex text-right" justify-space-between>
 								<h4 class="mr-12">Pensionär(79kr/st):</h4>
-								<v-icon value="-79" @click="changePrice($event)">mdi-account-minus-outline</v-icon>
-								{{ seniors }}
-								<v-icon value="79" @click="changePrice($event)">mdi-account-plus-outline</v-icon>  
+								<v-icon ref="senior" value="-79" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
+								{{ tickets.senior.value }}
+								<v-icon ref="senior" value="79" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
 							</v-layout>
 						</v-col>
 						<v-col>
 							<v-layout row wrap class="pt-5">
-								<h5 style="color: red;">{{ errorCode }}</h5>
+								<h4 style="color: red;">{{ errorCode }}</h4>
 							</v-layout>
 						</v-col>
 						<v-col>
@@ -60,40 +63,6 @@
 					</td>
 				</template>
 			</v-data-table>
-
-
-			<!-- 
-			<v-simple-table dark class="ma-2" :expanded.sync="expanded">
-				<template v-slot:default>
-					<thead>
-						<tr>
-							<th class="" text-align="center">
-								Namn
-							</th>
-							<th class="" text-align="center">
-								Avgång
-							</th>
-							<th class="" text-align="center" />
-						</tr>
-					</thead>
-					<tbody>
-						<tr
-							v-for="train in train"
-							:key="train.name"
-						>
-							<td>{{ train.name }}</td>
-							<td>{{ train.departure }}</td>
-							
-
-							<td>
-								<v-col class="text-right">
-									<v-btn align-content="right" @click="chosen = !chosen">Välj</v-btn>
-								</v-col>
-							</td>
-						</tr>
-					</tbody>
-				</template>
-			</v-simple-table> -->
 		</v-card>
 	</div>
 </template>
@@ -106,9 +75,12 @@ export default {
 		date: '2021-12-14',
 		chosen: false,
 		expanded: [],
-		student: 0,
-		adults: 0,
-		seniors: 0,
+		singleExpand: true,
+		tickets: {
+			student: {price: 0, value: 0},
+			adult: {price: 0, value: 0},
+			senior: {price: 0, value: 0}
+		},
 		price: 0,
 		errorCode: '',
 		trainHeaders: [
@@ -140,37 +112,99 @@ export default {
 			}
 		]
 	}),
-	computed: {
-		chosenClicked() {
-			return !this.chosen;
-		}
-	},
 	methods: {
+		onExpand() {
+			Object.keys(this.tickets).forEach(key => {
+				Object.keys(this.tickets[key]).forEach(val => {
+					this.tickets[key][val] = 0;
+				});
+			});
+			this.price = 0;
+		},
+		expandRow(e) {
+			this.onExpand();
+			this.expanded = [e];
+		},
 		nextView() {
-			if(this.price >= 100) {
+			if(this.price >= 79) {
 				this.errorCode = '';
 				this.$router.push('/nextModule');
 			} else{
 				this.errorCode = 'Var vänlig välj minst 1 biljett';
 			}
 		},
-		changePrice(e) {
+
+		changePrice(e, type) {
 			let value = parseInt(e.target.value);
 
-			if(value < 0) {
-				let val = Math.abs(value);
 
-				this.price = this.price - val;
+			if(type.includes('student')) {
+
+				if(value < 0 && this.tickets.student.value > 0) {
+					let val = Math.abs(value);
+
+					this.tickets.student.price = this.tickets.student.price - val;
+					this.tickets.student.value--;
+					
+				}
+ 
+				if(value > 0) {
+					this.tickets.student.price = this.tickets.student.price + value;
+					this.tickets.student.value++;
+
+				}
+
+
+
+				this.price = this.tickets.student.price + this.tickets.adult.price + this.tickets.senior.price;
 
 				return;
 			}
 
-			if(value > 0) {
-				this.price = this.price + value;
+			if(type.includes('adult')) {
+				if(value < 0 && this.tickets.adult.value > 0) {
+					let val = Math.abs(value);
+
+					this.tickets.adult.price = this.tickets.adult.price - val;
+					this.tickets.adult.value--;
+
+				}
+ 
+				if(value > 0) {
+					this.tickets.adult.price = this.tickets.adult.price + value;
+					this.tickets.adult.value++;
+
+				}
+
+
+				this.price = this.tickets.student.price + this.tickets.adult.price + this.tickets.senior.price;
 
 				return;
-
 			}
+
+			if(type.includes('senior')) {
+				if(value < 0 && this.tickets.senior.value > 0) {
+					let val = Math.abs(value);
+
+					this.tickets.senior.price = this.tickets.senior.price - val;
+					this.tickets.senior.value--;
+
+				}
+ 
+				if(value > 0) {
+					this.tickets.senior.price = this.tickets.senior.price + value;
+					this.tickets.senior.value++;
+			
+				}
+
+
+				this.price = this.tickets.student.price + this.tickets.adult.price + this.tickets.senior.price;
+
+				return;
+			}
+			
+			
+		
 		}
 	}
 };
