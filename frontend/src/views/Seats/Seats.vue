@@ -28,6 +28,15 @@
 				<!-- <v-icon :id="seats" v-model="specificSeat" :color="isClicked?'red':'green'" @click="setClicked">{{ icon.name }}</v-icon> -->
 			</div>
 		</div>
+		<div id="popup-modal" class="modal">
+			<div class="modal-content">
+				<p>Du kan bara välja {{ nrOfTickets }} platser.</p>
+				<v-btn id="close-modal" depressed class="mb-4" color="primary">
+					Stäng
+					<v-icon class="ml-2">{{ 'mdi-close-circle' }}</v-icon>
+				</v-btn>
+			</div>
+		</div>
 	</v-container>
 </template>
 <script>
@@ -39,14 +48,6 @@ export default {
 		isClicked: false,
 		nrOfTickets: 3,
 		chosenSeats: []
-		// icon: {
-		// 	name: 'mdi-checkbox-blank-circle-outline',
-		// 	color: 'green'
-		// },
-		// colors: {
-		// 	green: 'green',
-		// 	red: 'red'
-		// }
 	}),
 	created() {
 		vue.nextTick(this.fillSeatArr());
@@ -76,7 +77,18 @@ export default {
 					seatToChange.style.backgroundColor = 'red';
 					this.chosenSeats.push(seatID);
 				} else {
-					confirm(`Du kan bara välja ${this.nrOfTickets}`);
+					// confirm(`Du kan bara välja ${this.nrOfTickets}`);
+					let modal = document.getElementById('popup-modal');
+
+					modal.style.display = 'block';
+
+					window.onclick = (e) => {
+						if(e.target === modal) {
+							modal.style.display = 'none';
+							console.log('Clicked!');
+						}
+					};
+
 				} 
 			} else {
 				seatToChange.style.backgroundColor = 'green';
@@ -130,5 +142,27 @@ export default {
 }
 .seat-availability > span {
 	color: white;
+}
+.modal {
+	display: none;
+	position: fixed;
+	left: 0;
+	top: 50%;
+	z-index: 1;
+	width: 100%;
+	height: 25%;
+	overflow: auto;
+	background-color: rgba(25,118,210, 0.8);
+}
+.modal-content {
+	text-align: center;
+	background-color: rgb(238, 238, 238);
+	margin: 8% auto;
+	border: 1px solid rgba(25,118,210, 1.0);
+	width: 80%;
+}
+.modal-content > p {
+	margin-top: 15px;
+	font-size: 18px;
 }
 </style>
