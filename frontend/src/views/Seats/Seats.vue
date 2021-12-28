@@ -31,7 +31,7 @@
 		<div id="popup-modal" class="modal">
 			<div class="modal-content">
 				<p>Du kan bara välja {{ nrOfTickets }} platser.</p>
-				<v-btn id="close-modal" depressed class="mb-4" color="primary">
+				<v-btn id="close-modal" depressed class="mb-4" color="primary" @click="testClick">
 					Stäng
 					<v-icon class="ml-2">{{ 'mdi-close-circle' }}</v-icon>
 				</v-btn>
@@ -53,6 +53,9 @@ export default {
 		vue.nextTick(this.fillSeatArr());
 	},
 	methods: {
+		testClick() {
+			document.getElementById('popup-modal').style.display = 'none';
+		},
 		nextPage() {
 			this.$router.push('/departures');
 		},
@@ -65,36 +68,27 @@ export default {
 			let seatID = event.currentTarget.id;
 			let seatToChange = document.getElementById(`${seatID}`);
 
-			// if(!this.isClicked) {
-			// 	this.isClicked = true;
-			// 	seatToChange.style.backgroundColor = 'red';
-			// } else {
-			// 	this.isClicked = false;
-			// 	seatToChange.style.backgroundColor = 'green';
-			// }
 			if(this.chosenSeats.indexOf(seatID) === -1) {
 				if(this.chosenSeats.length < this.nrOfTickets) {
 					seatToChange.style.backgroundColor = 'red';
 					this.chosenSeats.push(seatID);
 				} else {
-					// confirm(`Du kan bara välja ${this.nrOfTickets}`);
 					let modal = document.getElementById('popup-modal');
 
 					modal.style.display = 'block';
 
 					window.onclick = (e) => {
-						if(e.target === modal) {
+						if(e.target == modal) {
 							modal.style.display = 'none';
 							console.log('Clicked!');
 						}
 					};
-
 				} 
 			} else {
 				seatToChange.style.backgroundColor = 'green';
 				this.chosenSeats.splice(this.chosenSeats.indexOf(seatID), 1);
 			}
-	
+			
 			console.log(this.chosenSeats);
 		},
 		
