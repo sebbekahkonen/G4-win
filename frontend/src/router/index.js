@@ -5,6 +5,7 @@ import TrainDepartures from '@/views/TrainDepartures/routes.js';
 import TestAPI from '@/views/TestAPI/routes.js';
 import Confirmation from '@/views/Confirmation/routes.js';
 import Payment from '@/views/Payment/routes.js';
+import SearchTicket from '@/views/SearchTicket/routes.js';
 
 
 Vue.use(VueRouter);
@@ -14,7 +15,8 @@ const routes = [
 	...TrainDepartures,
 	...TestAPI,
 	...Confirmation,
-	...Payment
+	...Payment,
+	...SearchTicket
 ];
 const router = new VueRouter({
 	mode: 'history',
