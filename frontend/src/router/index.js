@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Booking from '@/views/Booking/routes.js';
 import TrainDepartures from '@/views/TrainDepartures/routes.js';
 import TestAPI from '@/views/TestAPI/routes.js';
+import Seats from '@/views/Seats/routes.js';
 import Confirmation from '@/views/Confirmation/routes.js';
 import Payment from '@/views/Payment/routes.js';
 import SearchTicket from '@/views/SearchTicket/routes.js';
@@ -14,6 +15,7 @@ const routes = [
 	...Booking,
 	...TrainDepartures,
 	...TestAPI,
+	...Seats,
 	...Confirmation,
 	...Payment,
 	...SearchTicket
