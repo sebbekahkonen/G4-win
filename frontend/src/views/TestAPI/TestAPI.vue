@@ -3,8 +3,14 @@
 		<h1 class="text-center">Testsida för API tester</h1>
 		<form>
 			<v-text-field v-model="search.stationSearch" label="Till" outlined clearable />
+			<v-text-field v-model="search.arrivalsSearch" label="Ankomster" outlined clearable />
+			<v-text-field v-model="search.departuresSearch" label="Avgångar" outlined clearable />
 		</form>
 		<v-btn color="red" @click="testSearch">Sök resa</v-btn>
+		<v-btn color="red" @click="requestArrival">Ankomster</v-btn>
+		<v-btn color="red" @click="requestDeparture">Avgångar</v-btn>
+
+
 		<div v-for="(stationSingle, i) in singleStation" :key="i">
 			{{ stationSingle.AdvertisedLocationName }}
 		</div>
@@ -22,11 +28,14 @@
 
 <script>
 import vue from 'vue';
+import { mapActions } from 'vuex';
 export default {
 	data: () => ({
 		trainStations: [],
 		search: {
-			stationSearch: ''
+			stationSearch: '',
+			arrivalsSearch: 'G',
+			departuresSearch: 'G'
 		},
 		singleStation: ''
 	}),
@@ -34,6 +43,20 @@ export default {
 		vue.nextTick(this.testApi());
 	},
 	methods: {
+		...mapActions('bookingStore', ['getStations', 'getDepartures', 'getArrivals']),
+
+		/* getArrival */
+		requestArrival() {
+			this.getArrivals(this.search.arrivalsSearch);
+		},
+
+		/* getDeparture */
+		requestDeparture() {
+			this.getDepartures(this.search.departuresSearch);
+		},
+
+
+
 		testApi() {
 			let body = 
      '<REQUEST>' +
