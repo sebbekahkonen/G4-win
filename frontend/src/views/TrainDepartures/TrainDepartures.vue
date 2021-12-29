@@ -1,6 +1,10 @@
 <template>
 	<div>
 		<v-card class="justify-center  mt-16 ml-2 mr-2 elevation-16">
+			<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
+				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
+				Tillbaka
+			</v-btn>
 			<v-layout row wrap class="pt-5">
 				<v-flex xs6>
 					<h3 class="text-center">Från: {{ from }}</h3>
@@ -113,6 +117,9 @@ export default {
 		]
 	}),
 	methods: {
+		returnPage() {
+			this.$router.push('/');
+		},
 		onExpand() {
 			Object.keys(this.tickets).forEach(key => {
 				Object.keys(this.tickets[key]).forEach(val => {
@@ -128,7 +135,7 @@ export default {
 		nextView() {
 			if(this.price >= 79) {
 				this.errorCode = '';
-				this.$router.push('/nextModule');
+				this.$router.push('/seats');
 			} else{
 				this.errorCode = 'Var vänlig välj minst 1 biljett';
 			}

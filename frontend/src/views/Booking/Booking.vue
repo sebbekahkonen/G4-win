@@ -1,19 +1,13 @@
 <template>
 	<v-container>
-		<v-card class="justify-center mx-auto" width="100%">
-			<h1 class="text-center">Boka din resa här!</h1>
-			<form>
-				<v-text-field v-model="search.departureStation" class="pa-1" label="Från" outlined clearable />
-				<v-text-field v-model="search.arrivalStation" label="Till" class="pa-1" outlined clearable />
-			</form>
-			<v-col align="center">
-				<v-btn class="blue darken-1 white--text" @click="testWithStore">Testa store</v-btn>
-				<v-btn class="blue darken-1 white--text" @click="testSearch">Sök resa</v-btn>
-			</v-col>
-			<div v-for="(stationSingle, i) in singleStation" :key="i">
-				{{ stationSingle.AdvertisedLocationName }}
-			</div>
-		</v-card>
+		<h1 class="text-center">Vart vill du resa?</h1>
+		<form>
+			<v-text-field v-model="search.departureStation" class="pa-1" label="Från" outlined clearable />
+			<v-text-field v-model="search.arrivalStation" class="pa-1" label="Till" outlined clearable />
+		</form>
+		<v-col align="center" class="pt-0">
+			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
+		</v-col>	
 		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
 			<v-col class="pa-0 mt-3">
 				<v-card>
@@ -25,12 +19,12 @@
 						<v-radio label="Avgång" value="Avgång" @click="getValueExit('Avgång')" />
 						<v-radio label="Ankomst" value="Ankomst" @click="getValueExit('Ankomst')" />
 					</v-radio-group>
-					<vc-date-picker v-model="departureDate" is-expanded @dayclick="departureDateClick" />
+					<vc-date-picker v-model="departureDate" :min-date="new Date()" is-expanded @dayclick="departureDateClick" />
 				</v-card>
 			</v-col>
 			<v-col class="pa-0 mt-3">
 				<v-card-actions class="justify-center">
-					<v-btn color="black" text @click="displayArrivalCalendar">
+					<v-btn color="blue" class="mb-4" outlined plain @click="displayArrivalCalendar">
 						Vill du boka återresa?
 						<v-icon right>{{ displayArrival ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</v-btn>
@@ -44,9 +38,9 @@
 						<v-radio label="Avgång" value="Avgång" @click="getValueEntry('Avgång')" />
 						<v-radio label="Ankomst" value="Ankomst" @click="getValueEntry('Ankomst')" />
 					</v-radio-group>
-					<vc-date-picker v-model="arrivalDate" class="mt-0" is-expanded @dayclick="arrivalDateClick" />
+					<vc-date-picker v-model="arrivalDate" :min-date="new Date()" class="mt-0" is-expanded @dayclick="arrivalDateClick" />
 				</v-card>
-				<v-btn class="blue darken-1 white--text" small depressed block @click="nextPage">
+				<v-btn class="blue darken-1 white--text mt-4" small depressed block @click="nextPage">
 					Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
 				</v-btn>
 			</v-col>
@@ -147,29 +141,6 @@ export default {
 			if (!this.isClicked && this.search.departureStation.length > 0) {
 				this.isClicked = true;
 			}
-
-			let body =
-		'<REQUEST>' +
-		'<LOGIN authenticationkey=\'7dcd599fb8f3436382d20e4e54ddf57a\' />' +
-		' <QUERY objecttype=\'TrainStation\' schemaversion=\'1\'>' +
-		' <FILTER>' +
-		' <AND> ' +
-					' <EQ name=\'Advertised\' value=\'true\' />' +
-		`<IN name='AdvertisedLocationName' value='${this.search.departureStation}' />` +
-		'</AND> ' +
-		'</FILTER>' +
-		'<INCLUDE>AdvertisedLocationName</INCLUDE>' +
-		'</QUERY> ' +
-		'</REQUEST> ';
-
-			fetch('https://api.trafikinfo.trafikverket.se/v2/data.json', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'text/xml'
-				},
-				body: body
-			}).then(res => res.json())
-				.then(data => this.singleStation = data.RESPONSE.RESULT[0].TrainStation);
 		},
 
 		setDepartureTime(depTime) {

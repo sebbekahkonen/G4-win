@@ -1,6 +1,6 @@
 <template>
 	<v-container>
-		<v-btn depressed small class="mb-4 pl-0 white" @click="nextPage()">
+		<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
 			<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 			Tillbaka
 		</v-btn>
@@ -37,6 +37,9 @@
 				</v-btn>
 			</div>
 		</div>
+		<v-btn class="blue darken-1 white--text mt-4" small depressed block @click="nextPage">
+			Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
+		</v-btn>
 	</v-container>
 </template>
 <script>
@@ -56,8 +59,11 @@ export default {
 		testClick() {
 			document.getElementById('popup-modal').style.display = 'none';
 		},
-		nextPage() {
+		returnPage() {
 			this.$router.push('/departures');
+		},
+		nextPage() {
+			this.$router.push('/payment');
 		},
 		fillSeatArr() {
 			for(let i=0; i<40; i++) {
