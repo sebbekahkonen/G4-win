@@ -1,6 +1,10 @@
 <template>
 	<div>
 		<v-card class="justify-center  mt-16 ml-2 mr-2 elevation-16">
+			<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
+				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
+				Tillbaka
+			</v-btn>
 			<v-layout row wrap class="pt-5">
 				<v-flex xs6>
 					<h3 class="text-center">Från: {{ from }}</h3>
@@ -64,6 +68,9 @@ export default {
 	methods: {
 		redirect() {
 			this.$refs.checkoutRef.redirectToCheckout();
+		},
+		returnPage() {
+			this.$router.push('/seats');
 		}
 	}
 

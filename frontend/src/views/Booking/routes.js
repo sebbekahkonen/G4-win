@@ -1,7 +1,7 @@
 import Booking from './Booking.vue';
 
 export default [{
-	path: '/booking',
+	path: '/',
 	name: 'Booking',
 	component: Booking
 }];
