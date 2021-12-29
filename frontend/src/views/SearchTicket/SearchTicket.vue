@@ -3,6 +3,7 @@
 		<v-card dark height="fit-content" class="justify-center  mt-16 ml-2 mr-2 elevation-16">
 			<v-col class="flex text-center pa-3">
 				<h3>Sök efter din biljett</h3>
+				{{ getAllTickets }}
 			</v-col>
 			<v-text-field v-model="ticketInput" class="pa-10" label="Search.." append-icon="mdi-magnify" @click:append="search" />
 			<v-data-table
@@ -44,6 +45,7 @@
 	</div>
 </template>
 <script>
+import { mapActions, mapGetters } from 'vuex';
 export default {
 	data: () => ({
 		firstAndLast: 'John Doe',
@@ -70,9 +72,14 @@ export default {
 			}
 		]
 	}),
+	computed: {
+		...mapGetters('ticketStore', ['getAllTickets'])
+	},
+
 	methods: {
+		...mapActions('ticketStore', ['getTickets']),
 		search() {
-			
+			this.getTickets(this.ticketInput);
 		},
 
 		onExpand() {
