@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<p>{{ travelObj }}</p>
 		<v-card class="justify-center  mt-16 ml-2 mr-2 elevation-16">
 			<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
 				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
@@ -7,10 +8,10 @@
 			</v-btn>
 			<v-layout row wrap class="pt-5">
 				<v-flex xs6>
-					<h3 class="text-center">Från: {{ from }}</h3>
+					<h3 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h3>
 				</v-flex>
 				<v-flex xs6>
-					<h3 class="text-center">Till: {{ to }}</h3>
+					<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				</v-flex>
 			</v-layout>
 			<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
@@ -72,11 +73,11 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
 	data: () => ({
-		from: 'Stockholm',
-		to: 'Göteborg',
-		date: '2021-12-14',
+		from: '',
+		to: '',
 		chosen: false,
 		expanded: [],
 		singleExpand: true,
@@ -116,10 +117,14 @@ export default {
 			}
 		]
 	}),
+	computed: {
+		...mapState('travelStore', ['travelObj', 'date'])
+	},
 	methods: {
 		returnPage() {
 			this.$router.push('/');
 		},
+
 		onExpand() {
 			Object.keys(this.tickets).forEach(key => {
 				Object.keys(this.tickets[key]).forEach(val => {
