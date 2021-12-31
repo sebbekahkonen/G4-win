@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<p>{{ travelObj }}</p>
 		<v-card class="justify-center  mt-16 ml-2 mr-2 elevation-16">
 			<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
 				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
@@ -76,8 +75,6 @@
 import { mapState } from 'vuex';
 export default {
 	data: () => ({
-		from: '',
-		to: '',
 		chosen: false,
 		expanded: [],
 		singleExpand: true,

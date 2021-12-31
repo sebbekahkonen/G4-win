@@ -7,10 +7,10 @@
 			</v-btn>
 			<v-layout row wrap class="pt-5">
 				<v-flex xs6>
-					<h3 class="text-center">Från: {{ from }}</h3>
+					<h3 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h3>
 				</v-flex>
 				<v-flex xs6>
-					<h3 class="text-center">Till: {{ to }}</h3>
+					<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				</v-flex>
 			</v-layout>
 			<v-layout row wrap class="pt-5">
@@ -42,14 +42,12 @@
 <script>
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { publishableKey } from '@/../shared/config.json';
+import { mapState } from 'vuex';
 export default {
 	components: {
 		StripeCheckout
 	},
 	data: () => ({
-		from: 'Stockholm',
-		to: 'Göteborg',
-		date: '2021-12-14',
 		departure: '10:00',
 		arrival: '13:00',
 		isTrue: false,
@@ -61,6 +59,9 @@ export default {
 		}],
 		publishableKey:  publishableKey
 	}),
+	computed: {
+		...mapState('travelStore', ['travelObj', 'date'])
+	},
 
 	mounted() {
 		this.isTrue = true;
