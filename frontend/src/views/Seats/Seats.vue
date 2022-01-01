@@ -6,26 +6,39 @@
 		</v-btn>
 		<v-row>
 			<v-col align="center">
-				Från: Göteborg C
+				<!-- Från: {{ travelObj.departure.departureDestination }} -->
+				Från: Göteborg
 			</v-col>
 			<v-col align="center">
-				Till: Stockholm C
+				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
+				Till: Stockholm
 			</v-col>
 		</v-row>
 		<v-col align="center">
-			Valt datum: 2021-12-20
+			<!-- Valt datum: {{ date }} -->
+			Valt datum: 2022-01-01
 		</v-col>
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
-			<v-btn id="custom-disabled" text disabled>{{ 'Vagn ' + noOfWagons }}</v-btn>
+			<v-btn v-if="noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
+			<v-btn v-else id="custom-disabled" text disabled>{{ 'Vagn ' + noOfWagons }}</v-btn>
 			<v-icon right large @click="increaseWagons">{{ 'mdi-chevron-right' }}</v-icon>
 		</v-card>
 		<div class="seat-container">
-			<div v-for="seats in nrOfSeats" :key="seats" class="seat-booking">
+			<div v-if="noOfWagons === 3" class="bistro">
+				<div class="bistro-seats" />
+				<div class="bistro-seats" />
+				<div class="bistro-seats" />
+				<div class="bistro-seats" />
+				<div class="shop"><v-icon align="center" large>{{ 'mdi-silverware-variant' }}</v-icon></div>
+				<div />
+				<div class="bistro-seats" />
+				<div class="bistro-seats" />
+			</div>
+			<div v-for="seats in nrOfSeats" v-else :key="seats" class="seat-booking">	
 				<div :id="seats" class="seat-availability" @click="setClicked">
 					<span>{{ seats + 1 }}</span>
 				</div>
-				<!-- <v-icon :id="seats" v-model="specificSeat" :color="isClicked?'red':'green'" @click="setClicked">{{ icon.name }}</v-icon> -->
 			</div>
 		</div>
 		<div id="popup-modal" class="modal">
@@ -44,17 +57,22 @@
 </template>
 <script>
 import vue from 'vue';
+import { mapState } from 'vuex';
 export default {
 	data: () =>  ({
 		noOfWagons: 1,
 		nrOfSeats: [],
+		bistroSeats: [10],
 		isClicked: false,
 		nrOfTickets: 3,
 		chosenSeats: []
 	}),
+	computed: {
+		...mapState('travelStore', ['travelObj', 'date'])
+	},
 	created() {
 		vue.nextTick(this.fillSeatArr());
-	},
+	},	
 	methods: {
 		testClick() {
 			document.getElementById('popup-modal').style.display = 'none';
@@ -142,6 +160,32 @@ export default {
 }
 .seat-availability > span {
 	color: white;
+}
+.bistro {
+	margin-left: 90px;
+	display: grid;
+	grid-template-columns: 30px 30px;
+	grid-template-rows: 40px 40px 60px;
+	column-gap: 50px;
+	row-gap: 50px;
+	justify-content: center;
+
+}
+.bistro-seats {
+	display: flex;
+	justify-content: center;
+	background-color: rgba(44, 88, 44, 0.7);
+	min-height: 60px;
+	border: 1px solid rgb(70, 70, 70);
+	border-radius: 10%;
+}
+.shop {
+	display: flex;
+	justify-content: center;
+	min-height: 80px;
+	min-width: 40px;
+	background-color: rgba(44, 88, 44, 0.5);
+	border: 1px solid rgb(70,70,70);
 }
 .modal {
 	display: none;
