@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
@@ -84,15 +84,20 @@ export default {
 		}
 	}),
 	computed: {
-		...mapGetters('bookingStore', ['getAllStations'])
-
+		...mapGetters('bookingStore', ['getAllStations']),
+		...mapState('travelStore', [ 'count' ])
 	},
 	created() {
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations']),
-
+		increment() {
+			this.$store.commit('travelStore/increment');
+		},
+		decrement() {
+			this.$store.commit('travelStore/decrement');
+		},
 		getValueExit(v) {
 			this.selectedExit = v;
 		},
@@ -160,8 +165,11 @@ export default {
 			this.bookingInformation.returnTrip.arrivalDestination = this.search.departureStation;
 			this.bookingInformation.returnTrip.departureDateTime = `${this.selectedEntry} ${this.arrivalDate.toLocaleDateString()} ${this.arrTime}`;
 			this.bookingInformation.returnTrip.arrivalDateTime = '';
-			console.log(JSON.stringify(this.bookingInformation));
+
+			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
+			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString());
 			this.$router.push({name: 'TrainDepartures'});
+			
 		}
 	}
 };

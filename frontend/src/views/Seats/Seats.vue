@@ -6,14 +6,14 @@
 		</v-btn>
 		<v-row>
 			<v-col align="center">
-				Från: Göteborg C
+				Från: {{ travelObj.departure.departureDestination }}
 			</v-col>
 			<v-col align="center">
-				Till: Stockholm C
+				Till: {{ travelObj.departure.arrivalDestination }}
 			</v-col>
 		</v-row>
 		<v-col align="center">
-			Valt datum: 2021-12-20
+			Valt datum: {{ date }}
 		</v-col>
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
@@ -44,6 +44,7 @@
 </template>
 <script>
 import vue from 'vue';
+import { mapState } from 'vuex';
 export default {
 	data: () =>  ({
 		noOfWagons: 1,
@@ -52,9 +53,12 @@ export default {
 		nrOfTickets: 3,
 		chosenSeats: []
 	}),
+	computed: {
+		...mapState('travelStore', ['travelObj', 'date'])
+	},
 	created() {
 		vue.nextTick(this.fillSeatArr());
-	},
+	},	
 	methods: {
 		testClick() {
 			document.getElementById('popup-modal').style.display = 'none';

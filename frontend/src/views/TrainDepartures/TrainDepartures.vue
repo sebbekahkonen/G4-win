@@ -7,10 +7,10 @@
 			</v-btn>
 			<v-layout row wrap class="pt-5">
 				<v-flex xs6>
-					<h3 class="text-center">Från: {{ from }}</h3>
+					<h3 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h3>
 				</v-flex>
 				<v-flex xs6>
-					<h3 class="text-center">Till: {{ to }}</h3>
+					<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				</v-flex>
 			</v-layout>
 			<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
@@ -72,11 +72,9 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
 	data: () => ({
-		from: 'Stockholm',
-		to: 'Göteborg',
-		date: '2021-12-14',
 		chosen: false,
 		expanded: [],
 		singleExpand: true,
@@ -116,10 +114,14 @@ export default {
 			}
 		]
 	}),
+	computed: {
+		...mapState('travelStore', ['travelObj', 'date'])
+	},
 	methods: {
 		returnPage() {
 			this.$router.push('/');
 		},
+
 		onExpand() {
 			Object.keys(this.tickets).forEach(key => {
 				Object.keys(this.tickets[key]).forEach(val => {
