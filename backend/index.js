@@ -4,6 +4,42 @@ const app = express();
 const driver = require('better-sqlite3');
 //För att connecta till databasen
 const db = driver('./database/traindb.sqlite3');
+const stripe = require('stripe');
+
+const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
+const eventData = { name: '', email: '', receipt_url: '' };
+app.post('/api/user', express.raw({ type: 'application/json' }), (request, response) => {
+	const sig = request.headers['stripe-signature'];
+
+	let event;
+
+	try {
+		event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+	} catch (err) {
+		response.status(400).send(`Webhook Error: ${err.message}`);
+		return;
+	}
+	// Handle the event
+	switch (event.type) {
+		case 'customer.created':
+			eventData.name = event.data.object.name;
+			eventData.email = event.data.object.email;
+			break;
+		case 'checkout.session.completed':
+			response.status(200).send('success');
+			break;
+		case 'charge.succeeded':
+			eventData.receipt_url = event.data.object.receipt_url;
+			console.log(eventData);
+			break;
+		default:
+			console.log(`Unhandled event type ${event.type}`);
+	}
+
+	// Return a 200 response to acknowledge receipt of the event
+
+	response.send();
+});
 
 //Bodyparser för att parsa ihop object
 const bodyParser = require('body-parser');

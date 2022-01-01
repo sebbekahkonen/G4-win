@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 export default {
 	data: () => ({
 		from: 'Stockholm',
@@ -116,7 +117,14 @@ export default {
 			}
 		]
 	}),
+	mounted() {
+		this.changeStudentTickets(0);
+		this.changeAdultTickets(0);
+		this.changeSeniorTickets(0);
+	},
+
 	methods: {
+		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets']),
 		returnPage() {
 			this.$router.push('/');
 		},
@@ -135,6 +143,9 @@ export default {
 		nextView() {
 			if(this.price >= 79) {
 				this.errorCode = '';
+				this.changeStudentTickets(this.tickets.student.value);
+				this.changeAdultTickets(this.tickets.adult.value);
+				this.changeSeniorTickets(this.tickets.senior.value);
 				this.$router.push('/seats');
 			} else{
 				this.errorCode = 'Var vänlig välj minst 1 biljett';

@@ -42,6 +42,7 @@
 <script>
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { publishableKey } from '@/../shared/config.json';
+import { mapGetters } from 'vuex';
 export default {
 	components: {
 		StripeCheckout
@@ -55,18 +56,35 @@ export default {
 		isTrue: false,
 		successUrl: 'http://localhost:8080/confirmation',
 		cancelUrl: 'http://localhost:8080/payment',
-		lineItems: [{
-			price: 'price_1K9YroAsS2e6kWH4bq2NgQkO',
-			quantity: 1
-		}],
+		lineItems: [
+		],
 		publishableKey:  publishableKey
 	}),
+
+	computed: {
+		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets'])
+	},
 
 	mounted() {
 		this.isTrue = true;
 	},
 	methods: {
 		redirect() {
+			if(this.getSeniorTickets != 0) {
+				//Senior ticket
+				this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
+			}
+
+			if(this.getAdultTickets != 0) {
+				//Adult ticket
+				this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
+			}
+
+			if(this.getStudentTickets != 0) {
+				//Student ticket
+				this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
+			}
+
 			this.$refs.checkoutRef.redirectToCheckout();
 		},
 		returnPage() {
