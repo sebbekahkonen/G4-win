@@ -24,20 +24,38 @@
 			<v-btn v-else id="custom-disabled" text disabled>{{ 'Vagn ' + noOfWagons }}</v-btn>
 			<v-icon right large @click="increaseWagons">{{ 'mdi-chevron-right' }}</v-icon>
 		</v-card>
-		<div class="seat-container">
+		<div>
 			<div v-if="noOfWagons === 3" class="bistro">
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
-				<div class="shop"><v-icon align="center" large>{{ 'mdi-silverware-variant' }}</v-icon></div>
+				<div class="shop">
+					<v-icon align="center" large>{{ 'mdi-silverware-variant' }}</v-icon>
+				</div>
 				<div />
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
+				<div class="toilets">
+					<div class="wc">
+						WC
+						<v-icon color="black">{{ 'mdi-wheelchair-accessibility' }}</v-icon>
+					</div>
+				</div>
+				<div class="toilets">
+					<div class="wc">
+						WC
+						<v-icon color="black">{{ 'mdi-wheelchair-accessibility' }}</v-icon>
+					</div>
+				</div>
 			</div>
-			<div v-for="seats in nrOfSeats" v-else :key="seats" class="seat-booking">	
-				<div :id="seats" class="seat-availability" @click="setClicked">
-					<span>{{ seats + 1 }}</span>
+			<div v-else class="seat-container">
+				<div v-for="seats in nrOfSeats" :key="seats" class="seat-booking">	
+					<div class="seat-booking">
+						<div :id="seats" class="seat-availability" @click="setClicked">
+							<span>{{ seats + 1 }}</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -62,7 +80,6 @@ export default {
 	data: () =>  ({
 		noOfWagons: 1,
 		nrOfSeats: [],
-		bistroSeats: [10],
 		isClicked: false,
 		nrOfTickets: 3,
 		chosenSeats: []
@@ -162,19 +179,19 @@ export default {
 	color: white;
 }
 .bistro {
-	margin-left: 90px;
+	margin-top: 20px;
 	display: grid;
 	grid-template-columns: 30px 30px;
-	grid-template-rows: 40px 40px 60px;
+	grid-template-rows: 40px 40px 60px 40px 40px 7px;
 	column-gap: 50px;
 	row-gap: 50px;
 	justify-content: center;
-
 }
 .bistro-seats {
 	display: flex;
 	justify-content: center;
-	background-color: rgba(44, 88, 44, 0.7);
+	/* background: repeating-linear-gradient(-45deg, #ffffff 5px, #ffffff 10px, #ffffff 11px, #000000 10px, #000000 15px); */
+	background: linear-gradient(-45deg, rgba(30,136,229, 0.1), rgb(30,136,229));
 	min-height: 60px;
 	border: 1px solid rgb(70, 70, 70);
 	border-radius: 10%;
@@ -184,8 +201,23 @@ export default {
 	justify-content: center;
 	min-height: 80px;
 	min-width: 40px;
-	background-color: rgba(44, 88, 44, 0.5);
+	background-color: rgba(30,136,229, 0.3);
 	border: 1px solid rgb(70,70,70);
+}
+.toilets {
+	display: block;
+	justify-content: center;
+	background: linear-gradient(-45deg, rgba(30,136,229, 0.1), rgb(30,136,229));
+	min-height: 60px;
+	border: 1px solid rgb(70, 70, 70);
+	border-radius: 10%;
+	min-width: 40px;
+}
+.wc {
+	text-align: center;
+	font-style: oblique;
+	font-weight: bold;
+
 }
 .modal {
 	display: none;
