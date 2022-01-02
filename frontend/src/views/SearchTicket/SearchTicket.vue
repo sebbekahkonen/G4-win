@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-card dark height="fit-content" class="justify-center  mt-16 ml-2 mr-2 elevation-16">
+		<v-card height="fit-content" class="justify-center  mt-16 ml-2 mr-2 elevation-16">
 			<v-col class="flex text-center pa-3">
 				<h3>Sök efter din biljett</h3>
 				{{ getAllTickets }}

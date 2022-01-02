@@ -15,7 +15,6 @@
 			</v-layout>
 			<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
 			<v-data-table
-				dark
 				:headers="trainHeaders"
 				:items="train"
 				:single-expand="singleExpand"

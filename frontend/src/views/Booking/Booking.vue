@@ -2,8 +2,24 @@
 	<v-container>
 		<h1 class="text-center">Vart vill du resa?</h1>
 		<form>
-			<v-text-field v-model="search.departureStation" class="pa-1" label="Från" outlined clearable />
-			<v-text-field v-model="search.arrivalStation" class="pa-1" label="Till" outlined clearable />
+			<v-autocomplete
+				v-model="search.departureStation"
+				label="Från"
+				:items="staticStations"
+				hint="Ange de tre första bokstäverna"
+				clearable
+				dense
+				filled
+			/>
+			<v-autocomplete
+				v-model="search.arrivalStation"
+				label="Till"
+				:items="staticStations"
+				hint="Ange de tre första bokstäverna"
+				clearable
+				dense
+				filled
+			/>
 		</form>
 		<v-col align="center" class="pt-0">
 			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
@@ -64,6 +80,12 @@ export default {
 		displayArrival: false,
 		timeFormatted: '',
 		timePick: [],
+		staticStations: [
+			'Göteborg C',
+			'Stockholm C',
+			'Malmö C',
+			'Lund C'
+		],
 		depTime: '',
 		arrTime: '',
 		selectedExit: '',
