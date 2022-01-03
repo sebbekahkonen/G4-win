@@ -1,5 +1,5 @@
 // import services from '@/services';
-import trainServices from '@/services/trainData';
+import trainServices from '@/services/trainServices';
 
 
 
@@ -28,6 +28,13 @@ export default {
 	actions: {
 		async getStations({ commit }, data) {
 			const trainData = await trainServices.getAllStations(data);
+
+			console.log('This is the traindata: ', trainData);
+			commit('setStations', trainData);
+		},
+
+		async getSearched({ commit }, data) {
+			const trainData = await trainServices.searchTrains(data.from, data.to);
 
 			console.log('This is the traindata: ', trainData);
 			commit('setStations', trainData);
