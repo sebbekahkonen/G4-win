@@ -107,6 +107,6 @@ export default {
 </script>
 <style>
 .theme--dark.v-footer {
-	background-color: rgb(43, 49, 102);
+	background-color: rgb(19, 37, 201);
 }
 </style>
