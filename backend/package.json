@@ -1,8 +1,12 @@
 {
 	"dependencies": {
+		"axios": "^0.24.0",
 		"better-sqlite3": "^7.4.5",
 		"express": "^4.17.1",
-		"stripe": "^8.195.0"
+		"sequelize": "^7.0.0-alpha.4",
+		"sqlite3": "^5.0.2",
+		"stripe": "^8.195.0",
+		"underscore": "^1.13.2"
 	},
 	"name": "backend",
 	"version": "1.0.0",

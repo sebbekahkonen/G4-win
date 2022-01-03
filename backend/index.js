@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const { Sequelize } = require('sequelize');
 //Behövs för SQlite
 const driver = require('better-sqlite3');
 //För att connecta till databasen
