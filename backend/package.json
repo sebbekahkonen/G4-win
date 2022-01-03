@@ -15,7 +15,7 @@
 		"nodemon": "^2.0.15"
 	},
 	"scripts": {
-		"start": "node index.js",
+		"start": "nodemon index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],

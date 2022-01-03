@@ -9,15 +9,15 @@ const stripe = require('stripe');
 
 const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
 const eventData = { name: '', email: '', receipt_url: '' };
-app.post('/api/user', express.raw({ type: 'application/json' }), (request, response) => {
-	const sig = request.headers['stripe-signature'];
+app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) => {
+	const sig = req.headers['stripe-signature'];
 
 	let event;
 
 	try {
-		event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+		event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
 	} catch (err) {
-		response.status(400).send(`Webhook Error: ${err.message}`);
+		res.status(400).send(`Webhook Error: ${err.message}`);
 		return;
 	}
 	// Handle the event
@@ -27,11 +27,29 @@ app.post('/api/user', express.raw({ type: 'application/json' }), (request, respo
 			eventData.email = event.data.object.email;
 			break;
 		case 'checkout.session.completed':
-			response.status(200).send('success');
+			res.status(200).send('success');
 			break;
 		case 'charge.succeeded':
 			eventData.receipt_url = event.data.object.receipt_url;
 			console.log(eventData);
+			let columnNames = Object.keys(eventData);
+			console.log("colnames: ", columnNames);
+			let columnParamaters = columnNames.map((colName) => ':' + colName);
+			console.log("parameters: ", columnParamaters);
+
+			let query =
+				`INSERT INTO receipts
+				(${columnNames})
+				VALUES (${columnParamaters})
+				`;
+			console.log(query);
+			let preparedStatement = db.prepare(query);
+			preparedStatement.run(eventData);
+
+			res.status(200).json({
+				message: 'success',
+				data: eventData
+			});
 			break;
 		default:
 			console.log(`Unhandled event type ${event.type}`);
@@ -39,7 +57,7 @@ app.post('/api/user', express.raw({ type: 'application/json' }), (request, respo
 
 	// Return a 200 response to acknowledge receipt of the event
 
-	response.send();
+	res.send();
 });
 
 //Bodyparser för att parsa ihop object
@@ -145,6 +163,58 @@ app.delete('/api/:table/:id', (req, res) => {
 	`);
 	let result = preparedStatement.run({
 		id: req.params.id
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
+
+
+app.get('/api/:table/from/:from', (req, res) => {
+	let preparedStatement = db.prepare(`
+	SELECT *
+	FROM ${req.params.table}
+	WHERE trains."from" LIKE :from
+	`);
+	let result = preparedStatement.all({
+		from: req.params.from
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
+
+
+
+app.get('/api/:table/to/:to', (req, res) => {
+	let preparedStatement = db.prepare(`
+	SELECT *
+	FROM ${req.params.table}
+	WHERE trains."to" LIKE :to
+	`);
+	let result = preparedStatement.all({
+		to: req.params.to
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
+
+app.get('/api/:table/:from/:to', (req, res) => {
+	let preparedStatement = db.prepare(`
+	SELECT *
+	FROM ${req.params.table}
+	WHERE trains."from" LIKE :from AND trains."to" LIKE :to
+	`);
+	let result = preparedStatement.all({
+		from: req.params.from,
+		to: req.params.to
 	});
 
 	res.status(200).json({
