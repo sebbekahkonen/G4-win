@@ -7,21 +7,21 @@ const Train = require('./Sequelize/Train');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
-// sequelize.sync({force: true}).then(() => console.log('db is ready'));
+sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
 ///// CREATING THE METHODS
 
 async function getLocationSignatureForStation(stationName) {
 	let allStations = await index.sendStationRequest();
-	for (let station of allStations) 
-		if (station.AdvertisedLocationName === stationName) 
+	for (let station of allStations)
+		if (station.AdvertisedLocationName === stationName)
 			return station.LocationSignature;
 }
 
 
 async function getAdvertisedLocationName(signature) {
 	let allStations = await index.sendStationRequest();
-	for (let station of allStations) 
+	for (let station of allStations)
 		if (station.LocationSignature === signature) {
 			console.log(station.AdvertisedLocationName);
 			return station.AdvertisedLocationName;
@@ -31,10 +31,10 @@ async function getAdvertisedLocationName(signature) {
 
 async function autoComplete(city) {
 	let allStations = await index.sendStationRequest();
-	
+
 	let matchedStations = [];
 
-	for (let station of allStations) 
+	for (let station of allStations)
 		if (station.AdvertisedLocationName.toUpperCase().includes(city.toUpperCase()))
 			matchedStations.push(station);
 
@@ -57,15 +57,15 @@ async function getDeparturesOrArrivals(activity, location, fromTime, toTime) {
 
 
 async function renderTrainAnnouncement(from, to) {
-	
+
 	if (from == to) {
 		console.log('You have given from and to as the same station');
 		return;
 	}
 
-	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, '-19:50:00', '04:10:00');
-	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, '-19:50:00', '04:10:00');
-	
+	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, '-21:30:00', '02:20:00');
+	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, '-21:30:00', '02:20:00');
+
 	let trainInformation = [];
 	let iterator = 0;
 
@@ -74,49 +74,49 @@ async function renderTrainAnnouncement(from, to) {
 			if (trainDeparture.AdvertisedTrainIdent === trainArrival.AdvertisedTrainIdent
 				&& new Date(trainDeparture.AdvertisedTimeAtLocation).getDate() == new Date(trainArrival.AdvertisedTimeAtLocation).getDate()
 				&& new Date(trainArrival.AdvertisedTimeAtLocation).getHours() > new Date(trainDeparture.AdvertisedTimeAtLocation).getHours()) {
-					
-					let hours = Math.floor((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000));
-					let minutes = Math.ceil(((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime() )/ (3600 * 1000) - hours) * 60);
-					
-					let service = trainDeparture.Service != undefined ? true : false;
-				
-					let timeOptions = {hour: "2-digit", minute: "2-digit"};
-					
-					const dates = getDates(new Date(2022, 0, 26), new Date(2022, 0, 31))
-						dates.forEach(function (date) {
-							Train.create({
-							trainId: trainDeparture.AdvertisedTrainIdent,
-							from: from,
-							to: to,
-							owner: 'G4Win',
-							date: date.toLocaleDateString(),
-							departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
-							arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
-							travelTime: `${hours}h and ${minutes}min`,
-							betweenStations: null,
-							betweenStationDeparture: null,
-							service: service
-						});	
-					})
-				
-				
-					
-				
-				// .toString('dddd, d MMMM yyyy at HH:mm:ss')
-					trainInformation.push({
+
+				let hours = Math.floor((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000));
+				let minutes = Math.ceil(((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000) - hours) * 60);
+
+				let service = trainDeparture.Service != undefined ? true : false;
+
+				let timeOptions = { hour: "2-digit", minute: "2-digit" };
+
+				const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
+				dates.forEach(function (date) {
+					Train.create({
 						trainId: trainDeparture.AdvertisedTrainIdent,
 						from: from,
-						to: to, 
-						owner: 'G4Win', 
-						departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toString(),
-						arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toString(),
-						travelTime: `${hours}h and ${minutes}min`, 
-						service: service,
+						to: to,
+						owner: 'G4Win',
+						date: date.toLocaleDateString(),
+						departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+						arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+						travelTime: `${hours}h and ${minutes}min`,
+						betweenStations: null,
+						betweenStationDeparture: null,
+						service: service
 					});
-				
-					iterator++;
-				}
+				})
+
+
+
+
+				// .toString('dddd, d MMMM yyyy at HH:mm:ss')
+				trainInformation.push({
+					trainId: trainDeparture.AdvertisedTrainIdent,
+					from: from,
+					to: to,
+					owner: 'G4Win',
+					departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toString(),
+					arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toString(),
+					travelTime: `${hours}h and ${minutes}min`,
+					service: service,
+				});
+
+				iterator++;
 			}
+		}
 	}
 
 	// console.log(trainInformation);
@@ -126,19 +126,19 @@ async function renderTrainAnnouncement(from, to) {
 	// 	await trainStops();
 	// 	return;
 	// }
-	
+
 	// trainInformation[0].vagnar = { vagn: 2, sitplats: 25 };
 
 
 	// let json = JSON.stringify(trainInformation);
 
 	// fs.writeFile(from + '-' + to + '.json', "", (err) => {
-    // 	if (err) throw err;
+	// 	if (err) throw err;
 	// 	console.log('Data inside data.json has been cleared');
 	// });
 
 	// fs.writeFile(from  + '-' + to + '.json', json, (err) => {
-    // 	if (err) throw err;
+	// 	if (err) throw err;
 	// 	console.log('Data written to file');
 	// });
 }
@@ -148,7 +148,7 @@ async function trainStops() {
 	let departures = await index.sendAllDeparturesRequest();
 	let trainsWithStops = [];
 	let allStations = await index.sendStationRequest();
-	let alreadyRegisteredStations = new Array(); 
+	let alreadyRegisteredStations = new Array();
 
 	for (let departure of departures) {
 
@@ -157,8 +157,8 @@ async function trainStops() {
 
 		for (let location of departure.ToLocation) {
 			for (let station of allStations) {
-				if (station.LocationSignature == location) 
-					toLocation.push(station.AdvertisedLocationName); 
+				if (station.LocationSignature == location)
+					toLocation.push(station.AdvertisedLocationName);
 			}
 		}
 
@@ -169,12 +169,12 @@ async function trainStops() {
 
 		let stationChange = fromLocation;
 		for (let i = 0; i < toLocation.length; i++) {
-			
-			if (_.where(alreadyRegisteredStations, { from: stationChange, to: toLocation[i] }).length > 0) {}
+
+			if (_.where(alreadyRegisteredStations, { from: stationChange, to: toLocation[i] }).length > 0) { }
 			else {
-				if (stationChange == toLocation[i] || stationChange == '' || toLocation[i] == '' ) {}
+				if (stationChange == toLocation[i] || stationChange == '' || toLocation[i] == '') { }
 				else {
-					alreadyRegisteredStations.push({ from: stationChange, to:toLocation[i] });
+					alreadyRegisteredStations.push({ from: stationChange, to: toLocation[i] });
 					stationChange = toLocation[i];
 				}
 			}
@@ -191,47 +191,47 @@ async function trainStops() {
 		})
 	}
 
-	
+
 	let json = JSON.stringify(departures);
 
 	fs.writeFile('departures.json', "", (err) => {
-    	if (err) throw err;
-			console.log('Data inside data.json has been cleared');
+		if (err) throw err;
+		console.log('Data inside data.json has been cleared');
 	});
 
 	fs.writeFile('departures.json', json, (err) => {
-    	if (err) throw err;
-			console.log('Data written to file');
+		if (err) throw err;
+		console.log('Data written to file');
 	});
 
 	let json1 = JSON.stringify(trainsWithStops);
 
 	fs.writeFile('trainsWithStops.json', "", (err) => {
-    	if (err) throw err;
-			console.log('Data inside data.json has been cleared');
+		if (err) throw err;
+		console.log('Data inside data.json has been cleared');
 	});
 
 	fs.writeFile('trainsWithStops.json', json1, (err) => {
-    	if (err) throw err;
-			console.log('Data written to file');
+		if (err) throw err;
+		console.log('Data written to file');
 	});
 
 	let json2 = JSON.stringify(alreadyRegisteredStations);
 
 	fs.writeFile('alreadyRegisteredStations.json', "", (err) => {
-    	if (err) throw err;
-			console.log('Data inside data.json has been cleared');
+		if (err) throw err;
+		console.log('Data inside data.json has been cleared');
 	});
 
 	fs.writeFile('alreadyRegisteredStations.json', json2, (err) => {
-    	if (err) throw err;
-			console.log('Data written to file');
+		if (err) throw err;
+		console.log('Data written to file');
 	});
 
 	console.log(alreadyRegisteredStations.length);
 
 	for (let i = 0; i < alreadyRegisteredStations.length; i++) {
-		
+
 		setTimeout(async () => {
 			console.log(alreadyRegisteredStations[i].from, alreadyRegisteredStations[i].to);
 			await renderTrainAnnouncement(alreadyRegisteredStations[i].from, alreadyRegisteredStations[i].to);
@@ -259,7 +259,7 @@ async function matchStops() {
 					toLocation.push(station.AdvertisedLocationName);
 			}
 		}
-	
+
 		for (let station of allStations) {
 			if (station.LocationSignature == departure.FromLocation[0])
 				fromLocation = station.AdvertisedLocationName;
@@ -268,17 +268,17 @@ async function matchStops() {
 		trainRoutes.push({
 			fromLocation: fromLocation,
 			toLocation: toLocation,
-			departure: departure.AdvertisedTimeAtLocation 
+			departure: departure.AdvertisedTimeAtLocation
 		});
 	}
 
 	let trainInfo = new Array();
 	for (let route of trainRoutes) {
-		let fromDestination = route.fromLocation; 
+		let fromDestination = route.fromLocation;
 
 		for (let i = 0; i < route.toLocation.length; i++) {
 
-			if (_.where(registeredRoutes, { fromLocation: fromDestination, toLocation: route.toLocation[i] }).length == 0 && fromDestination != '') { 
+			if (_.where(registeredRoutes, { fromLocation: fromDestination, toLocation: route.toLocation[i] }).length == 0 && fromDestination != '') {
 
 				registeredRoutes.push({ fromLocation: fromDestination, toLocation: route.toLocation[i] });
 				trainInfo.push(await renderTrainAnnouncement(fromDestination, route.toLocation[i]));
@@ -288,7 +288,7 @@ async function matchStops() {
 	}
 
 	for (let route of trainRoutes) {
-		let fromDestination1 = route.fromLocation; 
+		let fromDestination1 = route.fromLocation;
 		let fromDest = route.fromLocation;
 
 		let startStops = new Array();
@@ -307,13 +307,13 @@ async function matchStops() {
 				}
 
 				for (let train of trainInfo) {
-						if (train != []) {
+					if (train != []) {
 						if (_.where(train, { from: route.toLocation[i - 1], to: route.toLocation[i] }).length > 0) {
 							endStops = _.where(train, { from: route.toLocation[i - 1], to: route.toLocation[i] });
 						}
 					}
 				}
-				
+
 				for (let startStop of startStops) {
 					Object.keys(endStops).forEach(key => {
 						if (new Date(startStop.arrival).getTime() == new Date(endStops[key].departure).getTime()) {
@@ -321,27 +321,27 @@ async function matchStops() {
 							let hours = Math.floor((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000));
 							let minutes = Math.ceil(((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000) - hours) * 60);
 
-							if (_.where(trainWithStops, { from: startStop.from, to: endStops[key].to, betweenStations: startStop.to, departure: startStop.departure, arrival: endStops[key].arrival, travelTime: `${hours}h and ${minutes}min`,service: endStops[key].service }).length == 0) {
-							
+							if (_.where(trainWithStops, { from: startStop.from, to: endStops[key].to, betweenStations: startStop.to, departure: startStop.departure, arrival: endStops[key].arrival, travelTime: `${hours}h and ${minutes}min`, service: endStops[key].service }).length == 0) {
+
 
 								let timeOptions = { hour: "2-digit", minute: "2-digit" };
-								
+
 								new Date().toLocaleTimeString("sv-SE", timeOptions)
 
 								trainWithStops.push({
-								from: startStop.from,
-								to: endStops[key].to,
-								betweenStations: startStop.to,
-								betweenStationDeparture: startStop.arrival,
-								departure: startStop.departure,
-								arrival: endStops[key].arrival,
-								travelTime: `${hours}h and ${minutes}min`,
-								service: endStops[key].service
+									from: startStop.from,
+									to: endStops[key].to,
+									betweenStations: startStop.to,
+									betweenStationDeparture: startStop.arrival,
+									departure: startStop.departure,
+									arrival: endStops[key].arrival,
+									travelTime: `${hours}h and ${minutes}min`,
+									service: endStops[key].service
 								});
 
 
 
-								const dates = getDates(new Date(2022, 0, 26), new Date(2022, 0, 31))
+								const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
 								dates.forEach(function (date) {
 									Train.create({
 										from: startStop.from,
@@ -381,25 +381,25 @@ async function matchStops() {
 
 
 
-function getDates (startDate, endDate) {
-const dates = []
-let currentDate = startDate
-const addDays = function (days) {
-	const date = new Date(this.valueOf())
-	date.setDate(date.getDate() + days)
-	return date
-}
-while (currentDate <= endDate) {
-	dates.push(currentDate)
-	currentDate = addDays.call(currentDate, 1)
-}
-return dates
+function getDates(startDate, endDate) {
+	const dates = []
+	let currentDate = startDate
+	const addDays = function (days) {
+		const date = new Date(this.valueOf())
+		date.setDate(date.getDate() + days)
+		return date
+	}
+	while (currentDate <= endDate) {
+		dates.push(currentDate)
+		currentDate = addDays.call(currentDate, 1)
+	}
+	return dates
 }
 
 
 
 function test() {
-	let uniqueStations = new Array(); 
+	let uniqueStations = new Array();
 
 	let num = 0;
 
