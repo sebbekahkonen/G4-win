@@ -1,5 +1,5 @@
 const axios = require('axios');
-const xmlRequests = require('./XMLRequest/xmlRequests');
+const xmlRequests = require('./xmlRequests');
 
 const url = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
 

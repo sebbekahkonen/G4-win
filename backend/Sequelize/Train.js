@@ -13,6 +13,9 @@ Train.init({
 	to: {
 		type: DataTypes.STRING
 	},
+	date: {
+		type: DataTypes.STRING
+	},
 	owner: {
 		type: DataTypes.STRING
 	},

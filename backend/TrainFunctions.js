@@ -1,4 +1,4 @@
-const index = require('./sendXmlRequest');
+const index = require('./XMLRequest/sendXmlRequest');
 // require("util").inspect.defaultOptions.depth = null;
 // const fs = require('fs');
 const Train = require('./Sequelize/Train');
@@ -7,7 +7,7 @@ const Train = require('./Sequelize/Train');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
-sequelize.sync({force: true}).then(() => console.log('db is ready'));
+// sequelize.sync({force: true}).then(() => console.log('db is ready'));
 
 ///// CREATING THE METHODS
 
@@ -63,8 +63,8 @@ async function renderTrainAnnouncement(from, to) {
 		return;
 	}
 
-	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, '-10:20:00', '14:00:00');
-	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, '-10:20:00', '14:00:00');
+	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, '-19:50:00', '04:10:00');
+	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, '-19:50:00', '04:10:00');
 	
 	let trainInformation = [];
 	let iterator = 0;
@@ -82,18 +82,25 @@ async function renderTrainAnnouncement(from, to) {
 				
 					let timeOptions = {hour: "2-digit", minute: "2-digit"};
 					
-					Train.create({
-						trainId: trainDeparture.AdvertisedTrainIdent,
-						from: from,
-						to: to,
-						owner: 'G4Win',
-						departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
-						arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
-						travelTime: `${hours}h and ${minutes}min`,
-						betweenStations: null,
-						betweenStationDeparture: null,
-						service: service
-					});
+					const dates = getDates(new Date(2022, 0, 26), new Date(2022, 0, 31))
+						dates.forEach(function (date) {
+							Train.create({
+							trainId: trainDeparture.AdvertisedTrainIdent,
+							from: from,
+							to: to,
+							owner: 'G4Win',
+							date: date.toLocaleDateString(),
+							departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+							arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+							travelTime: `${hours}h and ${minutes}min`,
+							betweenStations: null,
+							betweenStationDeparture: null,
+							service: service
+						});	
+					})
+				
+				
+					
 				
 				// .toString('dddd, d MMMM yyyy at HH:mm:ss')
 					trainInformation.push({
@@ -332,17 +339,34 @@ async function matchStops() {
 								service: endStops[key].service
 								});
 
-								Train.create({
-									from: startStop.from,
-									to: endStops[key].to,
-									owner: 'G4Win',
-									betweenStations: startStop.to,
-									betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
-									departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
-									arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
-									travelTime: `${hours}h and ${minutes}min`,
-									service: endStops[key].service
+
+
+								const dates = getDates(new Date(2022, 0, 26), new Date(2022, 0, 31))
+								dates.forEach(function (date) {
+									Train.create({
+										from: startStop.from,
+										to: endStops[key].to,
+										owner: 'G4Win',
+										betweenStations: startStop.to,
+										date: date.toLocaleDateString(),
+										betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
+										departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
+										arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
+										travelTime: `${hours}h and ${minutes}min`,
+										service: endStops[key].service
+									});
 								});
+								// Train.create({
+								// 	from: startStop.from,
+								// 	to: endStops[key].to,
+								// 	owner: 'G4Win',
+								// 	betweenStations: startStop.to,
+								// 	betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
+								// 	departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
+								// 	arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
+								// 	travelTime: `${hours}h and ${minutes}min`,
+								// 	service: endStops[key].service
+								// });
 							}
 						}
 					});
@@ -352,6 +376,27 @@ async function matchStops() {
 		}
 	}
 }
+
+
+
+
+
+function getDates (startDate, endDate) {
+const dates = []
+let currentDate = startDate
+const addDays = function (days) {
+	const date = new Date(this.valueOf())
+	date.setDate(date.getDate() + days)
+	return date
+}
+while (currentDate <= endDate) {
+	dates.push(currentDate)
+	currentDate = addDays.call(currentDate, 1)
+}
+return dates
+}
+
+
 
 function test() {
 	let uniqueStations = new Array(); 
