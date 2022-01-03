@@ -23,6 +23,7 @@
 		</form>
 		<v-col align="center" class="pt-0">
 			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
+			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testMethod">TestSök</v-btn>
 		</v-col>	
 		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
 			<v-col class="pa-0 mt-3">
@@ -113,7 +114,11 @@ export default {
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
-		...mapActions('bookingStore', ['getStations']),
+		...mapActions('bookingStore', ['getStations', 'getSearched']),
+		testMethod() {
+			this.getSearched({from: this.search.departureStation, to: this.search.arrivalStation});
+		},	
+
 		increment() {
 			this.$store.commit('travelStore/increment');
 		},
