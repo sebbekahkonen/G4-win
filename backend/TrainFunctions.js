@@ -2,12 +2,12 @@ const index = require('./XMLRequest/sendXmlRequest');
 // require("util").inspect.defaultOptions.depth = null;
 // const fs = require('fs');
 const Train = require('./Sequelize/Train');
-// const Stations = require('./Stations');
+const Stations = require('./Sequelize/Station');
 // const express = require('express');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
-sequelize.sync({ force: true }).then(() => console.log('db is ready'));
+// sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
 ///// CREATING THE METHODS
 
@@ -192,41 +192,41 @@ async function trainStops() {
 	}
 
 
-	let json = JSON.stringify(departures);
+	// let json = JSON.stringify(departures);
 
-	fs.writeFile('departures.json', "", (err) => {
-		if (err) throw err;
-		console.log('Data inside data.json has been cleared');
-	});
+	// fs.writeFile('departures.json', "", (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data inside data.json has been cleared');
+	// });
 
-	fs.writeFile('departures.json', json, (err) => {
-		if (err) throw err;
-		console.log('Data written to file');
-	});
+	// fs.writeFile('departures.json', json, (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data written to file');
+	// });
 
-	let json1 = JSON.stringify(trainsWithStops);
+	// let json1 = JSON.stringify(trainsWithStops);
 
-	fs.writeFile('trainsWithStops.json', "", (err) => {
-		if (err) throw err;
-		console.log('Data inside data.json has been cleared');
-	});
+	// fs.writeFile('trainsWithStops.json', "", (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data inside data.json has been cleared');
+	// });
 
-	fs.writeFile('trainsWithStops.json', json1, (err) => {
-		if (err) throw err;
-		console.log('Data written to file');
-	});
+	// fs.writeFile('trainsWithStops.json', json1, (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data written to file');
+	// });
 
-	let json2 = JSON.stringify(alreadyRegisteredStations);
+	// let json2 = JSON.stringify(alreadyRegisteredStations);
 
-	fs.writeFile('alreadyRegisteredStations.json', "", (err) => {
-		if (err) throw err;
-		console.log('Data inside data.json has been cleared');
-	});
+	// fs.writeFile('alreadyRegisteredStations.json', "", (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data inside data.json has been cleared');
+	// });
 
-	fs.writeFile('alreadyRegisteredStations.json', json2, (err) => {
-		if (err) throw err;
-		console.log('Data written to file');
-	});
+	// fs.writeFile('alreadyRegisteredStations.json', json2, (err) => {
+	// 	if (err) throw err;
+	// 	console.log('Data written to file');
+	// });
 
 	console.log(alreadyRegisteredStations.length);
 
@@ -340,7 +340,6 @@ async function matchStops(intervalStart, intervalStop) {
 								});
 
 
-
 								const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
 								dates.forEach(function (date) {
 									Train.create({
@@ -356,17 +355,6 @@ async function matchStops(intervalStart, intervalStop) {
 										service: endStops[key].service
 									});
 								});
-								// Train.create({
-								// 	from: startStop.from,
-								// 	to: endStops[key].to,
-								// 	owner: 'G4Win',
-								// 	betweenStations: startStop.to,
-								// 	betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
-								// 	departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
-								// 	arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
-								// 	travelTime: `${hours}h and ${minutes}min`,
-								// 	service: endStops[key].service
-								// });
 							}
 						}
 					});
@@ -395,22 +383,6 @@ function getDates(startDate, endDate) {
 	}
 	return dates
 }
-
-
-
-function test() {
-	let uniqueStations = new Array();
-
-	let num = 0;
-
-	uniqueStations.push({ name: 'sebbe', age: 1 });
-	uniqueStations.push({ name: 'mazdak', age: 1 });
-	uniqueStations.push({ name: 'mazdak', age: 1 });
-	uniqueStations.push({ name: 'mazdak', age: 2 });
-
-	console.log(_.where(uniqueStations, { name: 'mazdak', age: 1 }).length);
-}
-
 
 // test();
 
