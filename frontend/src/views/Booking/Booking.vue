@@ -5,27 +5,28 @@
 			<v-autocomplete
 				v-model="search.departureStation"
 				label="Från"
-				:items="staticStations"
+				:items="stationsArr"
 				hint="Ange de tre första bokstäverna"
 				clearable
 				dense
 				filled
+				@change="testBtnDisabled"
 			/>
 			<v-autocomplete
 				v-model="search.arrivalStation"
 				label="Till"
-				:items="staticStations"
+				:items="stationsArr"
 				hint="Ange de tre första bokstäverna"
 				clearable
 				dense
 				filled
+				@change="testBtnDisabled"
 			/>
 		</form>
 		<v-col align="center" class="pt-0">
-			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
-			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testMethod">TestSök</v-btn>
+			<v-btn :disabled="btnDisabled" class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
 		</v-col>	
-		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto" @change="testBtnDisabled">
 			<v-col class="pa-0 mt-3">
 				<v-card>
 					<div class="flex-center">
@@ -74,6 +75,7 @@ export default {
 			departureStation: '',
 			arrivalStation: ''
 		},
+		btnDisabled: true,
 		singleStation: '',
 		departureDate: new Date(),
 		arrivalDate: new Date(),
@@ -81,12 +83,7 @@ export default {
 		displayArrival: false,
 		timeFormatted: '',
 		timePick: [],
-		staticStations: [
-			'Göteborg C',
-			'Stockholm C',
-			'Malmö C',
-			'Lund C'
-		],
+		stationsArr: [],
 		depTime: '',
 		arrTime: '',
 		selectedExit: '',
@@ -111,14 +108,21 @@ export default {
 		...mapState('travelStore', [ 'count' ])
 	},
 	created() {
+		vue.nextTick(this.testBtnDisabled());
+		vue.nextTick(this.fetchApi());
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations', 'getSearched']),
-		testMethod() {
-			this.getSearched({from: this.search.departureStation, to: this.search.arrivalStation});
-		},	
-
+			
+		fetchApi() {
+			fetch('/api/stations')
+				.then(res => res.json())
+				.then(data => Object.keys(data.data).forEach(key => {
+					this.stationsArr.push(data.data[key].AdvertisedLocationName);
+				})
+				);
+		},
 		increment() {
 			this.$store.commit('travelStore/increment');
 		},
@@ -170,11 +174,25 @@ export default {
 			}				
 		},
 		testSearch() {
-			if (!this.isClicked && this.search.departureStation.length > 0) {
+			if (!this.isClicked && !this.search.departureStation == '' && !this.search.arrivalStation == '') {
 				this.isClicked = true;
+			} else {
+				this.isClicked = false;
 			}
 		},
+		testBtnDisabled() {
+			if (!this.search.departureStation == '' && !this.search.arrivalStation == '') {
+				this.btnDisabled = false;		
+			} else {
+				this.btnDisabled = true;
+			}
 
+			if (this.isClicked && !this.search.departureStation == '' && !this.search.arrivalStation == '') {
+				this.isClicked = true;
+			} else {
+				this.isClicked = false;
+			}
+		},
 		setDepartureTime(depTime) {
 			this.depTime = depTime;
 		},
