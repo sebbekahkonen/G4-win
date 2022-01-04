@@ -56,15 +56,15 @@ async function getDeparturesOrArrivals(activity, location, fromTime, toTime) {
 }
 
 
-async function renderTrainAnnouncement(from, to) {
+async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 
 	if (from == to) {
 		console.log('You have given from and to as the same station');
 		return;
 	}
 
-	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, '-21:30:00', '02:20:00');
-	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, '-21:30:00', '02:20:00');
+	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, intervalStart, intervalStop);
+	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, intervalStart, intervalStop);
 
 	let trainInformation = [];
 	let iterator = 0;
@@ -241,7 +241,7 @@ async function trainStops() {
 }
 
 
-async function matchStops() {
+async function matchStops(intervalStart, intervalStop) {
 	let departures = await index.sendAllDeparturesRequest();
 	let allStations = await index.sendStationRequest();
 	let trainRoutes = new Array();
@@ -281,7 +281,7 @@ async function matchStops() {
 			if (_.where(registeredRoutes, { fromLocation: fromDestination, toLocation: route.toLocation[i] }).length == 0 && fromDestination != '') {
 
 				registeredRoutes.push({ fromLocation: fromDestination, toLocation: route.toLocation[i] });
-				trainInfo.push(await renderTrainAnnouncement(fromDestination, route.toLocation[i]));
+				trainInfo.push(await renderTrainAnnouncement(fromDestination, route.toLocation[i], intervalStart, intervalStop));
 				fromDestination = route.toLocation[i];
 			}
 		}
@@ -416,7 +416,7 @@ function test() {
 
 //// RUNNING THE METHODS
 
-matchStops();
+matchStops('-21:30:00', '02:20:00');
 // getAdvertisedLocationName('Hpbg');
 // trainStops();
 // getAllStations();
