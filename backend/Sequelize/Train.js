@@ -35,7 +35,7 @@ Train.init({
 		type: DataTypes.STRING
 	},
 	service: {
-		type: DataTypes.BOOLEAN
+		type: DataTypes.STRING
 	}
 }, {
 	sequelize,

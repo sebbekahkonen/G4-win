@@ -78,7 +78,7 @@ async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 				let hours = Math.floor((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000));
 				let minutes = Math.ceil(((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000) - hours) * 60);
 
-				let service = trainDeparture.Service != undefined ? true : false;
+				let service = trainDeparture.Service != undefined ? 'Ja' : 'Nej';
 
 				let timeOptions = { hour: "2-digit", minute: "2-digit" };
 
@@ -92,7 +92,7 @@ async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 						date: date.toLocaleDateString(),
 						departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
 						arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
-						travelTime: `${hours}h and ${minutes}min`,
+						travelTime: `${hours}h:${minutes}m`,
 						betweenStations: null,
 						betweenStationDeparture: null,
 						service: service
@@ -110,7 +110,7 @@ async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 					owner: 'G4Win',
 					departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toString(),
 					arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toString(),
-					travelTime: `${hours}h and ${minutes}min`,
+					travelTime: `${hours}h:${minutes}m`,
 					service: service,
 				});
 
@@ -321,7 +321,7 @@ async function matchStops(intervalStart, intervalStop) {
 							let hours = Math.floor((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000));
 							let minutes = Math.ceil(((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000) - hours) * 60);
 
-							if (_.where(trainWithStops, { from: startStop.from, to: endStops[key].to, betweenStations: startStop.to, departure: startStop.departure, arrival: endStops[key].arrival, travelTime: `${hours}h and ${minutes}min`, service: endStops[key].service }).length == 0) {
+							if (_.where(trainWithStops, { from: startStop.from, to: endStops[key].to, betweenStations: startStop.to, departure: startStop.departure, arrival: endStops[key].arrival, travelTime: `${hours}h:${minutes}m`, service: endStops[key].service }).length == 0) {
 
 
 								let timeOptions = { hour: "2-digit", minute: "2-digit" };
@@ -335,7 +335,7 @@ async function matchStops(intervalStart, intervalStop) {
 									betweenStationDeparture: startStop.arrival,
 									departure: startStop.departure,
 									arrival: endStops[key].arrival,
-									travelTime: `${hours}h and ${minutes}min`,
+									travelTime: `${hours}h:${minutes}m`,
 									service: endStops[key].service
 								});
 
@@ -351,7 +351,7 @@ async function matchStops(intervalStart, intervalStop) {
 										betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
 										departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
 										arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
-										travelTime: `${hours}h and ${minutes}min`,
+										travelTime: `${hours}h:${minutes}m`,
 										service: endStops[key].service
 									});
 								});
@@ -388,8 +388,8 @@ function getDates(startDate, endDate) {
 
 //// RUNNING THE METHODS
 
-matchStops('-10:30:00', '12:25:00');
+matchStops('-16:25:00', '06:30:00');
 // getAdvertisedLocationName('Hpbg');
 // trainStops();
-// getAllStations();
+getAllStations();
 // renderTrainAnnouncement('Örebro C', 'Hallsberg');
