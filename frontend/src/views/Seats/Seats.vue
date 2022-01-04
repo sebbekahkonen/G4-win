@@ -11,6 +11,10 @@
 			</v-col>
 			<v-col align="center">
 				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
+				Mellanstation: Jönköping
+			</v-col>
+			<v-col align="center">
+				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
 				Till: Stockholm
 			</v-col>
 		</v-row>
@@ -68,7 +72,9 @@
 				</v-btn>
 			</div>
 		</div>
-		<v-btn class="blue darken-1 white--text mt-4" small depressed block @click="nextPage">
+		<v-btn :disabled="btnDisable" class="blue darken-1 white--text mt-4" small depressed block
+			@click="nextPage"
+		>
 			Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
 		</v-btn>
 	</v-container>
@@ -82,7 +88,8 @@ export default {
 		nrOfSeats: [],
 		isClicked: false,
 		nrOfTickets: 3,
-		chosenSeats: []
+		chosenSeats: [],
+		btnDisable : true
 	}),
 	computed: {
 		...mapState('travelStore', ['travelObj', 'date'])
@@ -110,6 +117,7 @@ export default {
 			let seatToChange = document.getElementById(`${seatID}`);
 
 			if(this.chosenSeats.indexOf(seatID) === -1) {
+
 				if(this.chosenSeats.length < this.nrOfTickets) {
 					seatToChange.style.backgroundColor = 'red';
 					this.chosenSeats.push(seatID);
@@ -129,8 +137,13 @@ export default {
 				seatToChange.style.backgroundColor = 'green';
 				this.chosenSeats.splice(this.chosenSeats.indexOf(seatID), 1);
 			}
-			
-			console.log(this.chosenSeats);
+
+			if(this.chosenSeats.length < this.nrOfTickets) {
+				this.btnDisable = true;
+			} else {
+				console.log(this.chosenSeats.length);
+				this.btnDisable = false;
+			}
 		},
 		
 		increaseWagons() {	

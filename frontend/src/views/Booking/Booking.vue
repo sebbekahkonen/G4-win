@@ -2,11 +2,28 @@
 	<v-container>
 		<h1 class="text-center">Vart vill du resa?</h1>
 		<form>
-			<v-text-field v-model="search.departureStation" class="pa-1" label="Från" outlined clearable />
-			<v-text-field v-model="search.arrivalStation" class="pa-1" label="Till" outlined clearable />
+			<v-autocomplete
+				v-model="search.departureStation"
+				label="Från"
+				:items="staticStations"
+				hint="Ange de tre första bokstäverna"
+				clearable
+				dense
+				filled
+			/>
+			<v-autocomplete
+				v-model="search.arrivalStation"
+				label="Till"
+				:items="staticStations"
+				hint="Ange de tre första bokstäverna"
+				clearable
+				dense
+				filled
+			/>
 		</form>
 		<v-col align="center" class="pt-0">
 			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
+			<v-btn class="blue darken-1 white--text" min-width="50%" @click="testMethod">TestSök</v-btn>
 		</v-col>	
 		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto">
 			<v-col class="pa-0 mt-3">
@@ -64,6 +81,12 @@ export default {
 		displayArrival: false,
 		timeFormatted: '',
 		timePick: [],
+		staticStations: [
+			'Göteborg C',
+			'Stockholm C',
+			'Malmö C',
+			'Lund C'
+		],
 		depTime: '',
 		arrTime: '',
 		selectedExit: '',
@@ -91,7 +114,11 @@ export default {
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
-		...mapActions('bookingStore', ['getStations']),
+		...mapActions('bookingStore', ['getStations', 'getSearched']),
+		testMethod() {
+			this.getSearched({from: this.search.departureStation, to: this.search.arrivalStation});
+		},	
+
 		increment() {
 			this.$store.commit('travelStore/increment');
 		},
