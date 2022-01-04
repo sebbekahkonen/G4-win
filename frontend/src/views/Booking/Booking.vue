@@ -213,6 +213,7 @@ export default {
 
 			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
 			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString());
+			this.$store.commit('travelStore/setFormatDate', this.departureDate);
 			this.$router.push({name: 'TrainDepartures'});
 			
 		}

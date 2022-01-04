@@ -3,7 +3,8 @@ export default {
 
 	state: {
 		travelObj: {},
-		date: ''
+		date: '',
+		formatDate: new Date
 	},
 
 	mutations: {
@@ -12,6 +13,14 @@ export default {
 		},
 		setDate(state, payload) { 
 			state.date = payload;
+		},
+		setFormatDate(state, payload) { 
+			state.formatDate = payload;
 		}
-	}	
+	},
+	actions: {
+		changeFormatDate({ commit }, data) { 
+			commit('setFormatDate', data);
+		}
+	}
 };
