@@ -87,17 +87,22 @@ export default {
 		noOfWagons: 1,
 		nrOfSeats: [],
 		isClicked: false,
-		nrOfTickets: 3,
+		nrOfTickets: 0,
 		chosenSeats: [],
 		btnDisable : true
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date'])
+		...mapState('travelStore', ['travelObj', 'date']),
+		...mapState('ticketStore', ['studentTickets', 'adultTickets', 'seniorTickets'])
 	},
 	created() {
 		vue.nextTick(this.fillSeatArr());
+		vue.nextTick(this.countTickets());
 	},	
 	methods: {
+		countTickets() {
+			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets; 
+		},
 		testClick() {
 			document.getElementById('popup-modal').style.display = 'none';
 		},
