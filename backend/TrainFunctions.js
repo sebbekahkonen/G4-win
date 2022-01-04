@@ -7,7 +7,7 @@ const Stations = require('./Sequelize/Station');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
-// sequelize.sync({ force: true }).then(() => console.log('db is ready'));
+sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
 ///// CREATING THE METHODS
 
@@ -388,7 +388,7 @@ function getDates(startDate, endDate) {
 
 //// RUNNING THE METHODS
 
-matchStops('-21:30:00', '02:20:00');
+matchStops('-10:30:00', '12:25:00');
 // getAdvertisedLocationName('Hpbg');
 // trainStops();
 // getAllStations();
