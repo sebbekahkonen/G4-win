@@ -132,7 +132,7 @@ export default {
 	},
 
 	methods: {
-		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets']),
+		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice']),
 		...mapActions('travelStore', ['changeFormatDate']),
 
 		returnPage() {
@@ -178,6 +178,7 @@ export default {
 				this.changeStudentTickets(this.tickets.student.value);
 				this.changeAdultTickets(this.tickets.adult.value);
 				this.changeSeniorTickets(this.tickets.senior.value);
+				this.changeThePrice(this.price);
 				this.$router.push('/seats');
 			} else{
 				this.errorCode = 'Var vänlig välj minst 1 biljett';

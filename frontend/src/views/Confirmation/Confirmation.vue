@@ -8,7 +8,7 @@
 						sm="6"
 					>
 						<v-text-field
-							v-model="from"
+							v-model="travelObj.departure.departureDestination"
 							label="Från:"
 							outlined
 							readonly
@@ -20,7 +20,7 @@
 						sm="6"
 					>
 						<v-text-field
-							v-model="to"
+							v-model="travelObj.departure.arrivalDestination"
 							label="Till:"
 							outlined
 							readonly
@@ -38,7 +38,7 @@
 				<v-col cols="8">
 					<v-text-field
 						label="Summan"
-						value="10.00"
+						:value="getPrice+'kr'"
 						suffix="SEK"
 						readonly
 					/>
@@ -51,8 +51,8 @@
 				<v-col cols="8">
 					<v-text-field
 						label="Email address"
-						value="example"
-						suffix="@gmail.com"
+						:value="getTheReceipt.email"
+						
 						readonly
 					/>
 				</v-col>
@@ -64,7 +64,7 @@
 				<v-col cols="8">
 					<v-text-field
 						label="Datum"
-						value="2021-12-14"
+						:value="formatDate"
 						readonly
 					/>
 				</v-col>
@@ -114,10 +114,21 @@
 	</div>
 </template>
 <script>
+import { mapState, mapGetters, mapActions } from 'vuex';
+import vue from 'vue';
 export default {
 	data: () => ({
-		from: 'Gothenburg',
-		to: 'Stockholm'
-	})
+	}),
+	computed: {
+		...mapGetters('ticketStore', ['getPrice']),
+		...mapGetters('receiptStore', ['getTheReceipt']),
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate'])
+	},
+	created() {
+		vue.nextTick(this.getReceipt);
+	},
+	methods: {
+		...mapActions('receiptStore', ['getReceipt'])
+	}
 };
 </script>
