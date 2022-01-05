@@ -66,7 +66,7 @@
 		<div id="popup-modal" class="modal">
 			<div class="modal-content">
 				<p>Du kan bara välja {{ nrOfTickets }} platser.</p>
-				<v-btn id="close-modal" depressed class="mb-4" color="primary" @click="testClick">
+				<v-btn id="close-modal" depressed class="mb-4" color="primary" @click="modalPopup">
 					Stäng
 					<v-icon class="ml-2">{{ 'mdi-close-circle' }}</v-icon>
 				</v-btn>
@@ -101,9 +101,9 @@ export default {
 	},	
 	methods: {
 		countTickets() {
-			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets; 
+			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
 		},
-		testClick() {
+		modalPopup() {
 			document.getElementById('popup-modal').style.display = 'none';
 		},
 		returnPage() {
@@ -112,6 +112,22 @@ export default {
 		nextPage() {
 			this.$router.push('/payment');
 		},
+		/*
+		TANKEBUBBLA 1:
+		Steg 1: skapa en tabell i databasen, koppla foreign key till trainId (id i trains)
+		Steg 2: skicka in data i tabellen baserat på vilka platser som är valda.
+		Steg 3: skapa en array som fyller upp platserna som är bokade från databasen och disablea dom.
+		Steg 4: hämta data för det specifika tågId:t, kolla ifall platserna syns som upptagna.
+		FÖRDEL: Mindre databas struktur
+		NACKDEL: Kan bli svårare att koppla.
+
+		TANKEBUBBLA 2:
+		Steg 1: skapa sequelize modell för vagnar & säten i vagnarna som är kopplade till trains (id)
+		Steg 2: Hämta vagnar & säten. 
+		Steg 3: Skapa en rest-route(PUT) som uppdaterar bokade platser i databasen.
+		NACKDEL: 50k nya rader i databasen.
+		FÖRDEL: Kan bli enklare koppling.
+		*/
 		fillSeatArr() {
 			for(let i=0; i<40; i++) {
 				this.nrOfSeats.push(i);
