@@ -7,7 +7,7 @@ const Stations = require('./Sequelize/Station');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
-sequelize.sync({ force: true }).then(() => console.log('db is ready'));
+// sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
 ///// CREATING THE METHODS
 
@@ -237,7 +237,6 @@ async function trainStops() {
 			await renderTrainAnnouncement(alreadyRegisteredStations[i].from, alreadyRegisteredStations[i].to);
 		}, 2000 * i);
 	}
-
 }
 
 
