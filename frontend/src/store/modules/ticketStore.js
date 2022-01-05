@@ -6,6 +6,7 @@ export default {
 	namespaced: true,
 
 	state: {
+		price: null,
 		tickets: [],
 		studentTickets: null,
 		adultTickets: null,
@@ -24,6 +25,9 @@ export default {
 		},
 		setSeniorTickets(state, data) {
 			state.seniorTickets = data;
+		},
+		setPrice(state, data) {
+			state.price = data;
 		}
 	},
 
@@ -34,6 +38,10 @@ export default {
 			commit('setTickets', ticket);
 
 			return ticket;
+		},
+
+		changeThePrice({ commit }, data) {
+			commit('setPrice', data);
 		},
 		changeStudentTickets({ commit }, data) {
 			commit('setStudentTickets', data);
@@ -58,6 +66,9 @@ export default {
 		},
 		getSeniorTickets(state) {
 			return state.seniorTickets;
+		},
+		getPrice(state) {
+			return state.price;
 		}
 	}
 };
