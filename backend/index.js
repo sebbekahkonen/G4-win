@@ -25,24 +25,21 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 		case 'customer.created':
 			eventData.name = event.data.object.name;
 			eventData.email = event.data.object.email;
-			break;
-		case 'checkout.session.completed':
-			res.status(200).send('success');
+			let query1 = `DELETE FROM receipts;`
+			let preparedStatement1 = db.prepare(query1);
+			preparedStatement1.run();
 			break;
 		case 'charge.succeeded':
 			eventData.receipt_url = event.data.object.receipt_url;
-			console.log(eventData);
 			let columnNames = Object.keys(eventData);
-			console.log("colnames: ", columnNames);
 			let columnParamaters = columnNames.map((colName) => ':' + colName);
-			console.log("parameters: ", columnParamaters);
 
 			let query =
-				`INSERT INTO receipts
+				`
+				INSERT INTO receipts
 				(${columnNames})
 				VALUES (${columnParamaters})
 				`;
-			console.log(query);
 			let preparedStatement = db.prepare(query);
 			preparedStatement.run(eventData);
 
