@@ -10,7 +10,8 @@ export default {
 		tickets: [],
 		studentTickets: null,
 		adultTickets: null,
-		seniorTickets: null
+		seniorTickets: null,
+		pickedTrain: {}
 	},
 
 	mutations: {
@@ -28,6 +29,9 @@ export default {
 		},
 		setPrice(state, data) {
 			state.price = data;
+		},
+		setPickedTrain(state, data) {
+			state.pickedTrain = data;
 		}
 	},
 
@@ -51,6 +55,9 @@ export default {
 		},
 		changeSeniorTickets({ commit }, data) {
 			commit('setSeniorTickets', data);
+		},
+		changePickedTrain({ commit }, data) {
+			commit('setPickedTrain', data);
 		}
 	},
 
@@ -69,6 +76,9 @@ export default {
 		},
 		getPrice(state) {
 			return state.price;
+		},
+		getPickedTrain(state) {
+			return state.pickedTrain;
 		}
 	}
 };

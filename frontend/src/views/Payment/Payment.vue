@@ -1,29 +1,30 @@
 <template>
 	<div>
-		<v-card class="justify-center  mt-16 ml-2 mr-2 elevation-16">
+		<v-container>
 			<v-btn depressed small class="mb-4 pl-0 white" @click="returnPage">
 				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 				Tillbaka
 			</v-btn>
-			<v-layout row wrap class="pt-5">
-				<v-flex xs6>
-					<h3 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h3>
-				</v-flex>
-				<v-flex xs6>
-					<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
-				</v-flex>
+			<v-layout column justify-center>
+				<h2 class="text-center">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</h2>
+				<v-layout row wrap class="pt-5 text-center">
+					<v-flex xs6>
+						<span class="text-center">Avgång: {{ getPickedTrain[0].departure }}</span>
+					</v-flex>
+					<v-flex xs6>
+						<span class="text-center">Ankomst: {{ getPickedTrain[0].arrival }}</span>
+					</v-flex>
+				</v-layout>
+				<v-layout row wrap class="pt-2 pb-2 text-center">
+					<v-flex xs6>
+						<span class="text-center">{{ formatDate }}</span>
+					</v-flex>
+					<v-flex xs6>
+						<span class="text-center">Restid: {{ getPickedTrain[0].travelTime }}</span>
+					</v-flex>
+				</v-layout>
+				<h2 class="text-center pt-5 pb-5">Pris: {{ getPrice }}kr</h2>
 			</v-layout>
-			<v-layout row wrap class="pt-5">
-				<v-flex xs6>
-					<h3 class="text-center">Avgång: {{ departure }}</h3>
-				</v-flex>
-				<v-flex xs6>
-					<h3 class="text-center">Ankomst: {{ arrival }}</h3>
-				</v-flex>
-			</v-layout>
-			<v-col>
-				<h3 class="pt-10 text-center">Valt datum: {{ date }}</h3>
-			</v-col>
 			<v-col class="text-center">
 				<stripe-checkout v-if="isTrue"
 					ref="checkoutRef"
@@ -36,7 +37,7 @@
 				/>
 				<v-btn color="primary" @click="redirect">Betala</v-btn>
 			</v-col>
-		</v-card>
+		</v-container>
 	</div>
 </template>
 <script>
@@ -58,8 +59,8 @@ export default {
 		publishableKey:  publishableKey
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date']),
-		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets'])
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate']),
+		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
 
 	mounted() {
