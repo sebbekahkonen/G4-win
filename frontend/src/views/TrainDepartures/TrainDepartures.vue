@@ -103,7 +103,7 @@ export default {
 				value: 'arrival'
 			},
 			{
-				text: 'Åktid',
+				text: 'Restid',
 				value: 'travelTime'
 			},
 			{
