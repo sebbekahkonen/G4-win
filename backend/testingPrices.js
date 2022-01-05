@@ -1,8 +1,8 @@
 const _ = require('underscore');
 const Price = require('./Sequelize/Price');
 const Train = require('./Sequelize/Train');
-const sequelize = require('./Sequelize/database');
-const sqlite3 = require('sqlite3').verbose();
+// const sequelize = require('./Sequelize/database');
+// const sqlite3 = require('sqlite3').verbose();
 
 let run = async () => { prices(JSON.parse(JSON.stringify(await Train.findAll()))) };
 run();
@@ -73,6 +73,11 @@ function calculatePrices(table, shortestTravelTime) {
 			
 			// avdrag med 5kr/dag beroende på hur många dagar tidigare man bokar en resa
 			let deduction = 5;
+
+			if (table[key].date - new Date().toLocaleDateString() >= 7) {
+				days = 7;
+			}
+
 			const days = dateDiffInDays(new Date(), new Date(table[key].date));
 
 			priceAdult -= deduction * days;
