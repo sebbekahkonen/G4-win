@@ -14,7 +14,7 @@
 				<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				<h3 class="text-center">Till: Stockholm</h3>
 			</v-flex> -->
-			<span class="text-center">{{ formatDate }}</span>
+			<span class="text-center">{{ datumTest }}</span>
 		</v-layout>
 		
 		<!-- <h3 class="pt-10 text-center mb-4">Valt datum: 2022-01-04</h3> -->
@@ -86,6 +86,7 @@ export default {
 			adult: {price: 0, value: 0},
 			senior: {price: 0, value: 0}
 		},
+		datumTest: '',
 		price: 0,
 		errorCode: '',
 		trainsArray: [],
@@ -157,7 +158,7 @@ export default {
 			let dateNr = this.formatDate.getDate();
 			let year = this.formatDate.getFullYear();
 			
-			this.changeFormatDate(this.formatDate = `${day} ${dateNr} ${month} ${year}`);
+			this.changeFormatDate(this.datumTest = `${day} ${dateNr} ${month} ${year}`);
 
 		},
 		onExpand() {
