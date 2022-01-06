@@ -25,7 +25,8 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 		case 'customer.created':
 			eventData.name = event.data.object.name;
 			eventData.email = event.data.object.email;
-			let query1 = `DELETE FROM receipts;`
+			eventData.order_number = orderNumber;
+			let query1 = `DELETE FROM current_user;`
 			let preparedStatement1 = db.prepare(query1);
 			preparedStatement1.run();
 			break;
@@ -47,6 +48,18 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				message: 'success',
 				data: eventData
 			});
+			break;
+		case 'checkout.session.completed':
+			let columnNames3 = Object.keys(eventData);
+			let columnParamaters3 = columnNames3.map((colName) => ':' + colName);
+			let query3 =
+				`
+				INSERT INTO current_user
+				(${columnNames3})
+				VALUES (${columnParamaters3})
+				`;
+			let preparedStatement3 = db.prepare(query3);
+			preparedStatement3.run(eventData);
 			break;
 		default:
 			console.log(`Unhandled event type ${event.type}`);
@@ -78,6 +91,7 @@ app.get('/', (req, res) => {
 
 //Dynamic rest route:POST
 app.post('/api/:table', (req, res) => {
+	console.log("test");
 	// let data = {
 	// 	name: req.body.name,
 	// 	email: req.body.email,
