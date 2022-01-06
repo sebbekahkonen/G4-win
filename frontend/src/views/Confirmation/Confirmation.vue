@@ -72,7 +72,7 @@
 			<v-row />
 		</v-container>
 		<v-col class="text-center">
-			<h3>Ordernummmer: {{ getTheReceipt.order_number }} </h3>
+			<h3>Ordernummmer: 1234 </h3>
 		</v-col>
 		<v-col class="text-center">
 			<h3>Tack för att du valde G4-Win!</h3>
@@ -90,7 +90,6 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
-		order_number: null
 	}),
 	computed: {
 		...mapGetters('ticketStore', ['getPrice', 'getPickedTrain']),
@@ -99,7 +98,6 @@ export default {
 	},
 	created() {
 		vue.nextTick(this.getReceipt);
-		// vue.nextTick(this.order_number = this.eventData);
 	},
 	methods: {
 		...mapActions('receiptStore', ['getReceipt'])

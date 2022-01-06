@@ -7,12 +7,6 @@ Station.init({
 	AdvertisedLocationName: {
 		type: DataTypes.STRING
 	},
-	// CountryCode: {
-	// 	type: DataTypes.STRING
-	// },
-	// LocationSignature: {
-	// 	type: DataTypes.STRING
-	// }
 }, {
 	sequelize,
 	modelName: 'stations',

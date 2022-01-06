@@ -1,4 +1,3 @@
 node_modules
 frontend/shared/config.json
 backend/.env
-backend/.env
