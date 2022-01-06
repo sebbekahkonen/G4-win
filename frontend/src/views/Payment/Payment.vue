@@ -24,6 +24,9 @@
 					</v-flex>
 				</v-layout>
 				<h2 class="text-center pt-5 pb-5">Pris: {{ getPrice }}kr</h2>
+				<div v-for="seats in bookedSeats" :key="seats" align="center">
+					<span class="text-center"> Biljetter: {{ seats }} </span>
+				</div>
 			</v-layout>
 			<v-col class="text-center">
 				<stripe-checkout v-if="isTrue"
@@ -59,7 +62,7 @@ export default {
 		publishableKey:  publishableKey
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date', 'formatDate']),
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId']),
 		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
 
@@ -68,22 +71,47 @@ export default {
 	},
 	methods: {
 		redirect() {
-			if(this.getSeniorTickets != 0) {
-				//Senior ticket
-				this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
+			// if(this.getSeniorTickets != 0) {
+			// 	//Senior ticket
+			// 	this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
+			// }
+
+			// if(this.getAdultTickets != 0) {
+			// 	//Adult ticket
+			// 	this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
+			// }
+
+			// if(this.getStudentTickets != 0) {
+			// 	//Student ticket
+			// 	this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
+			// }
+
+			// this.$refs.checkoutRef.redirectToCheckout();			
+			console.log('Train_id:', this.trainId);
+			console.log('Biljetter:', this.bookedSeats);
+			console.log('date:', this.date);
+
+
+			for(let seats of this.bookedSeats) {
+				let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
+
+				fetch('/api/seats', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(dataSend)
+				})
+					.then(res => res.json())
+					.then(data => {
+						console.log('Success:', data);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
 			}
 
-			if(this.getAdultTickets != 0) {
-				//Adult ticket
-				this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
-			}
-
-			if(this.getStudentTickets != 0) {
-				//Student ticket
-				this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
-			}
-
-			this.$refs.checkoutRef.redirectToCheckout();
+			
 		},
 		returnPage() {
 			this.$router.push('/seats');

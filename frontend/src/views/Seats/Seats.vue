@@ -22,6 +22,7 @@
 			<!-- Valt datum: {{ date }} -->
 			Valt datum: 2022-01-01
 		</v-col>
+		<v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn>
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
 			<v-btn v-if="noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
@@ -84,6 +85,7 @@ import vue from 'vue';
 import { mapState } from 'vuex';
 export default {
 	data: () =>  ({
+		bookedSeatsArr: [],
 		noOfWagons: 1,
 		nrOfSeats: [],
 		isClicked: false,
@@ -92,14 +94,31 @@ export default {
 		btnDisable : true
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date']),
+		...mapState('travelStore', ['travelObj', 'date', 'trainId']),
 		...mapState('ticketStore', ['studentTickets', 'adultTickets', 'seniorTickets'])
 	},
 	created() {
+		vue.nextTick(this.fetchBookedSeats());
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
-	},	
+	},
+	// mounted() {
+	// 	setTimeout(() => {
+	// 		this.disableBookedSeats();
+	// 	}, 200);
+	// },
 	methods: {
+		disableBookedSeats() {			
+			for(let seats2 of this.bookedSeatsArr) {
+				for (let seats3 of this.nrOfSeats) {
+					if (seats2 === seats3) {
+						document.getElementById(seats3).style.pointerEvents = 'none';
+						document.getElementById(seats3).style.backgroundColor = 'black';
+						console.log('Bokade platser: ', seats2 + 1);
+					}
+				}
+			}
+		},
 		countTickets() {
 			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
 		},
@@ -110,28 +129,25 @@ export default {
 			this.$router.push('/departures');
 		},
 		nextPage() {
+			this.$store.commit('travelStore/setBookedSeats', this.chosenSeats);
 			this.$router.push('/payment');
 		},
-		/*
-		TANKEBUBBLA 1:
-		Steg 1: skapa en tabell i databasen, koppla foreign key till trainId (id i trains)
-		Steg 2: skicka in data i tabellen baserat på vilka platser som är valda.
-		Steg 3: skapa en array som fyller upp platserna som är bokade från databasen och disablea dom.
-		Steg 4: hämta data för det specifika tågId:t, kolla ifall platserna syns som upptagna.
-		FÖRDEL: Mindre databas struktur
-		NACKDEL: Kan bli svårare att koppla.
-
-		TANKEBUBBLA 2:
-		Steg 1: skapa sequelize modell för vagnar & säten i vagnarna som är kopplade till trains (id)
-		Steg 2: Hämta vagnar & säten. 
-		Steg 3: Skapa en rest-route(PUT) som uppdaterar bokade platser i databasen.
-		NACKDEL: 50k nya rader i databasen.
-		FÖRDEL: Kan bli enklare koppling.
-		*/
 		fillSeatArr() {
 			for(let i=0; i<40; i++) {
 				this.nrOfSeats.push(i);
 			}
+		},
+		fetchBookedSeats() {
+			console.log('TrainID från innan: ', this.trainId);
+
+			fetch('api/seats')
+				.then(res => res.json())
+				.then(data => Object.keys(data.data).forEach(key => {
+					if(data.data[key].train_id === this.trainId) {
+						this.bookedSeatsArr.push(data.data[key].seats_booked);
+					}
+				}));
+
 		},
 		setClicked(event) {
 			let seatID = event.currentTarget.id;

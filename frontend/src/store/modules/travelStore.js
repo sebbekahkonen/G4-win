@@ -4,7 +4,9 @@ export default {
 	state: {
 		travelObj: {},
 		date: '',
-		formatDate: new Date
+		formatDate: new Date,
+		bookedSeats: [],
+		trainId: ''
 	},
 
 	mutations: {
@@ -16,6 +18,12 @@ export default {
 		},
 		setFormatDate(state, payload) { 
 			state.formatDate = payload;
+		},
+		setBookedSeats(state, payload) { 
+			state.bookedSeats = payload;
+		},
+		setTrainId(state, payload) { 
+			state.trainId = payload;
 		}
 	},
 	actions: {
