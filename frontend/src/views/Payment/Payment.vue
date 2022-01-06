@@ -62,7 +62,7 @@ export default {
 		publishableKey:  publishableKey
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId']),
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId', 'wagon']),
 		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
 
@@ -90,10 +90,11 @@ export default {
 			console.log('Train_id:', this.trainId);
 			console.log('Biljetter:', this.bookedSeats);
 			console.log('date:', this.date);
+			console.log('wagon:', this.wagon);
 
 
 			for(let seats of this.bookedSeats) {
-				let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
+				let dataSend = { train_id: this.trainId, seats_booked: seats, wagon: this.wagon, date: this.date  };
 
 				fetch('/api/seats', {
 					method: 'POST',

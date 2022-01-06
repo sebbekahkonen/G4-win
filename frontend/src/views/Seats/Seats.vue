@@ -86,6 +86,7 @@ import { mapState } from 'vuex';
 export default {
 	data: () =>  ({
 		bookedSeatsArr: [],
+		databaseWagon: 0,
 		noOfWagons: 1,
 		nrOfSeats: [],
 		isClicked: false,
@@ -109,15 +110,20 @@ export default {
 	// },
 	methods: {
 		disableBookedSeats() {			
-			for(let seats2 of this.bookedSeatsArr) {
-				for (let seats3 of this.nrOfSeats) {
-					if (seats2 === seats3) {
-						document.getElementById(seats3).style.pointerEvents = 'none';
-						document.getElementById(seats3).style.backgroundColor = 'black';
-						console.log('Bokade platser: ', seats2 + 1);
+			for(let seats2 of this.bookedSeatsArr) {				
+				if (this.databaseWagon === this.noOfWagons) {
+					document.getElementById(seats2).style.pointerEvents = 'none';
+					document.getElementById(seats2).style.backgroundColor = 'black';
+					console.log('Bokade platser: ', seats2 + 1);
+					for(let seats3 of this.nrOfSeats) {
+						if(!seats2 === seats3) {
+							document.getElementById(seats2).style.backgroundColor = 'green';
+						}
 					}
 				}
-			}
+			}			
+			console.log('Database Wagon: ', this.databaseWagon, '\n', 'Wagons Site: ', this.noOfWagons);
+
 		},
 		countTickets() {
 			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
@@ -130,6 +136,7 @@ export default {
 		},
 		nextPage() {
 			this.$store.commit('travelStore/setBookedSeats', this.chosenSeats);
+			this.$store.commit('travelStore/setBookedWagon', this.noOfWagons);
 			this.$router.push('/payment');
 		},
 		fillSeatArr() {
@@ -143,8 +150,9 @@ export default {
 			fetch('api/seats')
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
-					if(data.data[key].train_id === this.trainId) {
+					if(data.data[key].train_id === this.trainId && data.data[key].wagon === this.noOfWagons) {
 						this.bookedSeatsArr.push(data.data[key].seats_booked);
+						this.databaseWagon = data.data[key].wagon;
 					}
 				}));
 
@@ -184,13 +192,29 @@ export default {
 		},
 		
 		increaseWagons() {	
-			if(this.noOfWagons != 7) 
-				this.noOfWagons += 1;		
+			if(this.noOfWagons != 7)
+				this.noOfWagons += 1;
+	
+			this.databaseWagon += 1;
+
+			this.bookedSeatsArr = [];
+			console.log(this.bookedSeatsArr);
+
+			this.fetchBookedSeats();
+				
 			
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
 				this.noOfWagons -= 1;
+
+			this.databaseWagon -= 1;
+
+			this.bookedSeatsArr = [];
+			console.log(this.bookedSeatsArr);
+
+			this.fetchBookedSeats();
+			
 		}
 	}
 };
