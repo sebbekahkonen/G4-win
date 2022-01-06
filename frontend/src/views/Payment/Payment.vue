@@ -46,7 +46,7 @@
 <script>
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { publishableKey } from '@/../shared/config.json';
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters, mapState, mapActions } from 'vuex';
 export default {
 	components: {
 		StripeCheckout
@@ -70,23 +70,43 @@ export default {
 		this.isTrue = true;
 	},
 	methods: {
+		...mapActions('receiptStore', ['addTrainId']),
 		redirect() {
-			// if(this.getSeniorTickets != 0) {
-			// 	//Senior ticket
-			// 	this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
-			// }
+			if(this.getSeniorTickets != 0) {
+				//Senior ticket
+				this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
+			}
 
-			// if(this.getAdultTickets != 0) {
-			// 	//Adult ticket
-			// 	this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
-			// }
+			if(this.getAdultTickets != 0) {
+				//Adult ticket
+				this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
+			}
 
-			// if(this.getStudentTickets != 0) {
-			// 	//Student ticket
-			// 	this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
-			// }
+			if(this.getStudentTickets != 0) {
+				//Student ticket
+				this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
+			}
 
-			// this.$refs.checkoutRef.redirectToCheckout();			
+			// this.addTrainId(this.trainId);
+			for(let seats of this.bookedSeats) {
+				let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
+
+				fetch('/api/current_trainId', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(dataSend)
+				})
+					.then(res => res.json())
+					.then(data => {
+						console.log('Success:', data);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+			}
+			this.$refs.checkoutRef.redirectToCheckout();			
 			console.log('Train_id:', this.trainId);
 			console.log('Biljetter:', this.bookedSeats);
 			console.log('date:', this.date);

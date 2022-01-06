@@ -10,7 +10,7 @@ const nodemailer = require("nodemailer");
 require('dotenv').config();
 
 const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
-const eventData = { name: '', email: '', receipt_url: '', order_number: null };
+const eventData = { name: '', email: '', receipt_url: '', order_number: null, train_id: null };
 
 async function sendEmail() {
 	// Generate test SMTP service account from ethereal.email
@@ -58,8 +58,21 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 	}
 	// Handle the event
 	switch (event.type) {
+		case 'payment_intent.created':
+			let preparedStatement4 = db.prepare(`
+			SELECT * FROM current_trainId
+			`);
+			let result = preparedStatement4.all();
+			eventData.train_id = result[0].train_id
+			break;
+		case 'payment_intent.succeeded':
+			let query5 = `DELETE FROM current_trainId;`
+			let preparedStatement5 = db.prepare(query5);
+			preparedStatement5.run();
+			break;
 		case 'customer.created':
 			let orderNumber = Math.floor(Math.random() * 100000000);
+
 			eventData.name = event.data.object.name;
 			eventData.email = event.data.object.email;
 			eventData.order_number = orderNumber;
