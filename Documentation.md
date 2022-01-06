@@ -31,9 +31,9 @@ stripe url:n och till slut har vi en confirmations url:n där vi kan se all info
 kunderna söka på deras ordernummer och välja att avboka deras biljett.
 
 
+### Wireframes:
 
-
-### Wireframes
+Här nedan ser vi alla url:n utfrån kundernas perspektiv:
 
 ![image](https://user-images.githubusercontent.com/48633146/148405234-8e429ac0-a9e6-4f91-b0cc-abcf0b3e70c6.png)
 
@@ -57,6 +57,7 @@ Dependencies som vi använda för vår projekt är följande:
 * dotenv
 * nodemon
 * nodemailer
+* fs
 
 2) Frontend:
 * vue-stripe
@@ -73,5 +74,6 @@ Dependencies som vi använda för vår projekt är följande:
 
 ### Förbättringar under processen t.ex. nämna att själva sequalize löste vårt problem för pris tabell ist för sqllite3
 
+### bokade säter ![image](https://user-images.githubusercontent.com/48633146/148439086-01ae6410-08dd-4b45-bcc3-3e15f9fef7cf.png)
 
 
