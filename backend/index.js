@@ -10,7 +10,7 @@ const nodemailer = require("nodemailer");
 require('dotenv').config();
 
 const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
-const eventData = { name: '', email: '', receipt_url: '', order_number: null, train_id: null };
+const eventData = { name: '', email: '', receipt_url: '', order_number: null, train_id: null, seats: '' };
 
 async function sendEmail() {
 	// Generate test SMTP service account from ethereal.email
@@ -56,6 +56,7 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 		res.status(400).send(`Webhook Error: ${err.message}`);
 		return;
 	}
+	let seatsBooked = '';
 	// Handle the event
 	switch (event.type) {
 		case 'payment_intent.created':
@@ -63,7 +64,18 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 			SELECT * FROM current_trainId
 			`);
 			let result = preparedStatement4.all();
+			Object.keys(result).forEach(key => {
+				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
+				// eventData.seats.push(result[key].seats_booked.toString() + ",");
+			});
+			eventData.seats = seatsBooked;
 			eventData.train_id = result[0].train_id
+			// let preparedStatement6 = db.prepare(`
+			// SELECT * FROM seats
+			// WHERE seats."train_id" = ${result[0].train_id}
+			// `);
+			// let result2 = preparedStatement6.all();
+			// console.log(result2);
 			break;
 		case 'payment_intent.succeeded':
 			let query5 = `DELETE FROM current_trainId;`
