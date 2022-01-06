@@ -2,7 +2,6 @@
 	<v-container class="justify-center">
 		<v-col class="flex text-center pa-3">
 			<h3>Sök efter din biljett</h3>
-			{{ getAllTickets }}
 		</v-col>
 		<v-text-field 
 			v-model="ticketInput"
@@ -22,6 +21,7 @@
 		/>			
 			
 		<v-data-table
+			v-if="isTrue"
 			:headers="ticketHeaders"
 			:items="tickets"
 			:single-expand="singleExpand"
@@ -35,21 +35,23 @@
 		>
 			<template v-slot:expanded-item="{ headers }">
 				<td :colspan="headers.length">
-					<v-row justify="space-between">
-						<v-col class="pa-0 pt-4">
-							<h3>Namn: {{ firstAndLast }}</h3>
-						</v-col>
-						<v-col class="pa-0 pt-4">
-							<h3 class="text-right">Platser: {{ seatsBooked }}</h3>
-						</v-col>
-					</v-row>																
+					<v-layout column justify-center>
+						<v-layout row wrap class="pt-5 text-center">
+							<v-flex xs6>
+								<span class="text-center">Namn: {{ firstAndLast }}</span>
+							</v-flex>
+							<v-flex xs6>
+								<span class="text-center">Platser: {{ seatsBooked }}</span>
+							</v-flex>
+						</v-layout>
+					</v-layout>
 					<v-col class="mt-4">
 						<v-layout>
 							<h3 v-if="btnClicked" class="flex text-center red--text">Är du säker på att du vill avboka?</h3>
 						</v-layout>
 						<v-layout row wrap class="pa-3">
 							<v-btn v-if="btnClicked === false" class="flex text-left" color="blue darken-1 white--text" @click="cancelBooking">Avboka</v-btn>
-							<v-btn v-if="btnClicked" class="flex text-right mr-5" color="success">Ja</v-btn>
+							<v-btn v-if="btnClicked" class="flex text-right mr-5" color="success" @click="removeTicket">Ja</v-btn>
 							<v-btn v-if="btnClicked" class="flex text-right" color="error" @click="btnClicked = false">Nej</v-btn>
 						</v-layout>
 					</v-col>
@@ -60,63 +62,34 @@
 </template>
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import vue from 'vue';
 export default {
 	data: () => ({
+		isTrue: false,
 		firstAndLast: 'John Doe',
-		seatsBooked: '4, 8, 2',
+		seatsBooked: '',
 		ticketInput: '',
 		btnClicked: false,
 		expanded: [],
 		singleExpand: true,
 		ticketHeaders: [
-			{ 
-				text: 'Namn',
-				value: 'name'
-			},
+		
 			{
-				text: 'Datum',
-				value: 'date'
+				text: 'Email',
+				value: 'email'
 			},
+			
 			{
-				text: 'Price',
-				value: 'price'
+				text: 'Ordernummer',
+				value: 'order_number'
 			},
 			{ 
-				text: '',
-				value: 'data-table-expand'
+				text: 'Säten',
+				value: 'seats'
 			}
 		],
 		tickets: [
-			{
-				name: 'Biljett 1',
-				date: '2021-11-16',
-				price: '450kr'
-			},
-			{
-				name: 'Biljett 2',
-				date: '2021-12-10',
-				price: '1500kr'
-			},
-			{
-				name: 'Biljett 3',
-				date: '2022-01-01',
-				price: '200kr'
-			},
-			{
-				name: 'Biljett 4',
-				date: '2021-02-20',
-				price: '300kr'
-			},
-			{
-				name: 'Biljett 5',
-				date: '2021-05-10',
-				price: '100kr'
-			},
-			{
-				name: 'Biljett 6',
-				date: '2021-09-15',
-				price: '150kr'
-			}
+		
 		],
 		sortArray: [
 			'Name',
@@ -125,13 +98,32 @@ export default {
 		]
 	}),
 	computed: {
-		...mapGetters('ticketStore', ['getAllTickets'])
+		...mapGetters('ticketStore', ['getAllTickets']),
+		...mapGetters('receiptStore', ['getAllTheReceipts'])
+	},
+	created() {
+		vue.nextTick(this.getAllReceipts);
 	},
 
 	methods: {
 		...mapActions('ticketStore', ['getTickets']),
+		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt']),
 		search() {
-			this.getTickets(this.ticketInput);
+			this.tickets = [];
+			
+			Object.keys(this.getAllTheReceipts).forEach(key => {
+				if (this.getAllTheReceipts[key].order_number == (this.ticketInput)) {
+					this.tickets.push(this.getAllTheReceipts[key]);
+				}
+			});
+			this.seatsBooked = this.tickets[0].seats;
+			this.isTrue = true;
+		},
+
+		removeTicket() {
+			this.deleteReceipt(this.tickets[0].id);
+			this.ticketInput = '';
+			this.isTrue = false;
 		},
 
 		onExpand() {

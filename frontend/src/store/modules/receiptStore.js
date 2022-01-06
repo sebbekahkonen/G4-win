@@ -6,13 +6,16 @@ export default {
 	namespaced: true,
 
 	state: {
-		receiptInformation: {}
+		receiptInformation: {},
+		receiptById: {}
 	},
 
 	mutations: {
 		setReceipt(state, data) {
-			console.log(data);
 			state.receiptInformation = data;
+		},
+		setAllReceipts(state, data) {
+			state.receiptById = data;
 		}
 	},
 
@@ -20,15 +23,29 @@ export default {
 		async getReceipt({ commit }) {
 			const receipt = await receiptServices.getReceipt();
 
-			console.log(receipt);
 			commit('setReceipt', receipt);
 
+		},
+		async getAllReceipts({ commit }) {
+			const receipt = await receiptServices.getAllReceipts();
+
+			commit('setAllReceipts', receipt);
+		},
+		async deleteReceipt({ commit }, data) {
+			await receiptServices.deleteReceipt(data);
+
+			const receipt = await receiptServices.getAllReceipts();
+
+			commit('setAllReceipts', receipt);
 		}
 	},
 
 	getters: {
 		getTheReceipt(state) {
 			return state.receiptInformation;
+		},
+		getAllTheReceipts(state) {
+			return state.receiptById;
 		}
 	}
 };
