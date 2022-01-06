@@ -365,9 +365,6 @@ async function matchStops(intervalStart, intervalStop) {
 }
 
 
-
-
-
 function getDates(startDate, endDate) {
 	const dates = []
 	let currentDate = startDate

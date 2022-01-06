@@ -1,8 +1,6 @@
 const _ = require('underscore');
 const Price = require('./Sequelize/Price');
 const Train = require('./Sequelize/Train');
-// const sequelize = require('./Sequelize/database');
-// const sqlite3 = require('sqlite3').verbose();
 
 let run = async () => { prices(JSON.parse(JSON.stringify(await Train.findAll()))) };
 run();
@@ -39,7 +37,7 @@ function calculatePrices(table, shortestTravelTime) {
 	
 	let adultFee = 70;
 	let studentFee = 25;
-	let retiredFee = 23;
+	let seniorFee = 23;
 
 	Object.keys(table).forEach(key => {
 		let travelTime = table[key].travelTime;
@@ -50,14 +48,14 @@ function calculatePrices(table, shortestTravelTime) {
 		
 		let priceAdult = shortestTravelTime * 2 + adultFee;
 		let priceStudent = shortestTravelTime * 2 + studentFee;
-		let priceRetired = shortestTravelTime * 2 + retiredFee;
+		let priceSenior = shortestTravelTime * 2 + seniorFee;
 		
 
 		if (table[key].betweenStations != undefined) {
 			let deductionStop = 0.05;
 			priceAdult -= Math.ceil(priceAdult * deductionStop);
 			priceStudent -= Math.ceil(priceStudent * deductionStop);
-			priceRetired -= Math.ceil(priceRetired * deductionStop);
+			priceSenior -= Math.ceil(priceSenior * deductionStop);
 		}
 
 		if (shortestTravelTime != totalMinutes) {
@@ -66,7 +64,7 @@ function calculatePrices(table, shortestTravelTime) {
 			// glöm inte ta med id
 			priceAdult -= difference;
 			priceStudent -= difference;
-			priceRetired -= difference;
+			priceSenior -= difference;
 		}
 
 		if (table[key].date >= new Date().toLocaleDateString()) {
@@ -82,13 +80,13 @@ function calculatePrices(table, shortestTravelTime) {
 
 			priceAdult -= deduction * days;
 			priceStudent -= deduction * days;
-			priceRetired -= deduction * days;
+			priceSenior -= deduction * days;
 			
 			Price.create({
 				train_id: table[key].id,
 				price_adult: priceAdult,
 				price_student: priceStudent,
-				price_retired: priceRetired
+				price_senior: priceSenior
 			});
 		}
 	});

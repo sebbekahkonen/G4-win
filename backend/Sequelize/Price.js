@@ -13,7 +13,7 @@ Price.init({
 	price_student: {
 		type: DataTypes.INTEGER
 	},
-	price_retired: {
+	price_senior: {
 		type: DataTypes.INTEGER
 	}
 }, {
