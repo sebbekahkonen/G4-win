@@ -13,6 +13,26 @@ export default {
 
 				return response.data.data[0];
 			});
+	},
+	getAllReceipts() {
+		return axios.get('/api/receipts', {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then((response) => {
+				return response.data.data;
+			});
+	},
+	deleteReceipt(data) {
+		return axios.delete(`/api/receipts/${data}`, {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then((response) => {
+				return response;
+			});
 	}
 
 };

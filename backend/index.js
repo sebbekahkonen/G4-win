@@ -221,39 +221,39 @@ app.delete('/api/:table/:id', (req, res) => {
 })
 
 
-app.get('/api/:table/from/:from', (req, res) => {
-	let preparedStatement = db.prepare(`
-	SELECT *
-	FROM ${req.params.table}
-	WHERE trains."from" LIKE :from
-	`);
-	let result = preparedStatement.all({
-		from: req.params.from
-	});
+// app.get('/api/:table/from/:from', (req, res) => {
+// 	let preparedStatement = db.prepare(`
+// 	SELECT *
+// 	FROM ${req.params.table}
+// 	WHERE trains."from" LIKE :from
+// 	`);
+// 	let result = preparedStatement.all({
+// 		from: req.params.from
+// 	});
 
-	res.status(200).json({
-		message: 'success',
-		data: result
-	});
-})
+// 	res.status(200).json({
+// 		message: 'success',
+// 		data: result
+// 	});
+// })
 
 
 
-app.get('/api/:table/to/:to', (req, res) => {
-	let preparedStatement = db.prepare(`
-	SELECT *
-	FROM ${req.params.table}
-	WHERE trains."to" LIKE :to
-	`);
-	let result = preparedStatement.all({
-		to: req.params.to
-	});
+// app.get('/api/:table/to/:to', (req, res) => {
+// 	let preparedStatement = db.prepare(`
+// 	SELECT *
+// 	FROM ${req.params.table}
+// 	WHERE trains."to" LIKE :to
+// 	`);
+// 	let result = preparedStatement.all({
+// 		to: req.params.to
+// 	});
 
-	res.status(200).json({
-		message: 'success',
-		data: result
-	});
-})
+// 	res.status(200).json({
+// 		message: 'success',
+// 		data: result
+// 	});
+// })
 
 app.get('/api/:table/:from/:to', (req, res) => {
 	let preparedStatement = db.prepare(`
