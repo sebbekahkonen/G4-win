@@ -3,7 +3,7 @@ import axios from 'axios';
 export default {
 
 	getReceipt() {
-		return axios.get('/api/receipts', {
+		return axios.get('/api/current_user', {
 			headers: {
 				'Content-Type': 'application/json'
 			}

@@ -6,9 +6,45 @@ const driver = require('better-sqlite3');
 //För att connecta till databasen
 const db = driver('./database/traindb.sqlite3');
 const stripe = require('stripe');
+const nodemailer = require("nodemailer");
+require('dotenv').config();
 
 const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
-const eventData = { name: '', email: '', receipt_url: '' };
+const eventData = { name: '', email: '', receipt_url: '', order_number: null };
+
+async function sendEmail() {
+	// Generate test SMTP service account from ethereal.email
+	// Only needed if you don't have a real mail account for testing
+	let testAccount = await nodemailer.createTestAccount();
+	// create reusable transporter object using the default SMTP transport
+	console.log(process.env.USER_MAIL);
+	let transporter = nodemailer.createTransport({
+		service: "gmail",
+		auth: {
+			user: process.env.USER_MAIL,
+			pass: process.env.USER_PASS
+		}
+	});
+
+	// send mail with defined transport object
+	let info = await transporter.sendMail({
+		from: 'gfourwin@gmail.com', // sender address
+		to: `${eventData.email}`, // list of receivers
+		subject: "G4-Win Kvitto", // Subject line
+		html: `<h1>Tack för att du valde att resa med G4-win</h1>
+				<h3>Här är ditt ordernummer: ${eventData.order_number}</h3>
+				<h3>Klicka<a href="${eventData.receipt_url}"> här</a> för att se ditt kvitto</h3>`, // html body
+	});
+
+	console.log("Message sent: %s", info.messageId);
+	// Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+	// Preview only available when sending through an Ethereal account
+	console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+	// Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+}
+
+
 app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) => {
 	const sig = req.headers['stripe-signature'];
 
@@ -23,6 +59,7 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 	// Handle the event
 	switch (event.type) {
 		case 'customer.created':
+			let orderNumber = Math.floor(Math.random() * 100000000);
 			eventData.name = event.data.object.name;
 			eventData.email = event.data.object.email;
 			eventData.order_number = orderNumber;
@@ -43,7 +80,7 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				`;
 			let preparedStatement = db.prepare(query);
 			preparedStatement.run(eventData);
-
+			sendEmail();
 			res.status(200).json({
 				message: 'success',
 				data: eventData
@@ -60,6 +97,7 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				`;
 			let preparedStatement3 = db.prepare(query3);
 			preparedStatement3.run(eventData);
+
 			break;
 		default:
 			console.log(`Unhandled event type ${event.type}`);
