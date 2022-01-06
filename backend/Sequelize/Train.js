@@ -39,7 +39,7 @@ Train.init({
 	}
 }, {
 	sequelize,
-	modelName: 'train',
+	modelName: 'trains',
 	timestamps: false
 });
 
