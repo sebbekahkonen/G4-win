@@ -210,6 +210,434 @@ Det som sker i ovanstående kod är att när vi kör någon form av anrop och an
 vi använda dessa trots att vi kör på vår localhost:8080 i frontenden.
 
 
+### Trafikverkets externa API
+Vi använde oss utav trafikverkets api för att lagra viss antal data i våra databaser. Första behövde vi registrera oss för att kunna använda deras api:er. Här
+är deras länk: https://api.trafikinfo.trafikverket.se/
+
+Vi gjorde en xml request för ett dygn för att kunna få alla möjliga tider för alla tåg resor och detta har vi sparat i vår xmlRequest.js fil i backenden:
+
+``` javascript
+var xmlStations = `<REQUEST> 
+	<LOGIN authenticationkey='APIKEY'/> 
+	<QUERY objecttype='TrainStation' schemaversion='1'> 
+	<FILTER> 
+		<EQ name="Advertised" value="true" />
+		<EQ name='CountryCode' value='SE' />
+	</FILTER> 
+	<INCLUDE>Prognosticated</INCLUDE> 
+	<INCLUDE>AdvertisedLocationName</INCLUDE> 
+	<INCLUDE>LocationSignature</INCLUDE>
+	<INCLUDE>CountryCode</INCLUDE> 
+	</QUERY> 
+	</REQUEST>`;
+
+	
+const xmlDepartureOrArrival = function (activity, locationSignature, fromTime, toTime) { return `<REQUEST>
+      <LOGIN authenticationkey="APIKEY" />
+      <QUERY objecttype="TrainAnnouncement" schemaversion="1.3" orderby="AdvertisedTimeAtLocation">
+            <FILTER>
+                  <AND>
+                        <EQ name="ActivityType" value="${activity}" />
+                        <EQ name="LocationSignature" value="${locationSignature}" />
+						<EQ name='InformationOwner' value='SJ' />
+                        <OR>
+                              <AND>
+                                    <GT name="AdvertisedTimeAtLocation" value="$dateadd(${fromTime})" />
+                                    <LT name="AdvertisedTimeAtLocation" value="$dateadd(${toTime})" />
+                              </AND>
+                              <AND>
+                                    <LT name="AdvertisedTimeAtLocation" value="$dateadd(00:30:00)" />
+                                    <GT name="EstimatedTimeAtLocation" value="$dateadd(-00:15:00)" />
+                              </AND>
+                        </OR>
+                  </AND>
+            </FILTER>
+			<INCLUDE>InformationOwner</INCLUDE>
+			<INCLUDE>AdvertisedTimeAtLocation</INCLUDE>
+			<INCLUDE>AdvertisedTrainIdent</INCLUDE>
+			<INCLUDE>TrackAtLocation</INCLUDE>
+			<INCLUDE>FromLocation</INCLUDE>
+			<INCLUDE>ToLocation</INCLUDE>
+			<INCLUDE>Service</INCLUDE>
+			<INCLUDE>Booking</INCLUDE>
+      </QUERY>
+</REQUEST>`
+}
+	
+var xmlAllDepartures = `<REQUEST>
+                                <LOGIN authenticationkey='APIKEY' />
+                                <QUERY objecttype='TrainAnnouncement' orderby='AdvertisedTimeAtLocation' schemaversion='1'>
+                                    <FILTER>
+                                    <AND>
+                                        <OR>
+                                            <AND>
+                                                <GT name='AdvertisedTimeAtLocation' 
+                                                            value='$dateadd(00:00:00)' />
+                                                <LT name='AdvertisedTimeAtLocation' 
+                                                            value='$dateadd(12:00:00)' />
+                                            </AND>
+                                            <GT name='EstimatedTimeAtLocation' value='$now' />
+                                        </OR>
+                                        <EQ name='ActivityType' value='Avgang' />
+                                        <EQ name='InformationOwner' value='SJ' />
+										</AND>
+                                    </FILTER>
+                                    <INCLUDE>InformationOwner</INCLUDE>
+                                    <INCLUDE>AdvertisedTimeAtLocation</INCLUDE>
+                                    <INCLUDE>AdvertisedTrainIdent</INCLUDE>
+                                    <INCLUDE>TrackAtLocation</INCLUDE>
+                                    <INCLUDE>FromLocation</INCLUDE>
+                                    <INCLUDE>ToLocation</INCLUDE>
+                                    <INCLUDE>Service</INCLUDE>
+                                    <INCLUDE>Booking</INCLUDE>
+                                    <INCLUDE>TrainComposition</INCLUDE>
+                                </QUERY>
+                                </REQUEST>`;
+
+module.exports.xmlStations = xmlStations;
+module.exports.xmlDepartureOrArrival = xmlDepartureOrArrival;
+module.exports.xmlAllDepartures = xmlAllDepartures;
+
+```
+
+Därefter skickar vi dessa via vår sendXmlRequest.js fil. I det här filer gör vi en del post anrop för att plocka fram data från trafikverketsapi.
+
+``` javascript
+const axios = require('axios');
+const xmlRequests = require('./xmlRequests');
+
+const url = 'https://api.trafikinfo.trafikverket.se/v2/data.json';
+
+
+async function sendStationRequest() {
+
+	try {
+		const response = await axios({
+			method: 'post',
+			url: url,
+			data: xmlRequests.xmlStations,
+			headers: { 'Content-Type': 'text/xml' }
+		});
+		return response.data.RESPONSE.RESULT[0].TrainStation;
+
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+
+async function sendDepartureOrArrivalRequest(activity, locationSignature, fromTime, toTime) {
+	try {
+		const response = await axios({
+			method: 'post',
+			url: url,
+			data: xmlRequests.xmlDepartureOrArrival(activity, locationSignature, fromTime, toTime),
+			headers: { 'Content-Type': 'text/xml' }
+		});
+		return response.data.RESPONSE.RESULT[0].TrainAnnouncement;
+
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+
+async function sendAllDeparturesRequest() {
+
+	try {
+		const response = await axios({
+			method: 'post',
+			url: url,
+			data: xmlRequests.xmlAllDepartures,
+			headers: { 'Content-Type': 'text/xml' }
+		});
+		return response.data.RESPONSE.RESULT[0].TrainAnnouncement;
+
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+module.exports.sendStationRequest = sendStationRequest;
+module.exports.sendDepartureOrArrivalRequest = sendDepartureOrArrivalRequest;
+module.exports.sendAllDeparturesRequest = sendAllDeparturesRequest;
+```
+
+Data använder vi sedan i vår TrainFunctions.js fil. Dessa data manipuleras i det här filen för att därefter kunna lagra det som behövs i vår sqlite DB som t.ex.
+galla möjliga tåg rutter, alla stationer samt tåg rutter med byten:
+
+``` javascript
+
+const index = require('./XMLRequest/sendXmlRequest');
+// require("util").inspect.defaultOptions.depth = null;
+// const fs = require('fs');
+const Train = require('./Sequelize/Train');
+const Stations = require('./Sequelize/Station');
+// const express = require('express');
+const sequelize = require('./Sequelize/database');
+const _ = require('underscore');
+
+// sequelize.sync({ force: true }).then(() => console.log('db is ready'));
+
+///// CREATING THE METHODS
+
+async function getLocationSignatureForStation(stationName) {
+	let allStations = await index.sendStationRequest();
+	for (let station of allStations)
+		if (station.AdvertisedLocationName === stationName)
+			return station.LocationSignature;
+}
+
+
+async function getAdvertisedLocationName(signature) {
+	let allStations = await index.sendStationRequest();
+	for (let station of allStations)
+		if (station.LocationSignature === signature) {
+			console.log(station.AdvertisedLocationName);
+			return station.AdvertisedLocationName;
+		}
+}
+
+
+async function autoComplete(city) {
+	let allStations = await index.sendStationRequest();
+
+	let matchedStations = [];
+
+	for (let station of allStations)
+		if (station.AdvertisedLocationName.toUpperCase().includes(city.toUpperCase()))
+			matchedStations.push(station);
+
+	console.log(matchedStations);
+}
+
+async function getAllStations() {
+	let allStations = await index.sendStationRequest();
+	for (let station of allStations)
+		Stations.create(station);
+}
+
+async function getDeparturesOrArrivals(activity, location, fromTime, toTime) {
+
+	let locationSignature = await getLocationSignatureForStation(location);
+	let travels = await index.sendDepartureOrArrivalRequest(activity, locationSignature, fromTime, toTime);
+
+	return travels;
+}
+
+
+async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
+
+	if (from == to) {
+		console.log('You have given from and to as the same station');
+		return;
+	}
+
+	let trainDepartures = await getDeparturesOrArrivals('Avgang', from, intervalStart, intervalStop);
+	let trainArrivals = await getDeparturesOrArrivals('Ankomst', to, intervalStart, intervalStop);
+
+	let trainInformation = [];
+	let iterator = 0;
+
+	for (let trainDeparture of trainDepartures) {
+		for (let trainArrival of trainArrivals) {
+			if (trainDeparture.AdvertisedTrainIdent === trainArrival.AdvertisedTrainIdent
+				&& new Date(trainDeparture.AdvertisedTimeAtLocation).getDate() == new Date(trainArrival.AdvertisedTimeAtLocation).getDate()
+				&& new Date(trainArrival.AdvertisedTimeAtLocation).getHours() > new Date(trainDeparture.AdvertisedTimeAtLocation).getHours()) {
+
+				let hours = Math.floor((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000));
+				let minutes = Math.ceil(((new Date(trainArrival.AdvertisedTimeAtLocation).getTime() - new Date(trainDeparture.AdvertisedTimeAtLocation).getTime()) / (3600 * 1000) - hours) * 60);
+
+				let service = trainDeparture.Service != undefined ? 'Ja' : 'Nej';
+
+				let timeOptions = { hour: "2-digit", minute: "2-digit" };
+
+				const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
+				dates.forEach(function (date) {
+					Train.create({
+						trainId: trainDeparture.AdvertisedTrainIdent,
+						from: from,
+						to: to,
+						owner: 'G4Win',
+						date: date.toLocaleDateString(),
+						departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+						arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toLocaleTimeString("sv-SE", timeOptions),
+						travelTime: `${hours}h:${minutes}m`,
+						betweenStations: null,
+						betweenStationDeparture: null,
+						service: service
+					});
+				})
+
+
+
+
+				// .toString('dddd, d MMMM yyyy at HH:mm:ss')
+				trainInformation.push({
+					trainId: trainDeparture.AdvertisedTrainIdent,
+					from: from,
+					to: to,
+					owner: 'G4Win',
+					departure: new Date(trainDeparture.AdvertisedTimeAtLocation).toString(),
+					arrival: new Date(trainArrival.AdvertisedTimeAtLocation).toString(),
+					travelTime: `${hours}h:${minutes}m`,
+					service: service,
+				});
+
+				iterator++;
+			}
+		}
+	}
+}
+
+async function matchStops(intervalStart, intervalStop) {
+	let departures = await index.sendAllDeparturesRequest();
+	let allStations = await index.sendStationRequest();
+	let trainRoutes = new Array();
+	let registeredRoutes = new Array();
+	let trainWithStops = new Array();
+
+	for (let departure of departures) {
+
+		let toLocation = [];
+		let fromLocation = '';
+
+		for (let location of departure.ToLocation) {
+			for (let station of allStations) {
+				if (station.LocationSignature == location)
+					toLocation.push(station.AdvertisedLocationName);
+			}
+		}
+
+		for (let station of allStations) {
+			if (station.LocationSignature == departure.FromLocation[0])
+				fromLocation = station.AdvertisedLocationName;
+		}
+
+		trainRoutes.push({
+			fromLocation: fromLocation,
+			toLocation: toLocation,
+			departure: departure.AdvertisedTimeAtLocation
+		});
+	}
+
+	let trainInfo = new Array();
+	for (let route of trainRoutes) {
+		let fromDestination = route.fromLocation;
+
+		for (let i = 0; i < route.toLocation.length; i++) {
+
+			if (_.where(registeredRoutes, { fromLocation: fromDestination, toLocation: route.toLocation[i] }).length == 0 && fromDestination != '') {
+
+				registeredRoutes.push({ fromLocation: fromDestination, toLocation: route.toLocation[i] });
+				trainInfo.push(await renderTrainAnnouncement(fromDestination, route.toLocation[i], intervalStart, intervalStop));
+				fromDestination = route.toLocation[i];
+			}
+		}
+	}
+
+	for (let route of trainRoutes) {
+		let fromDestination1 = route.fromLocation;
+		let fromDest = route.fromLocation;
+
+		let startStops = new Array();
+		let endStops = new Array();
+		for (let i = 1; i < route.toLocation.length; i++) {
+			if (route.fromDestination != '') {
+				if (i == 1) {
+					for (let train of trainInfo) {
+						if (train != []) {
+							if (_.where(train, { from: fromDestination1, to: route.toLocation[0] }).length > 0) {
+								// previousStop
+								startStops = _.where(train, { from: fromDestination1, to: route.toLocation[0] });
+							}
+						}
+					}
+				}
+
+				for (let train of trainInfo) {
+					if (train != []) {
+						if (_.where(train, { from: route.toLocation[i - 1], to: route.toLocation[i] }).length > 0) {
+							endStops = _.where(train, { from: route.toLocation[i - 1], to: route.toLocation[i] });
+						}
+					}
+				}
+
+				for (let startStop of startStops) {
+					Object.keys(endStops).forEach(key => {
+						if (new Date(startStop.arrival).getTime() == new Date(endStops[key].departure).getTime()) {
+
+							let hours = Math.floor((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000));
+							let minutes = Math.ceil(((new Date(endStops[key].arrival).getTime() - new Date(startStop.departure).getTime()) / (3600 * 1000) - hours) * 60);
+
+							if (_.where(trainWithStops, { from: startStop.from, to: endStops[key].to, betweenStations: startStop.to, departure: startStop.departure, arrival: endStops[key].arrival, travelTime: `${hours}h:${minutes}m`, service: endStops[key].service }).length == 0) {
+
+
+								let timeOptions = { hour: "2-digit", minute: "2-digit" };
+
+								new Date().toLocaleTimeString("sv-SE", timeOptions)
+
+								trainWithStops.push({
+									from: startStop.from,
+									to: endStops[key].to,
+									betweenStations: startStop.to,
+									betweenStationDeparture: startStop.arrival,
+									departure: startStop.departure,
+									arrival: endStops[key].arrival,
+									travelTime: `${hours}h:${minutes}m`,
+									service: endStops[key].service
+								});
+
+
+								const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
+								dates.forEach(function (date) {
+									Train.create({
+										from: startStop.from,
+										to: endStops[key].to,
+										owner: 'G4Win',
+										betweenStations: startStop.to,
+										date: date.toLocaleDateString(),
+										betweenStationDeparture: new Date(startStop.arrival).toLocaleTimeString("sv-SE", timeOptions),
+										departure: new Date(startStop.departure).toLocaleTimeString("sv-SE", timeOptions),
+										arrival: new Date(endStops[key].arrival).toLocaleTimeString("sv-SE", timeOptions),
+										travelTime: `${hours}h:${minutes}m`,
+										service: endStops[key].service
+									});
+								});
+							}
+						}
+					});
+				}
+				startStops = endStops;
+			}
+		}
+	}
+}
+
+
+function getDates(startDate, endDate) {
+	const dates = []
+	let currentDate = startDate
+	const addDays = function (days) {
+		const date = new Date(this.valueOf())
+		date.setDate(date.getDate() + days)
+		return date
+	}
+	while (currentDate <= endDate) {
+		dates.push(currentDate)
+		currentDate = addDays.call(currentDate, 1)
+	}
+	return dates
+}
+
+//// RUNNING THE METHODS
+
+matchStops('-16:25:00', '06:30:00');
+// getAdvertisedLocationName('Hpbg');
+// trainStops();
+getAllStations();
+// renderTrainAnnouncement('Örebro C', 'Hallsberg');
+```
 
 
 ### Javascript/Frontend Design
