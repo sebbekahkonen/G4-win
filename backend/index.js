@@ -154,7 +154,6 @@ app.get('/', (req, res) => {
 
 //Dynamic rest route:POST
 app.post('/api/:table', (req, res) => {
-	console.log("test");
 	// let data = {
 	// 	name: req.body.name,
 	// 	email: req.body.email,
