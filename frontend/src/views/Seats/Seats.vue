@@ -87,6 +87,7 @@ import _ from 'underscore';
 export default {
 	data: () =>  ({
 		bookedSeatsArr: [],
+		databaseWagon: 0,
 		noOfWagons: 1,
 		nrOfSeats: [],
 		isClicked: false,
@@ -139,6 +140,7 @@ export default {
 		},
 		nextPage() {
 			this.$store.commit('travelStore/setBookedSeats', this.chosenSeats);
+			this.$store.commit('travelStore/setBookedWagon', this.noOfWagons);
 			this.$router.push('/payment');
 		},
 		fillSeatArr() {
@@ -152,8 +154,9 @@ export default {
 			fetch('api/seats')
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
-					if(data.data[key].train_id === this.trainId) {
+					if(data.data[key].train_id === this.trainId && data.data[key].wagon === this.noOfWagons) {
 						this.bookedSeatsArr.push(data.data[key].seats_booked);
+						this.databaseWagon = data.data[key].wagon;
 					}
 				}));
 

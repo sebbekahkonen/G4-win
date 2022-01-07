@@ -6,7 +6,8 @@ export default {
 		date: '',
 		formatDate: new Date,
 		bookedSeats: [],
-		trainId: ''
+		trainId: '',
+		wagon: 1
 	},
 
 	mutations: {
@@ -24,6 +25,9 @@ export default {
 		},
 		setTrainId(state, payload) { 
 			state.trainId = payload;
+		},
+		setBookedWagon(state, payload) { 
+			state.wagon = payload;
 		}
 	},
 	actions: {
