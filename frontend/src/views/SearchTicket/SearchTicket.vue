@@ -1,14 +1,14 @@
 <template>
 	<v-container class="justify-center">
 		<v-col class="flex text-center pa-3">
-			<h3>Sök efter din biljett</h3>
+			<h3>Sök efter din biljett med ordernummer</h3>
 		</v-col>
 		<v-text-field 
 			v-model="ticketInput"
 			solo
 			dense
 			color="blue"
-			label="Sök biljett"
+			label="Ordernummer"
 			append-icon="mdi-magnify"
 			@click:append="search"
 		/>
