@@ -1,14 +1,14 @@
 <template>
 	<v-container class="justify-center">
 		<v-col class="flex text-center pa-3">
-			<h3>Sök efter din biljett</h3>
+			<h3>Sök efter din biljett med ordernummer</h3>
 		</v-col>
 		<v-text-field 
 			v-model="ticketInput"
 			solo
 			dense
 			color="blue"
-			label="Sök biljett"
+			label="Ordernummer"
 			append-icon="mdi-magnify"
 			@click:append="search"
 		/>
@@ -35,14 +35,16 @@
 		>
 			<template v-slot:expanded-item="{ headers }">
 				<td :colspan="headers.length">
-					<v-row justify="space-between">
-						<v-col class="pa-0 pt-4">
-							<h3>Namn: {{ firstAndLast }}</h3>
-						</v-col>
-						<v-col class="pa-0 pt-4">
-							<h3 class="text-right">Platser: {{ seatsBooked }}</h3>
-						</v-col>
-					</v-row>																
+					<v-layout column justify-center>
+						<v-layout row wrap class="pt-5 text-center">
+							<v-flex xs6>
+								<span class="text-center">Namn: {{ firstAndLast }}</span>
+							</v-flex>
+							<v-flex xs6>
+								<span class="text-center">Platser: {{ seatsBooked }}</span>
+							</v-flex>
+						</v-layout>
+					</v-layout>
 					<v-col class="mt-4">
 						<v-layout>
 							<h3 v-if="btnClicked" class="flex text-center red--text">Är du säker på att du vill avboka?</h3>
@@ -65,7 +67,7 @@ export default {
 	data: () => ({
 		isTrue: false,
 		firstAndLast: 'John Doe',
-		seatsBooked: '4, 8, 2',
+		seatsBooked: '',
 		ticketInput: '',
 		btnClicked: false,
 		expanded: [],
@@ -73,13 +75,17 @@ export default {
 		ticketHeaders: [
 		
 			{
-				text: 'email',
+				text: 'Email',
 				value: 'email'
 			},
 			
-			{ 
-				text: 'order_number',
+			{
+				text: 'Ordernummer',
 				value: 'order_number'
+			},
+			{ 
+				text: 'Säten',
+				value: 'seats'
 			}
 		],
 		tickets: [
@@ -104,11 +110,13 @@ export default {
 		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt']),
 		search() {
 			this.tickets = [];
+			
 			Object.keys(this.getAllTheReceipts).forEach(key => {
 				if (this.getAllTheReceipts[key].order_number == (this.ticketInput)) {
 					this.tickets.push(this.getAllTheReceipts[key]);
 				}
 			});
+			this.seatsBooked = this.tickets[0].seats;
 			this.isTrue = true;
 		},
 
