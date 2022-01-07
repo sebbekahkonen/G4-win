@@ -116,15 +116,20 @@ export default {
 				document.getElementById(seats2).style.backgroundColor = 'green';
 			}
 
+			console.log(this.bookedSeatsArr);
+
 			for (let seats3 of this.nrOfSeats) {
 				
-				if (_.contains(this.bookedSeatsArr, (seats3)) && this.noOfWagons === 1) {
+				if (_.where(this.bookedSeatsArr, {seat: seats3, wagon: this.noOfWagons}).length > 0) {
 					document.getElementById(seats3 - 1).style.pointerEvents = 'none';
 					document.getElementById(seats3 - 1).style.backgroundColor = 'black';
 				}
-			}			
-			console.log('Database Wagon: ', this.databaseWagon, '\n', 'Wagons Site: ', this.noOfWagons);
+			}
 
+			if (_.where(this.bookedSeatsArr, {seat: 40, wagon: this.noOfWagons}).length > 0) {
+				document.getElementById(40 - 1).style.pointerEvents = 'none';
+				document.getElementById(40 - 1).style.backgroundColor = 'black';
+			}
 		},
 		countTickets() {
 			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
@@ -151,9 +156,9 @@ export default {
 			fetch('api/seats')
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
-					if(data.data[key].train_id === this.trainId && data.data[key].wagon === this.noOfWagons) {
-						this.bookedSeatsArr.push(data.data[key].seats_booked);
-						this.databaseWagon = data.data[key].wagon;
+					if(data.data[key].train_id === this.trainId) {
+						this.bookedSeatsArr.push({seat: data.data[key].seats_booked, wagon: data.data[key].wagon });
+						// this.databaseWagon = data.data[key].wagon;
 					}
 				}));
 
