@@ -1,4 +1,4 @@
-- Innehållsförteckning, data flow med flowchart, db relation med flowchart, vilka verktyg och npm vi använde, backend, frontend, overview,mail
+- Innehållsförteckning, data flow med flowchart, db relation med flowchart, vilka verktyg och npm vi använde, backend, frontend, overview, mail
 
 # Dokumentation
 
@@ -38,10 +38,22 @@ Här nedan ser vi alla url:n utfrån kundernas perspektiv:
 ![image](https://user-images.githubusercontent.com/48633146/148405234-8e429ac0-a9e6-4f91-b0cc-abcf0b3e70c6.png)
 
 
-### Flowcharts (DB och data flow)
+### Flowcharts 
+
+> Data Flow
+
+![Data Flow](https://user-images.githubusercontent.com/48633146/148553635-b07aef1f-07e5-4a3b-9cd0-5daa6a00b934.png)
+
+> Databas diagram
+
+Diagrammet är ritat i Microsoft SQL Server Management Studio:
+
+![DB diagram](https://user-images.githubusercontent.com/48633146/148554800-ce0e3bad-182d-477c-9acd-e321ed7f1a3d.png)
+
+
 
 ### Code Struktur 
-lägga in det med proxy som kopplar front o bakcned
+lägga in det med proxy som kopplar front o backend
 
 
 Dependencies som vi använda för vår projekt är följande:
