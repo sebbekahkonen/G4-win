@@ -83,6 +83,7 @@
 <script>
 import vue from 'vue';
 import { mapState } from 'vuex';
+import _ from 'underscore';
 export default {
 	data: () =>  ({
 		bookedSeatsArr: [],
@@ -109,17 +110,17 @@ export default {
 	// 	}, 200);
 	// },
 	methods: {
-		disableBookedSeats() {			
-			for(let seats2 of this.bookedSeatsArr) {				
-				if (this.databaseWagon === this.noOfWagons) {
-					document.getElementById(seats2).style.pointerEvents = 'none';
-					document.getElementById(seats2).style.backgroundColor = 'black';
-					console.log('Bokade platser: ', seats2 + 1);
-					for(let seats3 of this.nrOfSeats) {
-						if(!seats2 === seats3) {
-							document.getElementById(seats2).style.backgroundColor = 'green';
-						}
-					}
+		disableBookedSeats() {
+
+			for (let seats2 of this.nrOfSeats) {
+				document.getElementById(seats2).style.backgroundColor = 'green';
+			}
+
+			for (let seats3 of this.nrOfSeats) {
+				
+				if (_.contains(this.bookedSeatsArr, (seats3)) && this.noOfWagons === 1) {
+					document.getElementById(seats3 - 1).style.pointerEvents = 'none';
+					document.getElementById(seats3 - 1).style.backgroundColor = 'black';
 				}
 			}			
 			console.log('Database Wagon: ', this.databaseWagon, '\n', 'Wagons Site: ', this.noOfWagons);
@@ -140,7 +141,7 @@ export default {
 			this.$router.push('/payment');
 		},
 		fillSeatArr() {
-			for(let i=0; i<40; i++) {
+			for (let i = 0; i < 40; i++) {
 				this.nrOfSeats.push(i);
 			}
 		},
@@ -192,29 +193,14 @@ export default {
 		},
 		
 		increaseWagons() {	
-			if(this.noOfWagons != 7)
-				this.noOfWagons += 1;
-	
-			this.databaseWagon += 1;
-
-			this.bookedSeatsArr = [];
-			console.log(this.bookedSeatsArr);
-
-			this.fetchBookedSeats();
+			if(this.noOfWagons != 7) 
+				this.noOfWagons += 1;	
 				
-			
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
 				this.noOfWagons -= 1;
 
-			this.databaseWagon -= 1;
-
-			this.bookedSeatsArr = [];
-			console.log(this.bookedSeatsArr);
-
-			this.fetchBookedSeats();
-			
 		}
 	}
 };

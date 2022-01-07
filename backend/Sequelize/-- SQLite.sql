@@ -1,4 +1,4 @@
 -- SQLite
-SELECT id, trainId, `from`, `to`, date, owner, departure, arrival, travelTime, betweenStations, betweenStationDeparture, service
-FROM trains
-ORDER BY id DESC
+SELECT *
+FROM seats
+ORDER BY train_id DESC, seats_booked
