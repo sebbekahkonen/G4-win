@@ -122,6 +122,11 @@ export default {
 					document.getElementById(seats3 - 1).style.backgroundColor = 'black';
 				}
 			}
+
+			if (_.contains(this.bookedSeatsArr, 40) && this.noOfWagons === 1) {
+				document.getElementById(40 - 1).style.pointerEvents = 'none';
+				document.getElementById(40 - 1).style.backgroundColor = 'black';
+			}
 		},
 		countTickets() {
 			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
