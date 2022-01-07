@@ -1,5 +1,3 @@
-- Innehållsförteckning, data flow med flowchart, db relation med flowchart, vilka verktyg och npm vi använde, backend, frontend, overview, mail
-
 # Dokumentation
 
 ## Innehållsförteckning
@@ -11,15 +9,10 @@
 5) Proxy
 6) Trafikverkets externa API
 7) Javascript/Frontend Design 
-8) Mail
-9) Förbättringar under processen
-10) Javascript/Frontend Design 
-11) Authentication och Authorization
-12) Verktyg
-13) Mail
-14) Stripe (Hitta confluence länken till det)
-15) Kanske en custom middle för API-Key till våra kontroller
-16) Förbättringar under processen
+8) Mail (nodemailer)
+9) Stripe (Hitta confluence länken till det)
+10) Förbättringar under processen
+11) Referens
 
 ### Översikt
 
@@ -84,89 +77,47 @@ Här tänkte jag bryta ner vår wireframes i detaljer. Det som sker i homepage u
 
 ![Homepage](https://user-images.githubusercontent.com/48633146/148562817-9d3e8bf9-34ee-4654-b06f-952b1d283379.png)
 
-I vår frontend booking.vue fil så har vi en search objekt med en departureStation och arrivalStation properties. Koden ser ut på det viset:
-Dessa är tomt i början tills kunden skriver in vart dem ska.
-Sedan har vi mappat in getStations och getSearched metoder i vår bookingStore.js via en spread-syntax.
+I vår frontend booking.vue fil så använder vi först och främst fetchApi metoden och via det så hämtar vi alla stationer i DB:n. Sen populerar vi autocomplete fälten genom att binda items till vår stationsArr som ni ser på nedanstående kod:
 
 ``` javascript
-Booking.vue:
+fetchApi() {
+			fetch('/api/stations')
+				.then(res => res.json())
+				.then(data => Object.keys(data.data).forEach(key => {
+					this.stationsArr.push(data.data[key].AdvertisedLocationName);
+				})
+				);
+		},
 
-data: () => ({
-		search: {
-			departureStation: '',
-			arrivalStation: ''
-		}),
-methods: {
-		...mapActions('bookingStore', ['getStations', 'getSearched'])
+<v-autocomplete
+				v-model="search.departureStation"
+				label="Från"
+				:items="stationsArr"
+				hint="Ange de tre första bokstäverna"
+				clearable
+				dense
+				filled
+				@change="testBtnDisabled"
+			/>
 ```
 
-BookingStore.js fil är sparat i vår store map. Store map lagrar alla filer som kopplar vår backend och frontend.
-
-Vi har några tomma state där vi t.ex. kan hämta alla stationer via vår getAllStations method i vår getters. Därefter använder vi oss av setStations metoden i
-mutations och matar in alla stationer som hämtas från db:n. Sedan har vi en searchTrains method som är i princip en fetch get metod för att hämtas vad kundernas har
-valt i från och till sök fältet som ser ut på det viset:
+Därefter har vi en search objekt med en departureStation och arrivalStation properties. Dessa är tomt i början tills kunden skriver in vart dem ska. När kunden har matat in sök fälten så  commitar vi objektet in i store mappen så att vi kan använda objektet globalt. 
+Koden ser ut på det viset:
 
 ``` javascript
-export default {
-	searchTrains(from, to) {
-		return axios.get(`/api/trains/${from}/${to}`, {
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		})
-			.then((response) => {
-				console.log('response: ', response);
+nextPage() {
+			this.bookingInformation.departure.departureDestination = this.search.departureStation;
+			this.bookingInformation.departure.arrivalDestination = this.search.arrivalStation;
+			this.bookingInformation.departure.departureDateTime = `${this.selectedExit} ${this.departureDate.toLocaleDateString()} ${this.depTime}`;		
+			this.bookingInformation.departure.arrivalDateTime = '';
 
-				return response.data.data;
-			});
-	}
+			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
+			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString());
+		}
 ```
 
-``` javascript
-bookingStore.js:
 
-state: {
-		allStations: [],
-		arrivals: [],
-		departures: []
-	},
 
-	mutations: {
-		setStations(state, data) {
-			console.log('data in set: ', data);
-			state.allStations.push(data);
-		},
-		setArrivals(state, data) {
-			state.arrivals.push(data);
-		},
-		setDepartures(state, data) {
-			state.departures.push(data);
-		}
-	},
-
-	actions: {
-		async getStations({ commit }, data) {
-			const trainData = await trainServices.getAllStations(data);
-
-			console.log('This is the traindata: ', trainData);
-			commit('setStations', trainData);
-		},
-
-		async getSearched({ commit }, data) {
-			const trainData = await trainServices.searchTrains(data.from, data.to);
-
-			console.log('This is the traindata: ', trainData);
-			commit('setStations', trainData);
-		}
-
-	},
-
-	getters: {
-		getAllStations(state) {
-			return state.allStations;
-		}
-	}
-``` 
 
 > Train Departures/Arrivals
 
@@ -176,15 +127,207 @@ Frontend på denna url:n är TrainDepartures.vue filen
 
 ![Departures/Arrivals Schedule](https://user-images.githubusercontent.com/48633146/148584113-ca7663ad-2544-416a-9668-75e76d011134.png)
 
+Vi börjar med att hämta avgångar baserad på destination. I samband med det filtrear vi på datum så att vi hämtar tillgängliga resor för det valda datumet. Routen för detta ser ut så här: 
+/api/:table/:from/:to
 
 
+``` javascript
+fetch(`/api/trains/${this.travelObj.departure.departureDestination}/${this.travelObj.departure.arrivalDestination}`)
+				.then(res => res.json())
+				.then(data => Object.keys(data.data).forEach(key => {
+					if(data.data[key].date === this.date) {
+						this.trainsArray.push(data.data[key]);
+					}				
+				})
+```
+
+``` javascript
+computed: {
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate'])
+	}
+```
+
+this.travelObj.departure.departureDestination = :from 
+this.travelObj.departure.arrivalDestination = :to
+
+Ovanstående objekt kommer ifrån store filen travelStore.js där användaren valde resa i Homepage url:n.
+
+Dropdown menyn som syns i bilden kommer ifrån samma fetch metod där trainsArray bind till items och loopas igenom. 
+
+``` javascript
+<v-data-table
+			:headers="trainHeaders"
+			:items="trainsArray"
+			:single-expand="singleExpand"
+			:expanded.sync="expanded"
+			item-key="id"
+			show-expand
+			mobile-breakpoint="0"
+			@click:row="expandRow"
+			@item-expanded="onExpand"
+			@row-clicked="onExpand"
+		>
+
+```
+
+För att komma åt den infon vi behöver så använder vi value i trainHeaders där value representerar datan i vår trains tabell o där text är headers.
+
+``` javascript
+trainHeaders: [
+			{
+				text: 'Tågnr',
+				value: 'id'
+			},
+			{
+				text: 'Avgång',
+				value: 'departure'
+			},
+			{
+				text: 'Ankomst',
+				value: 'arrival'
+			},
+			{
+				text: 'Restid',
+				value: 'travelTime'
+			},
+			{
+				text: 'Bistro',
+				value: 'service'
+			},
+			{
+				text: '',
+				value: 'data-table-expand'
+			}
+		]
+```
 
 
+``` javascript
+this.$store.commit('travelStore/setTrainId', value.item.id);
+```
+
+Slutligen när användaren har valt tåg så commitar vi in i store det unika trainId:t så att vi får rätt platser för rätt tåg för vår seats url.
 
 > Seats
+
+Därefter hamnar kunderna på seats url:n och beroende på antal biljetter dem har köpt så får kunder välja de exakta antal sitplatser i vilken vagn som helst och självklart
+så kan dem ej boka platser som redan är upptagna och dessa platser är svartmarkerade som ni ser på bilden nedan:
+
+![Seats](https://user-images.githubusercontent.com/48633146/148590574-c4bb0e86-6cf4-4804-bb79-bde9971f731a.png)
+
+Kodens entrypoint är via vår Seats.vue:
+Vi hämtar ifrån db:n alla bookade säten och därefter filtrerar vi på trainId. Om trainId matchar vår trainId i store (tåget användaren har valt) (svart markerade säten).
+
+``` javascript
+fetchBookedSeats() {
+			fetch('api/seats')
+				.then(res => res.json())
+				.then(data => Object.keys(data.data).forEach(key => {
+					if(data.data[key].train_id === this.trainId) {
+						this.bookedSeatsArr.push({seat: data.data[key].seats_booked, wagon: data.data[key].wagon });
+					}
+				}));
+
+		}
+```
+
+Nästa steg är vår nästa metod för att boka platser:
+Metoden nedan är vår logik för att välja antal platser man har bokat beroende på antal biljetter kunder har köpt (röd markerade sätet). 
+
+this.chosenSeats är array:en som kommer att skickas in i DB:n.
+
+``` javascript
+
+setClicked(event) {
+			let seatID = event.currentTarget.id;
+			let seatToChange = document.getElementById(`${seatID}`);
+
+			if(this.chosenSeats.indexOf(seatID) === -1) {
+
+				if(this.chosenSeats.length < this.nrOfTickets) {
+					seatToChange.style.backgroundColor = 'red';
+					this.chosenSeats.push(seatID);
+				} else {
+					let modal = document.getElementById('popup-modal');
+
+					modal.style.display = 'block';
+
+					window.onclick = (e) => {
+						if(e.target == modal) {
+							modal.style.display = 'none';
+							console.log('Clicked!');
+						}
+					};
+				} 
+			} else {
+				seatToChange.style.backgroundColor = 'green';
+				this.chosenSeats.splice(this.chosenSeats.indexOf(seatID), 1);
+			}
+
+			if(this.chosenSeats.length < this.nrOfTickets) {
+				this.btnDisable = true;
+			} else {
+				console.log(this.chosenSeats.length);
+				this.btnDisable = false;
+			}
+		}
+```
+
+Därefter skickar vi dessa plats och vagn objekt till store vilket därefter nås i payment url:n:
+
+``` javascript
+nextPage() {
+			this.$store.commit('travelStore/setBookedSeats', this.chosenSeats);
+			this.$store.commit('travelStore/setBookedWagon', this.noOfWagons);
+		}
+```
+
+> Payment
+
+Här kan kunderna bekräfta all ovanstående info vi gick igenom via betala knappen:
+
+![Payment](https://user-images.githubusercontent.com/48633146/148610760-b193260e-a06a-414a-a72c-bde7f8896738.png)
+
+
+Kodens entrypoint är via vår Payment.vue:
+Eftersom att DB:n inte tar emot array måste vi ha logik för dem bokade säterna. Logiken ser ut som nedan:
+
+``` javascript
+for(let seats of this.bookedSeats) {
+				let dataSend = { train_id: this.trainId, seats_booked: seats, wagon: this.wagon, date: this.date  };
+
+				fetch('/api/seats', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(dataSend)
+				})
+					.then(res => res.json())
+					.then(data => {
+						console.log('Success:', data);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+			}
+```
+
+Efter att vi har loopat igenom arrayen för sitplatserna så använder vi oss utav stripe dependency. Vi kallar på det genom this.$refs.checkoutRef.redirectToCheckout().
+Vi skickar priserna till stripe checkout. 
+
+
 > Stripe
+
+Stripe har inbyggd funktionalitet för mail, betalnings och kortinformation och dem har i ett test kort där man slå in för att testa runt sig i development miljön.
+
+![Stripe Credit information](https://user-images.githubusercontent.com/48633146/148611828-3b64911b-53a0-4789-b6aa-f248cfb4d536.png)
+
+
 > Confirmation
+
 > SearchTickets
+
 > CancelBooking
 
 
@@ -648,5 +791,11 @@ getAllStations();
 ### Förbättringar under processen t.ex. nämna att själva sequalize löste vårt problem för pris tabell ist för sqllite3
 
 ### bokade säter ![image](https://user-images.githubusercontent.com/48633146/148439086-01ae6410-08dd-4b45-bcc3-3e15f9fef7cf.png)
+
+
+### Referens:
+
+Lägg till alla stripes länkar
+
 
 
