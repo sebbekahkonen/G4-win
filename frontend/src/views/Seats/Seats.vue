@@ -112,12 +112,11 @@ export default {
 		disableBookedSeats() {
 
 			for (let seats2 of this.nrOfSeats) {
-				console.log(seats2);
 				document.getElementById(seats2).style.backgroundColor = 'green';
 			}
 
 			for (let seats3 of this.nrOfSeats) {
-
+				
 				if (_.contains(this.bookedSeatsArr, (seats3)) && this.noOfWagons === 1) {
 					document.getElementById(seats3 - 1).style.pointerEvents = 'none';
 					document.getElementById(seats3 - 1).style.backgroundColor = 'black';
