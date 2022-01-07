@@ -11,6 +11,7 @@
     "@vue-stripe/vue-stripe": "^4.2.9",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "underscore": "^1.13.2",
     "v-calendar": "^2.3.4",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
