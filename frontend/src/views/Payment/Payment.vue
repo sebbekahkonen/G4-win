@@ -65,7 +65,9 @@ export default {
 		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId', 'wagon']),
 		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
-
+	created() {
+		console.log(this.bookedSeats[1].wagon);
+	},
 	mounted() {
 		this.isTrue = true;
 	},
@@ -114,7 +116,7 @@ export default {
 
 
 			for(let seats of this.bookedSeats) {
-				let dataSend = { train_id: this.trainId, seats_booked: seats, wagon: this.wagon, date: this.date  };
+				let dataSend = { train_id: this.trainId, seats_booked: seats.seat, wagon: seats.wagon, date: this.date  };
 
 				fetch('/api/seats', {
 					method: 'POST',
