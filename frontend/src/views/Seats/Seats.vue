@@ -6,16 +6,16 @@
 		</v-btn>
 		<v-row>
 			<v-col align="center">
-				<!-- Från: {{ travelObj.departure.departureDestination }} -->
-				Från: Göteborg
+				Från: {{ travelObj.departure.departureDestination }}
+				<!-- Från: Göteborg -->
 			</v-col>
 			<v-col align="center">
 				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
 				Mellanstation: Jönköping
 			</v-col>
 			<v-col align="center">
-				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
-				Till: Stockholm
+				Till: {{ travelObj.departure.arrivalDestination }}
+				<!-- Till: Stockholm -->
 			</v-col>
 		</v-row>
 		<v-col align="center">
@@ -93,6 +93,7 @@ export default {
 		nrOfTickets: 0,
 		chosenSeats: [],
 		btnDisable : true
+
 	}),
 	computed: {
 		...mapState('travelStore', ['travelObj', 'date', 'trainId', 'formatDate', 'hasBistro']),
@@ -103,13 +104,23 @@ export default {
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
 
-		const timer = setInterval(() => {
+	
+	},
+	mounted() {
+		// const timer = setInterval(() => {
+		// 	this.disableBookedSeats();
+		// 	console.log('KÖR SETINTERVAL');
+		// }, 100);
+
+		// this.$once('hook:beforeDestroy', () => {
+		// 	console.log('KÖR CLEARINTERVAL');
+		// 	clearInterval(timer);
+		// });
+		setTimeout(() => {
+			console.log('RENDERA BOKADE SÄTEN');
 			this.disableBookedSeats();
 		}, 100);
-
-		this.$once('hook:beforeDestroy', () => {
-			clearInterval(timer);
-		});
+		
 	},
 	methods: {
 		disableBookedSeats() {
@@ -126,8 +137,8 @@ export default {
 			}
 
 			if (_.where(this.bookedSeatsArr, {seat: 39, wagon: this.noOfWagons}).length > 0) {
-				document.getElementById(40).style.pointerEvents = 'none';
-				document.getElementById(40).style.backgroundColor = 'black';
+				document.getElementById(39).style.pointerEvents = 'none';
+				document.getElementById(39).style.backgroundColor = 'black';
 			}
 		},
 		countTickets() {
@@ -198,14 +209,22 @@ export default {
 		
 		increaseWagons() {	
 			if(this.noOfWagons != 7) 
-				this.noOfWagons += 1;	
-
+				this.noOfWagons += 1;
+			
+			if(this.noOfWagons != 3) {
+				this.disableBookedSeats();
+				console.log(this.bookedSeatsArr);
+			}
+			
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
 				this.noOfWagons -= 1;
 
-			this.disableBookedSeats();
+			if(!this.noOfWagons != 3) {
+				this.disableBookedSeats();
+				console.log(this.bookedSeatsArr);
+			}
 		}
 	}
 };
