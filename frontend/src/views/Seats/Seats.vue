@@ -22,7 +22,7 @@
 			<!-- Valt datum: {{ date }} -->
 			Valt datum: 2022-01-01
 		</v-col>
-		<v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn>
+		<!-- <v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn> -->
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
 			<v-btn v-if="noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
@@ -103,20 +103,21 @@ export default {
 		vue.nextTick(this.fetchBookedSeats());
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
+
+		const timer = setInterval(() => {
+			this.disableBookedSeats();
+		}, 100);
+
+		this.$once('hook:beforeDestroy', () => {
+			clearInterval(timer);
+		});
 	},
-	// mounted() {
-	// 	setTimeout(() => {
-	// 		this.disableBookedSeats();
-	// 	}, 200);
-	// },
 	methods: {
 		disableBookedSeats() {
 
 			for (let seats2 of this.nrOfSeats) {
 				document.getElementById(seats2).style.backgroundColor = 'green';
 			}
-
-			console.log(this.bookedSeatsArr);
 
 			for (let seats3 of this.nrOfSeats) {
 				
@@ -200,7 +201,7 @@ export default {
 		increaseWagons() {	
 			if(this.noOfWagons != 7) 
 				this.noOfWagons += 1;	
-				
+
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
