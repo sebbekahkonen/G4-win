@@ -57,7 +57,7 @@
 				<div v-for="seats in nrOfSeats" :key="seats" class="seat-booking">	
 					<div class="seat-booking">
 						<div :id="seats" class="seat-availability" @click="setClicked">
-							<span>{{ seats + 1 }}</span>
+							<span>{{ seats }}</span>
 						</div>
 					</div>
 				</div>
@@ -92,8 +92,9 @@ export default {
 		isClicked: false,
 		nrOfTickets: 0,
 		chosenSeats: [],
-		btnDisable : true
-
+		btnDisable : true,
+		wagonIncreased: false,
+		wagonDecreased: false
 	}),
 	computed: {
 		...mapState('travelStore', ['travelObj', 'date', 'trainId', 'formatDate', 'hasBistro']),
@@ -124,8 +125,12 @@ export default {
 	},
 	methods: {
 		disableBookedSeats() {
-			for (let seats2 of this.nrOfSeats) {
-				document.getElementById(seats2).style.backgroundColor = 'green';
+
+			if(this.chosenSeats.length < 1 || this.wagonIncreased || this.wagonDecreased) {
+				for (let seats2 of this.nrOfSeats) {
+					document.getElementById(seats2).style.backgroundColor = 'green';
+					document.getElementById(seats2).style.pointerEvents = 'auto';
+				}
 			}
 
 			for (let seats3 of this.nrOfSeats) {
@@ -134,11 +139,21 @@ export default {
 					document.getElementById(seats3).style.pointerEvents = 'none';
 					document.getElementById(seats3).style.backgroundColor = 'black';
 				}
+
+				if(this.chosenSeats.length > 0) {
+
+					let seatToString = seats3.toString();
+
+					if(_.where(this.chosenSeats, {seat: seatToString, wagon: this.noOfWagons}).length > 0) {
+						console.log(seatToString, this.noOfWagons);
+						document.getElementById(seats3).style.backgroundColor = 'red';
+					}
+				}
 			}
 
 			if (_.where(this.bookedSeatsArr, {seat: 39, wagon: this.noOfWagons}).length > 0) {
-				document.getElementById(39).style.pointerEvents = 'none';
-				document.getElementById(39).style.backgroundColor = 'black';
+				document.getElementById(40).style.pointerEvents = 'none';
+				document.getElementById(40).style.backgroundColor = 'black';
 			}
 		},
 		countTickets() {
@@ -152,11 +167,11 @@ export default {
 		},
 		nextPage() {
 			this.$store.commit('travelStore/setBookedSeats', this.chosenSeats);
-			this.$store.commit('travelStore/setBookedWagon', this.noOfWagons);
+			// this.$store.commit('travelStore/setBookedWagon', this.noOfWagons);
 			this.$router.push('/payment');
 		},
 		fillSeatArr() {
-			for (let i = 0; i < 40; i++) {
+			for (let i = 1; i < 41; i++) {
 				this.nrOfSeats.push(i);
 			}
 		},
@@ -168,7 +183,6 @@ export default {
 				.then(data => Object.keys(data.data).forEach(key => {
 					if(data.data[key].train_id === this.trainId) {
 						this.bookedSeatsArr.push({seat: data.data[key].seats_booked, wagon: data.data[key].wagon });
-						// this.databaseWagon = data.data[key].wagon;
 					}
 				}));
 
@@ -176,12 +190,13 @@ export default {
 		setClicked(event) {
 			let seatID = event.currentTarget.id;
 			let seatToChange = document.getElementById(`${seatID}`);
+			let seatIDToString = seatID.toString();
 
-			if(this.chosenSeats.indexOf(seatID) === -1) {
+			if(_.where(this.chosenSeats, {seat: seatIDToString, wagon: this.noOfWagons}).length == 0) {
 
 				if(this.chosenSeats.length < this.nrOfTickets) {
 					seatToChange.style.backgroundColor = 'red';
-					this.chosenSeats.push(seatID);
+					this.chosenSeats.push({seat: seatID, wagon: this.noOfWagons});
 				} else {
 					let modal = document.getElementById('popup-modal');
 
@@ -196,7 +211,9 @@ export default {
 				} 
 			} else {
 				seatToChange.style.backgroundColor = 'green';
-				this.chosenSeats.splice(this.chosenSeats.indexOf(seatID), 1);
+
+				console.log({seat: seatIDToString, wagon: this.noOfWagons});
+				this.chosenSeats = _.without(this.chosenSeats, _.findWhere(this.chosenSeats, {seat: seatIDToString, wagon: this.noOfWagons}));
 			}
 
 			if(this.chosenSeats.length < this.nrOfTickets) {
@@ -210,21 +227,14 @@ export default {
 		increaseWagons() {	
 			if(this.noOfWagons != 7) 
 				this.noOfWagons += 1;
-			
-			if(this.noOfWagons != 3) {
-				this.disableBookedSeats();
-				console.log(this.bookedSeatsArr);
-			}
-			
+
+			this.wagonIncreased = true;
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
 				this.noOfWagons -= 1;
 
-			if(!this.noOfWagons != 3) {
-				this.disableBookedSeats();
-				console.log(this.bookedSeatsArr);
-			}
+			this.wagonDecreased = true;
 		}
 	}
 };
