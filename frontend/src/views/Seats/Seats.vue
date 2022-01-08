@@ -21,7 +21,7 @@
 		<v-col align="center">
 			Valt datum: {{ formatDate }}
 		</v-col>
-		<v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn>
+		<!-- <v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn> -->
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
 			<v-btn v-if="hasBistro && noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
@@ -102,11 +102,14 @@ export default {
 		vue.nextTick(this.fetchBookedSeats());
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
-	},
-	mounted() {
-		setTimeout(() => {
+
+		const timer = setInterval(() => {
 			this.disableBookedSeats();
 		}, 100);
+
+		this.$once('hook:beforeDestroy', () => {
+			clearInterval(timer);
+		});
 	},
 	methods: {
 		disableBookedSeats() {
@@ -114,7 +117,8 @@ export default {
 				document.getElementById(seats2).style.backgroundColor = 'green';
 			}
 
-			for (let seats3 of this.nrOfSeats) {				
+			for (let seats3 of this.nrOfSeats) {
+				
 				if (_.where(this.bookedSeatsArr, {seat: seats3, wagon: this.noOfWagons}).length > 0) {
 					document.getElementById(seats3).style.pointerEvents = 'none';
 					document.getElementById(seats3).style.backgroundColor = 'black';
@@ -196,8 +200,6 @@ export default {
 			if(this.noOfWagons != 7) 
 				this.noOfWagons += 1;	
 
-			this.disableBookedSeats();
-				
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
