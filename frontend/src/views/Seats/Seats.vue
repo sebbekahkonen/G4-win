@@ -19,18 +19,17 @@
 			</v-col>
 		</v-row>
 		<v-col align="center">
-			<!-- Valt datum: {{ date }} -->
-			Valt datum: 2022-01-01
+			Valt datum: {{ formatDate }}
 		</v-col>
 		<v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn>
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
-			<v-btn v-if="noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
+			<v-btn v-if="hasBistro && noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
 			<v-btn v-else id="custom-disabled" text disabled>{{ 'Vagn ' + noOfWagons }}</v-btn>
 			<v-icon right large @click="increaseWagons">{{ 'mdi-chevron-right' }}</v-icon>
 		</v-card>
 		<div>
-			<div v-if="noOfWagons === 3" class="bistro">
+			<div v-if="hasBistro && noOfWagons === 3" class="bistro">
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
@@ -96,7 +95,7 @@ export default {
 		btnDisable : true
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date', 'trainId']),
+		...mapState('travelStore', ['travelObj', 'date', 'trainId', 'formatDate', 'hasBistro']),
 		...mapState('ticketStore', ['studentTickets', 'adultTickets', 'seniorTickets'])
 	},
 	created() {
@@ -104,31 +103,27 @@ export default {
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
 	},
-	// mounted() {
-	// 	setTimeout(() => {
-	// 		this.disableBookedSeats();
-	// 	}, 200);
-	// },
+	mounted() {
+		setTimeout(() => {
+			this.disableBookedSeats();
+		}, 100);
+	},
 	methods: {
 		disableBookedSeats() {
-
 			for (let seats2 of this.nrOfSeats) {
 				document.getElementById(seats2).style.backgroundColor = 'green';
 			}
 
-			console.log(this.bookedSeatsArr);
-
-			for (let seats3 of this.nrOfSeats) {
-				
+			for (let seats3 of this.nrOfSeats) {				
 				if (_.where(this.bookedSeatsArr, {seat: seats3, wagon: this.noOfWagons}).length > 0) {
-					document.getElementById(seats3 - 1).style.pointerEvents = 'none';
-					document.getElementById(seats3 - 1).style.backgroundColor = 'black';
+					document.getElementById(seats3).style.pointerEvents = 'none';
+					document.getElementById(seats3).style.backgroundColor = 'black';
 				}
 			}
 
-			if (_.where(this.bookedSeatsArr, {seat: 40, wagon: this.noOfWagons}).length > 0) {
-				document.getElementById(40 - 1).style.pointerEvents = 'none';
-				document.getElementById(40 - 1).style.backgroundColor = 'black';
+			if (_.where(this.bookedSeatsArr, {seat: 39, wagon: this.noOfWagons}).length > 0) {
+				document.getElementById(40).style.pointerEvents = 'none';
+				document.getElementById(40).style.backgroundColor = 'black';
 			}
 		},
 		countTickets() {
@@ -200,12 +195,15 @@ export default {
 		increaseWagons() {	
 			if(this.noOfWagons != 7) 
 				this.noOfWagons += 1;	
+
+			this.disableBookedSeats();
 				
 		},
 		decreaseWagons() {
 			if(this.noOfWagons != 1)	
 				this.noOfWagons -= 1;
 
+			this.disableBookedSeats();
 		}
 	}
 };

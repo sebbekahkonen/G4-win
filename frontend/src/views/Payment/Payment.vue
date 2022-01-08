@@ -88,25 +88,25 @@ export default {
 			}
 
 			// this.addTrainId(this.trainId);
-			for(let seats of this.bookedSeats) {
-				let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
+			// for(let seats of this.bookedSeats) {
+			// 	let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
 
-				fetch('/api/current_trainId', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(dataSend)
-				})
-					.then(res => res.json())
-					.then(data => {
-						console.log('Success:', data);
-					})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-			}
-			this.$refs.checkoutRef.redirectToCheckout();			
+			// 	fetch('/api/current_trainId', {
+			// 		method: 'POST',
+			// 		headers: {
+			// 			'Content-Type': 'application/json'
+			// 		},
+			// 		body: JSON.stringify(dataSend)
+			// 	})
+			// 		.then(res => res.json())
+			// 		.then(data => {
+			// 			console.log('Success:', data);
+			// 		})
+			// 		.catch((error) => {
+			// 			console.error('Error:', error);
+			// 		});
+			// }
+			// this.$refs.checkoutRef.redirectToCheckout();			
 			console.log('Train_id:', this.trainId);
 			console.log('Biljetter:', this.bookedSeats);
 			console.log('date:', this.date);

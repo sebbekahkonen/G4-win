@@ -7,7 +7,8 @@ export default {
 		formatDate: new Date,
 		bookedSeats: [],
 		trainId: '',
-		wagon: 1
+		wagon: 1,
+		hasBistro: false
 	},
 
 	mutations: {
@@ -28,6 +29,9 @@ export default {
 		},
 		setBookedWagon(state, payload) { 
 			state.wagon = payload;
+		},
+		setHasBistro(state, payload) {
+			state.hasBistro = payload;
 		}
 	},
 	actions: {
