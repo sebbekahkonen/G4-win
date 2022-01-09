@@ -141,11 +141,6 @@ export default {
 					}
 				}
 			}
-
-			if (_.where(this.bookedSeatsArr, {seat: 39, wagon: this.noOfWagons}).length > 0) {
-				document.getElementById(40).style.pointerEvents = 'none';
-				document.getElementById(40).style.backgroundColor = 'black';
-			}
 		},
 		countTickets() {
 			this.nrOfTickets = this.studentTickets + this.adultTickets + this.seniorTickets;
