@@ -105,23 +105,13 @@ export default {
 		vue.nextTick(this.fillSeatArr());
 		vue.nextTick(this.countTickets());
 
-	
-	},
-	mounted() {
-		// const timer = setInterval(() => {
-		// 	this.disableBookedSeats();
-		// 	console.log('KÖR SETINTERVAL');
-		// }, 100);
-
-		// this.$once('hook:beforeDestroy', () => {
-		// 	console.log('KÖR CLEARINTERVAL');
-		// 	clearInterval(timer);
-		// });
-		setTimeout(() => {
-			console.log('RENDERA BOKADE SÄTEN');
+		const timer = setInterval(() => {
 			this.disableBookedSeats();
 		}, 100);
-		
+
+		this.$once('hook:beforeDestroy', () => {
+			clearInterval(timer);
+		});
 	},
 	methods: {
 		disableBookedSeats() {
