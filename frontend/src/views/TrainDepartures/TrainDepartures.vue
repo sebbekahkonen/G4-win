@@ -14,7 +14,7 @@
 				<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				<h3 class="text-center">Till: Stockholm</h3>
 			</v-flex> -->
-			<span class="text-center">{{ datumTest }}</span>
+			<span class="text-center">{{ formatDate }}</span>
 		</v-layout>
 		
 		<!-- <h3 class="pt-10 text-center mb-4">Valt datum: 2022-01-04</h3> -->
@@ -87,7 +87,6 @@ export default {
 			adult: {price: 0, value: 0},
 			senior: {price: 0, value: 0}
 		},
-		datumTest: '',
 		price: 0,
 		errorCode: '',
 		trainsArray: [],
@@ -124,7 +123,7 @@ export default {
 
 	created() {
 		vue.nextTick(this.testFetch());
-		vue.nextTick(this.dateFormatter());
+		vue.nextTick(console.log(this.formatDate));
 	},
 
 	mounted() {
@@ -151,17 +150,7 @@ export default {
 				})
 				);
 		},
-		dateFormatter() {
-			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
-			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
-			let day = days[this.formatDate.getDay()];
-			let month = months[this.formatDate.getMonth()];
-			let dateNr = this.formatDate.getDate();
-			let year = this.formatDate.getFullYear();
-			
-			this.changeFormatDate(this.datumTest = `${day} ${dateNr} ${month} ${year}`);
-
-		},
+		
 		onExpand(value) {
 			Object.keys(this.tickets).forEach(key => {
 				Object.keys(this.tickets[key]).forEach(val => {
@@ -172,9 +161,31 @@ export default {
 
 			if(value.id === undefined) {
 				this.$store.commit('travelStore/setTrainId', value.item.id);
-			}else{
+				
+				if(value.item.service === 'Ja') {
+					this.hasBistro = true;
+				} else {
+					this.hasBistro = false;
+				}
+
+				console.log('Bistro: ',this.hasBistro);
+				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
+			} else {
 				this.$store.commit('travelStore/setTrainId', value.id);
+
+				if(value.service === 'Ja') {
+					this.hasBistro = true;
+				} else {
+					this.hasBistro = false;
+				}
+
+				console.log('Bistro: ',this.hasBistro);
+				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
+
 			}
+			// console.log(value.item.id);
+			// this.$store.commit('travelStore/setTrainId', value.item.id);
+
 		},
 		expandRow(e) {
 			this.onExpand(e);

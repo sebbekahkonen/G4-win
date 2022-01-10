@@ -21,7 +21,6 @@
 		<v-col align="center">
 			Valt datum: {{ formatDate }}
 		</v-col>
-		<!-- <v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn> -->
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
 			<v-btn v-if="hasBistro && noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
