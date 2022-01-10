@@ -78,6 +78,7 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				console.log(result[key]);
 				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
 			});
+			seatsBooked = seatsBooked.replace(/,\s*$/, "");
 			eventData.train_id = result[0].train_id
 			eventData.seats = seatsBooked;
 
