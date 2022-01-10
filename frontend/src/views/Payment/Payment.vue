@@ -8,9 +8,9 @@
 
 			<v-col>
 				<v-list>
-					<v-subheader class="pa-0">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</v-subheader>
+					<v-subheader class="payment-header">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</v-subheader>
 					<v-divider />
-					<v-list-item class="grey--text text--darken-1">
+					<v-list-item class="grey--text text--darken-1 pa-0">
 						<v-list-item-content>
 							Avgång: {{ getPickedTrain[0].departure }}
 						</v-list-item-content>
@@ -18,7 +18,7 @@
 							Ankomst: {{ getPickedTrain[0].arrival }}
 						</v-list-item-content>					
 					</v-list-item>
-					<v-list-item class="grey--text text--darken-1">
+					<v-list-item class="grey--text text--darken-1 pa-0">
 						<v-list-item-content>
 							{{ formatDate }}
 						</v-list-item-content>
@@ -32,13 +32,13 @@
 				
 			<v-col>
 				<v-list>
-					<v-subheader class="pa-0">Dina valda biljetter</v-subheader>
+					<v-subheader class="payment-header">Dina valda biljetter</v-subheader>
 					<v-divider />
 					<v-list-item
 						v-for="(seats, i) in bookedSeats"
 						:key="i"
 						one-line
-						class="grey--text text--darken-1"
+						class="grey--text text--darken-1 pa-0"
 					>
 						<v-row class="pl-3 grey--text text--darken-1">
 							Tågnummer: {{ trainId }}
@@ -55,7 +55,7 @@
 							</v-list-item-title>
 						</v-list-item-content>
 						<v-list-item-icon>
-							<v-icon>
+							<v-icon class="payment-checkbox">
 								mdi-checkbox-marked-circle
 							</v-icon>
 						</v-list-item-icon>
@@ -176,18 +176,14 @@ export default {
 };
 </script>
 <style>
-.v-subheader {
+.payment-header {
     color: rgb(0, 0, 0) !important;
 		font-size: 20px;
 		font-style: oblique;
+		padding: 0;
 }
-.theme--light.v-icon {
-	color: green;
+.payment-checkbox {
+	color: green !important;
 }
-.v-list-item__content {
-	padding: 0;
-}
-.v-list-item {
-    padding: 0 0px;
-}
+
 </style>
