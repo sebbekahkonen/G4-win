@@ -56,28 +56,31 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 		res.status(400).send(`Webhook Error: ${err.message}`);
 		return;
 	}
-	let seatsBooked = '';
 	// Handle the event
 	switch (event.type) {
-		case 'payment_intent.created':
+		// case 'payment_intent.created':
+
+		// 	// let preparedStatement6 = db.prepare(`
+		// 	// SELECT * FROM seats
+		// 	// WHERE seats."train_id" = ${result[0].train_id}
+		// 	// `);
+		// 	// let result2 = preparedStatement6.all();
+		// 	// console.log(result2);
+		// 	break;
+		case 'payment_intent.succeeded':
+			console.log("paymentIntentSuccess");
+			let seatsBooked = '';
 			let preparedStatement4 = db.prepare(`
 			SELECT * FROM current_trainId
 			`);
 			let result = preparedStatement4.all();
 			Object.keys(result).forEach(key => {
+				console.log(result[key]);
 				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
-				// eventData.seats.push(result[key].seats_booked.toString() + ",");
 			});
-			eventData.seats = seatsBooked;
 			eventData.train_id = result[0].train_id
-			// let preparedStatement6 = db.prepare(`
-			// SELECT * FROM seats
-			// WHERE seats."train_id" = ${result[0].train_id}
-			// `);
-			// let result2 = preparedStatement6.all();
-			// console.log(result2);
-			break;
-		case 'payment_intent.succeeded':
+			eventData.seats = seatsBooked;
+
 			let query5 = `DELETE FROM current_trainId;`
 			let preparedStatement5 = db.prepare(query5);
 			preparedStatement5.run();
@@ -233,6 +236,21 @@ app.delete('/api/:table/:id', (req, res) => {
 	DELETE
 	FROM ${req.params.table}
 	WHERE id = :id
+	`);
+	let result = preparedStatement.run({
+		id: req.params.id
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
+
+app.delete('/api/:table', (req, res) => {
+	let preparedStatement = db.prepare(`
+	DELETE
+	FROM ${req.params.table}
 	`);
 	let result = preparedStatement.run({
 		id: req.params.id

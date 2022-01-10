@@ -47,6 +47,7 @@
 import { StripeCheckout } from '@vue-stripe/vue-stripe';
 import { publishableKey } from '@/../shared/config.json';
 import { mapGetters, mapState, mapActions } from 'vuex';
+
 export default {
 	components: {
 		StripeCheckout
@@ -59,14 +60,14 @@ export default {
 		cancelUrl: 'http://localhost:8080/payment',
 		lineItems: [
 		],
-		publishableKey:  publishableKey
+		publishableKey:  publishableKey,
+		dataSend: {}
 	}),
 	computed: {
 		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId', 'wagon']),
 		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
 	created() {
-		console.log(this.bookedSeats[1].wagon);
 	},
 	mounted() {
 		this.isTrue = true;
@@ -74,6 +75,8 @@ export default {
 	methods: {
 		...mapActions('receiptStore', ['addTrainId']),
 		redirect() {
+			console.log(this.dataSend);
+
 			if(this.getSeniorTickets != 0) {
 				//Senior ticket
 				this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
@@ -89,16 +92,26 @@ export default {
 				this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
 			}
 
-			// this.addTrainId(this.trainId);
+			fetch('/api/current_trainId', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(res => res.json())
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+
 			for(let seats of this.bookedSeats) {
-				let dataSend = { train_id: this.trainId, seats_booked: seats, date: this.date  };
+				this.dataSend = { train_id: this.trainId, seats_booked: seats.seat, date: this.date  };
 
 				fetch('/api/current_trainId', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify(dataSend)
+					body: JSON.stringify(this.dataSend)
 				})
 					.then(res => res.json())
 					.then(data => {
@@ -107,34 +120,15 @@ export default {
 					.catch((error) => {
 						console.error('Error:', error);
 					});
+				
 			}
+			
 			this.$refs.checkoutRef.redirectToCheckout();			
+
 			console.log('Train_id:', this.trainId);
 			console.log('Biljetter:', this.bookedSeats);
 			console.log('date:', this.date);
 			console.log('wagon:', this.wagon);
-
-
-			for(let seats of this.bookedSeats) {
-				let dataSend = { train_id: this.trainId, seats_booked: seats.seat, wagon: seats.wagon, date: this.date  };
-
-				fetch('/api/seats', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(dataSend)
-				})
-					.then(res => res.json())
-					.then(data => {
-						console.log('Success:', data);
-					})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-			}
-
-			
 		},
 		returnPage() {
 			this.$router.push('/seats');
