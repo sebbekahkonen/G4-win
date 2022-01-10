@@ -169,20 +169,15 @@ export default {
 				});
 			});
 			this.price = 0;
-			console.log(value.item.id);
-			this.$store.commit('travelStore/setTrainId', value.item.id);
 
-			if(value.item.service === 'Ja') {
-				this.hasBistro = true;
-			} else {
-				this.hasBistro = false;
+			if(value.id === undefined) {
+				this.$store.commit('travelStore/setTrainId', value.item.id);
+			}else{
+				this.$store.commit('travelStore/setTrainId', value.id);
 			}
-
-			console.log('Bistro: ',this.hasBistro);
-			this.$store.commit('travelStore/setHasBistro', this.hasBistro);
 		},
 		expandRow(e) {
-			this.onExpand();
+			this.onExpand(e);
 			this.expanded = [e];
 
 		},

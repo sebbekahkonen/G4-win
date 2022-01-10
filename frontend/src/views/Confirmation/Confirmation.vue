@@ -90,17 +90,39 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
+		dataSend: {}
 	}),
 	computed: {
 		...mapGetters('ticketStore', ['getPrice', 'getPickedTrain']),
 		...mapGetters('receiptStore', ['getTheReceipt']),
-		...mapState('travelStore', ['travelObj', 'date', 'formatDate'])
+		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId', 'wagon'])
 	},
 	created() {
 		vue.nextTick(this.getReceipt);
+		vue.nextTick(this.setSeats);
 	},
 	methods: {
-		...mapActions('receiptStore', ['getReceipt'])
+		...mapActions('receiptStore', ['getReceipt']),
+		setSeats() {
+			for(let seats of this.bookedSeats) {
+				this.dataSend = { train_id: this.trainId, seats_booked: seats.seat, wagon: seats.wagon, date: this.date  };
+
+				fetch('/api/seats', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(this.dataSend)
+				})
+					.then(res => res.json())
+					.then(data => {
+						console.log('Success:', data);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+			}
+		}
 	}
 };
 </script>
