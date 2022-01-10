@@ -114,8 +114,6 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				message: 'success',
 				data: eventData
 			});
-			break;
-		case 'checkout.session.completed':
 			let columnNames3 = Object.keys(eventData);
 			let columnParamaters3 = columnNames3.map((colName) => ':' + colName);
 			let query3 =
@@ -126,6 +124,9 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 				`;
 			let preparedStatement3 = db.prepare(query3);
 			preparedStatement3.run(eventData);
+			break;
+		case 'checkout.session.completed':
+
 
 			break;
 		default:
@@ -263,7 +264,23 @@ app.delete('/api/:table', (req, res) => {
 	});
 })
 
+app.delete('/api/:table/deleteSeats/:train_id/:seat', (req, res) => {
+	let preparedStatement = db.prepare(`
+	DELETE
+	FROM ${req.params.table}
+	WHERE ${req.params.table}."train_id" = :train_id
+	AND ${req.params.table}."seats_booked" = :seat
+	`);
+	let result = preparedStatement.run({
+		train_id: req.params.train_id,
+		seat: req.params.seat
+	});
 
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
 // app.get('/api/:table/from/:from', (req, res) => {
 // 	let preparedStatement = db.prepare(`
 // 	SELECT *
