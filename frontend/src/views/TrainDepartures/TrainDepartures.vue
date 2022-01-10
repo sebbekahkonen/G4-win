@@ -168,11 +168,15 @@ export default {
 				});
 			});
 			this.price = 0;
-			console.log(value.item.id);
-			this.$store.commit('travelStore/setTrainId', value.item.id);
+
+			if(value.id === undefined) {
+				this.$store.commit('travelStore/setTrainId', value.item.id);
+			}else{
+				this.$store.commit('travelStore/setTrainId', value.id);
+			}
 		},
 		expandRow(e) {
-			this.onExpand();
+			this.onExpand(e);
 			this.expanded = [e];
 
 		},
