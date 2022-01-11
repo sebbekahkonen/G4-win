@@ -59,7 +59,18 @@ export default {
 		successUrl: 'http://localhost:8080/confirmation',
 		cancelUrl: 'http://localhost:8080/payment',
 		lineItems: [
+			// {
+			// 	'price':{
+			// 		unit_amount: 1000,
+			// 		'currency': 'sek',
+			// 		'name': 'test'
+			// 	},
+			// 	quantity: 1
+			// },
+			{price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: 3}
 		],
+			
+		
 		publishableKey:  publishableKey,
 		dataSend: {}
 	}),
@@ -74,23 +85,25 @@ export default {
 	},
 	methods: {
 		...mapActions('receiptStore', ['addTrainId']),
+		...mapActions('stripeStore', ['checkout']),
+
 		redirect() {
 			console.log(this.dataSend);
 
-			if(this.getSeniorTickets != 0) {
-				//Senior ticket
-				this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
-			}
+			// if(this.getSeniorTickets != 0) {
+			// 	//Senior ticket
+			// 	this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
+			// }
 
-			if(this.getAdultTickets != 0) {
-				//Adult ticket
-				this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
-			}
+			// if(this.getAdultTickets != 0) {
+			// 	//Adult ticket
+			// 	this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
+			// }
 
-			if(this.getStudentTickets != 0) {
-				//Student ticket
-				this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
-			}
+			// if(this.getStudentTickets != 0) {
+			// 	//Student ticket
+			// 	this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
+			// }
 
 			fetch('/api/current_trainId', {
 				method: 'DELETE',
@@ -122,8 +135,8 @@ export default {
 					});
 				
 			}
-			
-			this.$refs.checkoutRef.redirectToCheckout();			
+			this.checkout(100);
+			// this.$refs.checkoutRef.redirectToCheckout();			
 
 			console.log('Train_id:', this.trainId);
 			console.log('Biljetter:', this.bookedSeats);

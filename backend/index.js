@@ -5,8 +5,14 @@ const { Sequelize } = require('sequelize');
 const driver = require('better-sqlite3');
 //För att connecta till databasen
 const db = driver('./database/traindb.sqlite3');
-const stripe = require('stripe');
+// const stripe = require('stripe');
 const nodemailer = require("nodemailer");
+//Bodyparser för att parsa ihop object
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
+app.use(bodyParser.json());
 require('dotenv').config();
 
 const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
@@ -45,105 +51,141 @@ async function sendEmail() {
 }
 
 
-app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) => {
-	const sig = req.headers['stripe-signature'];
+const Stripe = require('stripe')
+const stripe = new Stripe('sk_test_51K9H37AsS2e6kWH4AIHR0ScpXCHb9hOp5tzuap7Z0sYlTB8UTmKBqmdvYYKHEguf6D8O2jlisJZ2lWryBKYh9QIE00Znby8jdh') // stripe.com api secret key
 
-	let event;
+// route for checkout
+app.post('/api/checkout', async (req, res) => {
+	console.log("test");
+	console.log("BODY FRONTEND: ", req.body);
+	let line_items = req.body.items.map(item => {
+		return {
+			price_data: {
+				currency: 'sek',
+				product_data: {
+					name: item.title,
+				},
+				unit_amount: item.price * 100,
+			},
+			quantity: item.amount,
+		}
+	})
+	const session = await stripe.checkout.sessions.create({
+		payment_method_types: ['card'],
+		line_items: line_items,
+		mode: 'payment',
+		success_url: 'http://localhost:8080/confirmation',
+		cancel_url: 'http://localhost:8080/payment',
+	});
 
-	try {
-		event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-	} catch (err) {
-		res.status(400).send(`Webhook Error: ${err.message}`);
-		return;
-	}
-	// Handle the event
-	switch (event.type) {
-		// case 'payment_intent.created':
-
-		// 	// let preparedStatement6 = db.prepare(`
-		// 	// SELECT * FROM seats
-		// 	// WHERE seats."train_id" = ${result[0].train_id}
-		// 	// `);
-		// 	// let result2 = preparedStatement6.all();
-		// 	// console.log(result2);
-		// 	break;
-		case 'payment_intent.succeeded':
-			console.log("paymentIntentSuccess");
-			let seatsBooked = '';
-			let preparedStatement4 = db.prepare(`
-			SELECT * FROM current_trainId
-			`);
-			let result = preparedStatement4.all();
-			Object.keys(result).forEach(key => {
-				console.log(result[key]);
-				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
-			});
-			seatsBooked = seatsBooked.replace(/,\s*$/, "");
-			eventData.train_id = result[0].train_id
-			eventData.seats = seatsBooked;
-
-			let query5 = `DELETE FROM current_trainId;`
-			let preparedStatement5 = db.prepare(query5);
-			preparedStatement5.run();
-			break;
-		case 'customer.created':
-			let orderNumber = Math.floor(Math.random() * 100000000);
-
-			eventData.name = event.data.object.name;
-			eventData.email = event.data.object.email;
-			eventData.order_number = orderNumber;
-			let query1 = `DELETE FROM current_user;`
-			let preparedStatement1 = db.prepare(query1);
-			preparedStatement1.run();
-			break;
-		case 'charge.succeeded':
-			eventData.receipt_url = event.data.object.receipt_url;
-			let columnNames = Object.keys(eventData);
-			let columnParamaters = columnNames.map((colName) => ':' + colName);
-
-			let query =
-				`
-				INSERT INTO receipts
-				(${columnNames})
-				VALUES (${columnParamaters})
-				`;
-			let preparedStatement = db.prepare(query);
-			preparedStatement.run(eventData);
-			sendEmail();
-			res.status(200).json({
-				message: 'success',
-				data: eventData
-			});
-			let columnNames3 = Object.keys(eventData);
-			let columnParamaters3 = columnNames3.map((colName) => ':' + colName);
-			let query3 =
-				`
-				INSERT INTO current_user
-				(${columnNames3})
-				VALUES (${columnParamaters3})
-				`;
-			let preparedStatement3 = db.prepare(query3);
-			preparedStatement3.run(eventData);
-			break;
-		case 'checkout.session.completed':
-
-
-			break;
-		default:
-			console.log(`Unhandled event type ${event.type}`);
-	}
-
-	// Return a 200 response to acknowledge receipt of the event
-
-	res.send();
+	res.json({ id: session.id });
 });
 
-//Bodyparser för att parsa ihop object
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({
-	extended: false
-}));
-app.use(bodyParser.json());
+
+
+
+
+
+
+
+
+
+
+// app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) => {
+// 	const sig = req.headers['stripe-signature'];
+
+// 	let event;
+
+// 	try {
+// 		event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+// 		console.log(event);
+// 	} catch (err) {
+// 		res.status(400).send(`Webhook Error: ${err.message}`);
+// 		return;
+// 	}
+// 	// Handle the event
+// 	switch (event.type) {
+// 		// case 'payment_intent.created':
+
+// 		// 	// let preparedStatement6 = db.prepare(`
+// 		// 	// SELECT * FROM seats
+// 		// 	// WHERE seats."train_id" = ${result[0].train_id}
+// 		// 	// `);
+// 		// 	// let result2 = preparedStatement6.all();
+// 		// 	// console.log(result2);
+// 		// 	break;
+// 		case 'payment_intent.succeeded':
+// 			console.log("paymentIntentSuccess");
+// 			let seatsBooked = '';
+// 			let preparedStatement4 = db.prepare(`
+// 			SELECT * FROM current_trainId
+// 			`);
+// 			let result = preparedStatement4.all();
+// 			Object.keys(result).forEach(key => {
+// 				console.log(result[key]);
+// 				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
+// 			});
+// 			seatsBooked = seatsBooked.replace(/,\s*$/, "");
+// 			eventData.train_id = result[0].train_id
+// 			eventData.seats = seatsBooked;
+
+// 			let query5 = `DELETE FROM current_trainId;`
+// 			let preparedStatement5 = db.prepare(query5);
+// 			preparedStatement5.run();
+// 			break;
+// 		case 'customer.created':
+// 			let orderNumber = Math.floor(Math.random() * 100000000);
+
+// 			eventData.name = event.data.object.name;
+// 			eventData.email = event.data.object.email;
+// 			eventData.order_number = orderNumber;
+// 			let query1 = `DELETE FROM current_user;`
+// 			let preparedStatement1 = db.prepare(query1);
+// 			preparedStatement1.run();
+// 			break;
+// 		case 'charge.succeeded':
+// 			eventData.receipt_url = event.data.object.receipt_url;
+// 			let columnNames = Object.keys(eventData);
+// 			let columnParamaters = columnNames.map((colName) => ':' + colName);
+
+// 			let query =
+// 				`
+// 				INSERT INTO receipts
+// 				(${columnNames})
+// 				VALUES (${columnParamaters})
+// 				`;
+// 			let preparedStatement = db.prepare(query);
+// 			preparedStatement.run(eventData);
+// 			sendEmail();
+// 			res.status(200).json({
+// 				message: 'success',
+// 				data: eventData
+// 			});
+// 			let columnNames3 = Object.keys(eventData);
+// 			let columnParamaters3 = columnNames3.map((colName) => ':' + colName);
+// 			let query3 =
+// 				`
+// 				INSERT INTO current_user
+// 				(${columnNames3})
+// 				VALUES (${columnParamaters3})
+// 				`;
+// 			let preparedStatement3 = db.prepare(query3);
+// 			preparedStatement3.run(eventData);
+// 			break;
+// 		case 'checkout.session.completed':
+
+
+// 			break;
+// 		default:
+// 			console.log(`Unhandled event type ${event.type}`);
+// 	}
+
+// 	// Return a 200 response to acknowledge receipt of the event
+
+// 	res.send();
+// });
+
+
 
 //Listen on localhost:4000 and start webserver
 app.listen(4000, () => {
@@ -158,29 +200,29 @@ app.get('/', (req, res) => {
 });
 
 //Dynamic rest route:POST
-app.post('/api/:table', (req, res) => {
-	// let data = {
-	// 	name: req.body.name,
-	// 	email: req.body.email,
-	// 	password: req.body.password
-	// };
-	/*test*/
-	let columnNames = Object.keys(req.body);
-	let columnParamaters = columnNames.map((colName) => ':' + colName);
-	let query =
-		`INSERT INTO ${req.params.table}
-		(${columnNames})
-		VALUES (${columnParamaters})
-		`;
+// app.post('/api/:table', (req, res) => {
+// 	// let data = {
+// 	// 	name: req.body.name,
+// 	// 	email: req.body.email,
+// 	// 	password: req.body.password
+// 	// };
+// 	/*test*/
+// 	let columnNames = Object.keys(req.body);
+// 	let columnParamaters = columnNames.map((colName) => ':' + colName);
+// 	let query =
+// 		`INSERT INTO ${req.params.table}
+// 		(${columnNames})
+// 		VALUES (${columnParamaters})
+// 		`;
 
-	let preparedStatement = db.prepare(query);
-	preparedStatement.run(req.body);
+// 	let preparedStatement = db.prepare(query);
+// 	preparedStatement.run(req.body);
 
-	res.status(200).json({
-		message: 'success',
-		data: req.body
-	});
-})
+// 	res.status(200).json({
+// 		message: 'success',
+// 		data: req.body
+// 	});
+// })
 
 
 //Dynamic rest route:GET ALL

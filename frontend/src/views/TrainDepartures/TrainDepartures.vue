@@ -4,6 +4,8 @@
 			<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 			Tillbaka
 		</v-btn>
+		<v-btn @click="trainIdFetch">test</v-btn>
+		{{ testPrices }}
 		<v-layout column justify-center>
 			<span class="text-center">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</span>
 			<!-- <v-flex xs6>
@@ -88,8 +90,10 @@ export default {
 		},
 		datumTest: '',
 		price: 0,
+		testTrainId: [],
 		errorCode: '',
 		trainsArray: [],
+		testPrices: [],
 		trainHeaders: [
 			{
 				text: 'Tågnr',
@@ -135,9 +139,21 @@ export default {
 	methods: {
 		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice', 'changePickedTrain']),
 		...mapActions('travelStore', ['changeFormatDate']),
-
 		returnPage() {
 			this.$router.push('/');
+		},
+		trainIdFetch() {
+			for(let trainIdString of this.testTrainId) {
+				console.log('test');
+				fetch('/api/prices/')
+					.then(res => res.json())
+					.then(data => Object.keys(data.data).forEach(key => {
+						if(data.data[key].train_id === trainIdString) {
+							console.log(data.data[key].price_senior);
+							this.testPrices.push(data.data[key].price_senior);
+						}
+					}));
+			}
 		},
 		testFetch() {
 			fetch(`/api/trains/${this.travelObj.departure.departureDestination}/${this.travelObj.departure.arrivalDestination}`)
@@ -146,10 +162,20 @@ export default {
 					if(data.data[key].date === this.date) {
 						this.trainsArray.push(data.data[key]);
 						console.log((data.data[key]));
+						this.testTrainId.push(data.data[key].id);
+
+
 					}				
 				})
 				);
+			this.trainIdFetch();
+			// Object.keys(this.testTrainId).forEach(key => {
+			// 	console.log(this.testTrainId[key]);
+			// });
+			
+			
 		},
+
 		dateFormatter() {
 			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
 			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
