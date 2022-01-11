@@ -57,6 +57,10 @@ app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) 
 		return;
 	}
 	// Handle the event
+
+	/* GLÖM EJ ATT KOLLA PÅ DETTA!
+	Varför behövs det en helt ny route för detta eftersom vi ändå mappar igenom Object.keys?
+	Borde väl räcka med att ta seats routen som redan finns där både seats och train_id redan existerar ? */
 	switch (event.type) {
 		// case 'payment_intent.created':
 

@@ -203,16 +203,25 @@ export default {
 			/* DEPARTURE INFORMATION */
 			this.bookingInformation.departure.departureDestination = this.search.departureStation;
 			this.bookingInformation.departure.arrivalDestination = this.search.arrivalStation;
-			this.bookingInformation.departure.departureDateTime = `${this.selectedExit} ${this.departureDate.toLocaleDateString()} ${this.depTime}`;		
+			this.bookingInformation.departure.departureDateTime = `${this.selectedExit} ${this.departureDate.toLocaleDateString('sv-SE')} ${this.depTime}`;		
 			this.bookingInformation.departure.arrivalDateTime = '';
 			/* RETURN TRIP INFORMATION */
 			this.bookingInformation.returnTrip.departureDestination = this.search.arrivalStation;
 			this.bookingInformation.returnTrip.arrivalDestination = this.search.departureStation;
-			this.bookingInformation.returnTrip.departureDateTime = `${this.selectedEntry} ${this.arrivalDate.toLocaleDateString()} ${this.arrTime}`;
+			this.bookingInformation.returnTrip.departureDateTime = `${this.selectedEntry} ${this.arrivalDate.toLocaleDateString('sv-SE')} ${this.arrTime}`;
 			this.bookingInformation.returnTrip.arrivalDateTime = '';
 
 			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
-			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString());
+			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString('sv-SE'));
+
+			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
+			let day = days[this.departureDate.getDay()];
+			let month = months[this.departureDate.getMonth()];
+			let dateNr = this.departureDate.getDate();
+			let year = this.departureDate.getFullYear();
+			
+			this.departureDate = `${day} ${dateNr} ${month} ${year}`;
 			this.$store.commit('travelStore/setFormatDate', this.departureDate);
 			this.$router.push({name: 'TrainDepartures'});
 			
