@@ -33,6 +33,16 @@ export default {
 			.then((response) => {
 				return response;
 			});
+	},
+	deleteSeats(data) {
+		return axios.delete(`/api/seats/deleteSeats/${data.train_id}/${data.seat}`, {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then((response) => {
+				return response;
+			});
 	}
 
 };
