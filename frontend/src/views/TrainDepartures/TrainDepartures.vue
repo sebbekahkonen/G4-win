@@ -85,9 +85,9 @@ export default {
 		expanded: [],
 		singleExpand: true,
 		tickets: {
-			student: {price: 0, value: 0},
-			adult: {price: 0, value: 0},
-			senior: {price: 0, value: 0}
+			student: {id: 1, price: 0, amount: 0, title: 'student_biljett'},
+			adult: {id: 2, price: 0, amount: 0, title: 'vuxen_biljett'},
+			senior: {id: 3, price: 0, amount: 0, title: 'senior_biljett'}
 		},
 		price: 0,
 		testTrainId: [],
@@ -132,13 +132,11 @@ export default {
 	},
 
 	mounted() {
-		this.changeStudentTickets(0);
-		this.changeAdultTickets(0);
-		this.changeSeniorTickets(0);
+		this.resetCart();
 	},
 
 	methods: {
-		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice', 'changePickedTrain']),
+		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice', 'changePickedTrain', 'resetCart']),
 		...mapActions('travelStore', ['changeFormatDate']),
 		returnPage() {
 			this.$router.push('/');
@@ -191,7 +189,9 @@ export default {
 		onExpand(value) {
 			Object.keys(this.tickets).forEach(key => {
 				Object.keys(this.tickets[key]).forEach(val => {
-					this.tickets[key][val] = 0;
+					if(val === 'amount' || val === 'price') {
+						this.tickets[key][val] = 0;
+					}
 				});
 			});
 			this.price = 0;
@@ -230,11 +230,28 @@ export default {
 
 		},
 		nextView() {
+			Object.keys(this.tickets).forEach(key => {
+				Object.keys(this.tickets[key]).forEach(val => {
+					if(this.tickets[key][val] !== 0 && val === 'amount') {
+						console.log(this.tickets[key]);
+
+						if(this.tickets[key].title === 'student_biljett') {
+							this.changeStudentTickets(this.tickets[key]);
+						}
+
+						if(this.tickets[key].title === 'vuxen_biljett') {
+							this.changeAdultTickets(this.tickets[key]);
+						}
+
+						if(this.tickets[key].title === 'senior_biljett') {
+							this.changeSeniorTickets(this.tickets[key]);
+						}
+					}
+				});
+			});
+
 			if(this.price >= 79) {
 				this.errorCode = '';
-				this.changeStudentTickets(this.tickets.student.value);
-				this.changeAdultTickets(this.tickets.adult.value);
-				this.changeSeniorTickets(this.tickets.senior.value);
 				this.changeThePrice(this.price);
 				this.changePickedTrain(this.expanded);
 				this.$router.push('/seats');
@@ -247,17 +264,17 @@ export default {
 
 			if(type.includes('student')) {
 
-				if(value < 0 && this.tickets.student.value > 0) {
+				if(value < 0 && this.tickets.student.amount > 0) {
 					let val = Math.abs(value);
 
 					this.tickets.student.price = this.tickets.student.price - val;
-					this.tickets.student.value--;
+					this.tickets.student.amount--;
 					
 				}
  
 				if(value > 0) {
 					this.tickets.student.price = this.tickets.student.price + value;
-					this.tickets.student.value++;
+					this.tickets.student.amount++;
 
 				}
 
@@ -267,17 +284,17 @@ export default {
 			}
 
 			if(type.includes('adult')) {
-				if(value < 0 && this.tickets.adult.value > 0) {
+				if(value < 0 && this.tickets.adult.amount > 0) {
 					let val = Math.abs(value);
 
 					this.tickets.adult.price = this.tickets.adult.price - val;
-					this.tickets.adult.value--;
+					this.tickets.adult.amount--;
 
 				}
  
 				if(value > 0) {
 					this.tickets.adult.price = this.tickets.adult.price + value;
-					this.tickets.adult.value++;
+					this.tickets.adult.amount++;
 
 				}
 
@@ -287,17 +304,17 @@ export default {
 			}
 
 			if(type.includes('senior')) {
-				if(value < 0 && this.tickets.senior.value > 0) {
+				if(value < 0 && this.tickets.senior.amount > 0) {
 					let val = Math.abs(value);
 
 					this.tickets.senior.price = this.tickets.senior.price - val;
-					this.tickets.senior.value--;
+					this.tickets.senior.amount--;
 
 				}
  
 				if(value > 0) {
 					this.tickets.senior.price = this.tickets.senior.price + value;
-					this.tickets.senior.value++;
+					this.tickets.senior.amount++;
 			
 				}
 
