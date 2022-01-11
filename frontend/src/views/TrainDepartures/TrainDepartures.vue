@@ -124,6 +124,7 @@ export default {
 	created() {
 		vue.nextTick(this.testFetch());
 		vue.nextTick(console.log(this.formatDate));
+		vue.nextTick(console.log(this.date));
 	},
 
 	mounted() {
@@ -146,6 +147,7 @@ export default {
 					if(data.data[key].date === this.date) {
 						this.trainsArray.push(data.data[key]);
 						console.log((data.data[key]));
+						
 					}				
 				})
 				);
