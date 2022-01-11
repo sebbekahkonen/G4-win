@@ -6,31 +6,29 @@
 		</v-btn>
 		<v-row>
 			<v-col align="center">
-				<!-- Från: {{ travelObj.departure.departureDestination }} -->
-				Från: Göteborg
+				Från: {{ travelObj.departure.departureDestination }}
+				<!-- Från: Göteborg -->
 			</v-col>
 			<v-col align="center">
 				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
 				Mellanstation: Jönköping
 			</v-col>
 			<v-col align="center">
-				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
-				Till: Stockholm
+				Till: {{ travelObj.departure.arrivalDestination }}
+				<!-- Till: Stockholm -->
 			</v-col>
 		</v-row>
 		<v-col align="center">
-			<!-- Valt datum: {{ date }} -->
-			Valt datum: 2022-01-01
+			Valt datum: {{ formatDate }}
 		</v-col>
-		<!-- <v-btn @click="disableBookedSeats">LOGGA SKITEN</v-btn> -->
 		<v-card outlined align="center">
 			<v-icon left large @click="decreaseWagons">{{ 'mdi-chevron-left' }}</v-icon>
-			<v-btn v-if="noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
+			<v-btn v-if="hasBistro && noOfWagons === 3" id="custom-disabled" text disabled>{{ 'BISTRO' }}</v-btn>
 			<v-btn v-else id="custom-disabled" text disabled>{{ 'Vagn ' + noOfWagons }}</v-btn>
 			<v-icon right large @click="increaseWagons">{{ 'mdi-chevron-right' }}</v-icon>
 		</v-card>
 		<div>
-			<div v-if="noOfWagons === 3" class="bistro">
+			<div v-if="hasBistro && noOfWagons === 3" class="bistro">
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
 				<div class="bistro-seats" />
@@ -98,7 +96,7 @@ export default {
 		wagonDecreased: false
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date', 'trainId']),
+		...mapState('travelStore', ['travelObj', 'date', 'trainId', 'formatDate', 'hasBistro']),
 		...mapState('ticketStore', ['studentTickets', 'adultTickets', 'seniorTickets'])
 	},
 	created() {

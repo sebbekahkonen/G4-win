@@ -5,29 +5,67 @@
 				<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 				Tillbaka
 			</v-btn>
-			<v-layout column justify-center>
-				<h2 class="text-center">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</h2>
-				<v-layout row wrap class="pt-5 text-center">
-					<v-flex xs6>
-						<span class="text-center">Avgång: {{ getPickedTrain[0].departure }}</span>
-					</v-flex>
-					<v-flex xs6>
-						<span class="text-center">Ankomst: {{ getPickedTrain[0].arrival }}</span>
-					</v-flex>
-				</v-layout>
-				<v-layout row wrap class="pt-2 pb-2 text-center">
-					<v-flex xs6>
-						<span class="text-center">{{ formatDate }}</span>
-					</v-flex>
-					<v-flex xs6>
-						<span class="text-center">Restid: {{ getPickedTrain[0].travelTime }}</span>
-					</v-flex>
-				</v-layout>
-				<h2 class="text-center pt-5 pb-5">Pris: {{ getPrice }}kr</h2>
-				<div v-for="seats in bookedSeats" :key="seats" align="center">
-					<span class="text-center"> Biljetter: {{ seats }} </span>
-				</div>
-			</v-layout>
+
+			<v-col>
+				<v-list>
+					<v-subheader class="payment-header">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</v-subheader>
+					<v-divider />
+					<v-list-item class="grey--text text--darken-1 pa-0">
+						<v-list-item-content>
+							Avgång: {{ getPickedTrain[0].departure }}
+						</v-list-item-content>
+						<v-list-item-content>
+							Ankomst: {{ getPickedTrain[0].arrival }}
+						</v-list-item-content>					
+					</v-list-item>
+					<v-list-item class="grey--text text--darken-1 pa-0">
+						<v-list-item-content>
+							{{ formatDate }}
+						</v-list-item-content>
+						<v-list-item-content>
+							Restid: {{ getPickedTrain[0].travelTime }}
+						</v-list-item-content>					
+					</v-list-item>
+					<v-divider />
+				</v-list>
+			</v-col>
+				
+			<v-col>
+				<v-list>
+					<v-subheader class="payment-header">Dina valda biljetter</v-subheader>
+					<v-divider />
+					<v-list-item
+						v-for="(seats, i) in bookedSeats"
+						:key="i"
+						one-line
+						class="grey--text text--darken-1 pa-0"
+					>
+						<v-row class="pl-3 grey--text text--darken-1">
+							Tågnummer: {{ trainId }}
+						</v-row>
+					
+						<v-list-item-content>
+							<v-list-item-title>
+								Vagn: {{ seats.wagon }}
+							</v-list-item-title>
+						</v-list-item-content>
+						<v-list-item-content>
+							<v-list-item-title>
+								Plats: {{ seats.seat }}
+							</v-list-item-title>
+						</v-list-item-content>
+						<v-list-item-icon>
+							<v-icon class="payment-checkbox">
+								mdi-checkbox-marked-circle
+							</v-icon>
+						</v-list-item-icon>
+					</v-list-item>
+					<v-divider />
+				</v-list>
+			</v-col>
+		
+			<h2 class="text-center pb-5 font-italic">Pris: {{ getPrice }}kr</h2>
+
 			<v-col class="text-center">
 				<stripe-checkout v-if="isTrue"
 					ref="checkoutRef"
@@ -150,6 +188,15 @@ export default {
 
 };
 </script>
-<style scoped>
-	
+<style>
+.payment-header {
+    color: rgb(0, 0, 0) !important;
+		font-size: 20px;
+		font-style: oblique;
+		padding: 0;
+}
+.payment-checkbox {
+	color: green !important;
+}
+
 </style>

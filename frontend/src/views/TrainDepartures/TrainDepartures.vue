@@ -16,7 +16,7 @@
 				<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
 				<h3 class="text-center">Till: Stockholm</h3>
 			</v-flex> -->
-			<span class="text-center">{{ datumTest }}</span>
+			<span class="text-center">{{ formatDate }}</span>
 		</v-layout>
 		
 		<!-- <h3 class="pt-10 text-center mb-4">Valt datum: 2022-01-04</h3> -->
@@ -81,6 +81,7 @@ import vue from 'vue';
 export default {
 	data: () => ({
 		chosen: false,
+		hasBistro: false,
 		expanded: [],
 		singleExpand: true,
 		tickets: {
@@ -88,7 +89,6 @@ export default {
 			adult: {price: 0, value: 0},
 			senior: {price: 0, value: 0}
 		},
-		datumTest: '',
 		price: 0,
 		testTrainId: [],
 		errorCode: '',
@@ -127,7 +127,8 @@ export default {
 
 	created() {
 		vue.nextTick(this.testFetch());
-		vue.nextTick(this.dateFormatter());
+		vue.nextTick(console.log(this.formatDate));
+		vue.nextTick(console.log(this.date));
 	},
 
 	mounted() {
@@ -197,9 +198,31 @@ export default {
 
 			if(value.id === undefined) {
 				this.$store.commit('travelStore/setTrainId', value.item.id);
-			}else{
+				
+				if(value.item.service === 'Ja') {
+					this.hasBistro = true;
+				} else {
+					this.hasBistro = false;
+				}
+
+				console.log('Bistro: ',this.hasBistro);
+				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
+			} else {
 				this.$store.commit('travelStore/setTrainId', value.id);
+
+				if(value.service === 'Ja') {
+					this.hasBistro = true;
+				} else {
+					this.hasBistro = false;
+				}
+
+				console.log('Bistro: ',this.hasBistro);
+				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
+
 			}
+			// console.log(value.item.id);
+			// this.$store.commit('travelStore/setTrainId', value.item.id);
+
 		},
 		expandRow(e) {
 			this.onExpand(e);
