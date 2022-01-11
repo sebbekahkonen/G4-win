@@ -7,7 +7,8 @@ export default {
 
 	state: {
 		receiptInformation: {},
-		receiptById: {}
+		receiptById: {},
+		deletedSeats: {}
 	},
 
 	mutations: {
@@ -16,6 +17,9 @@ export default {
 		},
 		setAllReceipts(state, data) {
 			state.receiptById = data;
+		},
+		setAllDeletedSeats(state, data) {
+			state.deletedSeats = data;
 		}
 	},
 
@@ -37,7 +41,13 @@ export default {
 			const receipt = await receiptServices.getAllReceipts();
 
 			commit('setAllReceipts', receipt);
+		},
+		async deleteSeats({ commit }, data) {
+			await receiptServices.deleteSeats(data);
+
+			commit('setAllDeletedSeats', data);
 		}
+
 	},
 
 	getters: {
@@ -46,6 +56,9 @@ export default {
 		},
 		getAllTheReceipts(state) {
 			return state.receiptById;
+		},
+		getDeletedSeats(state) {
+			return state.deletedSeats;
 		}
 	}
 };

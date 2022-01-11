@@ -318,13 +318,33 @@ Vi skickar priserna till stripe checkout.
 
 
 > Stripe
-
 Stripe har inbyggd funktionalitet för mail, betalnings och kortinformation och dem har i ett test kort där man slå in för att testa runt sig i development miljön.
+
+Koden nedan visar hur en checkout sker:
+
+``` javascript
+<stripe-checkout v-if="isTrue"
+					ref="checkoutRef"
+					mode="payment"
+					:pk="publishableKey"
+					:line-items="lineItems"
+					:success-url="successUrl"
+					:cancel-url="cancelUrl"
+					@loading="v => loading = v"
+				/>
+```
+
+Mer info till hur checkout med deras inbyggda mockdata fungerar finns i nedanstående länk:
+https://plushogskolan.atlassian.net/wiki/spaces/G4/pages/122815318/Stripe
 
 ![Stripe Credit information](https://user-images.githubusercontent.com/48633146/148611828-3b64911b-53a0-4789-b6aa-f248cfb4d536.png)
 
+Eftersom att vi kör programmer lokalt så får vi använda oss utav stripe CLi:
+https://stripe.com/docs/stripe-cli
 
 > Confirmation
+
+
 
 > SearchTickets
 
@@ -795,7 +815,11 @@ getAllStations();
 
 ### Referens:
 
-Lägg till alla stripes länkar
+https://stripe.com/se
+https://vuestripe.com/
+https://stripe.com/docs
+
+
 
 
 

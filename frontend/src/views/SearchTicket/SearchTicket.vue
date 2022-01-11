@@ -11,6 +11,7 @@
 			label="Ordernummer"
 			append-icon="mdi-magnify"
 			@click:append="search"
+			@keydown.enter="search"
 		/>
 					
 		<v-select 
@@ -72,6 +73,7 @@ export default {
 		btnClicked: false,
 		expanded: [],
 		singleExpand: true,
+		seatsToRemove: [],
 		ticketHeaders: [
 		
 			{
@@ -107,21 +109,30 @@ export default {
 
 	methods: {
 		...mapActions('ticketStore', ['getTickets']),
-		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt']),
+		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt', 'deleteSeats']),
 		search() {
 			this.tickets = [];
-			
+			this.seatsToRemove = [];
 			Object.keys(this.getAllTheReceipts).forEach(key => {
 				if (this.getAllTheReceipts[key].order_number == (this.ticketInput)) {
 					this.tickets.push(this.getAllTheReceipts[key]);
 				}
 			});
 			this.seatsBooked = this.tickets[0].seats;
+			this.seatsToRemove = this.seatsBooked.split(',');
+			Object.keys(this.seatsToRemove).forEach(key => {
+				this.seatsToRemove[key] = parseInt(this.seatsToRemove[key]);
+			});
 			this.isTrue = true;
 		},
 
 		removeTicket() {
 			this.deleteReceipt(this.tickets[0].id);
+			Object.keys(this.seatsToRemove).forEach(key => {
+				let seatAndTrainId = {train_id: this.tickets[0].train_id, seat: this.seatsToRemove[key]};
+
+				this.deleteSeats(seatAndTrainId);
+			});
 			this.ticketInput = '';
 			this.isTrue = false;
 		},
