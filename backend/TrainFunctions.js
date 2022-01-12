@@ -1,9 +1,6 @@
 const index = require('./XMLRequest/sendXmlRequest');
-// require("util").inspect.defaultOptions.depth = null;
-// const fs = require('fs');
 const Train = require('./Sequelize/Train');
 const Stations = require('./Sequelize/Station');
-// const express = require('express');
 const sequelize = require('./Sequelize/database');
 const _ = require('underscore');
 
@@ -82,7 +79,7 @@ async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 
 				let timeOptions = { hour: "2-digit", minute: "2-digit" };
 
-				const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
+				const dates = getDates(new Date(2022, 4, 30), new Date(2022, 4, 31))
 				dates.forEach(function (date) {
 					Train.create({
 						trainId: trainDeparture.AdvertisedTrainIdent,
@@ -118,127 +115,8 @@ async function renderTrainAnnouncement(from, to, intervalStart, intervalStop) {
 			}
 		}
 	}
-
-	// console.log(trainInformation);
 	return trainInformation;
-
-	// if (trainInformation.length == 0) {
-	// 	await trainStops();
-	// 	return;
-	// }
-
-	// trainInformation[0].vagnar = { vagn: 2, sitplats: 25 };
-
-
-	// let json = JSON.stringify(trainInformation);
-
-	// fs.writeFile(from + '-' + to + '.json', "", (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data inside data.json has been cleared');
-	// });
-
-	// fs.writeFile(from  + '-' + to + '.json', json, (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data written to file');
-	// });
 }
-
-async function trainStops() {
-
-	let departures = await index.sendAllDeparturesRequest();
-	let trainsWithStops = [];
-	let allStations = await index.sendStationRequest();
-	let alreadyRegisteredStations = new Array();
-
-	for (let departure of departures) {
-
-		let toLocation = [];
-		let fromLocation = '';
-
-		for (let location of departure.ToLocation) {
-			for (let station of allStations) {
-				if (station.LocationSignature == location)
-					toLocation.push(station.AdvertisedLocationName);
-			}
-		}
-
-		for (let station of allStations) {
-			if (station.LocationSignature == departure.FromLocation[0])
-				fromLocation = station.AdvertisedLocationName;
-		}
-
-		let stationChange = fromLocation;
-		for (let i = 0; i < toLocation.length; i++) {
-
-			if (_.where(alreadyRegisteredStations, { from: stationChange, to: toLocation[i] }).length > 0) { }
-			else {
-				if (stationChange == toLocation[i] || stationChange == '' || toLocation[i] == '') { }
-				else {
-					alreadyRegisteredStations.push({ from: stationChange, to: toLocation[i] });
-					stationChange = toLocation[i];
-				}
-			}
-		};
-
-		trainsWithStops.push({
-			advertisedTimeAtLocation: departure.AdvertisedTimeAtLocation,
-			advertisedTrainIdent: departure.AdvertisedTrainIdent,
-			fromLocation: fromLocation,
-			owner: 'G4Win',
-			service: 'yes',
-			toLocation: toLocation,
-			trackAtLocation: departure.trackAtLocation,
-		})
-	}
-
-
-	// let json = JSON.stringify(departures);
-
-	// fs.writeFile('departures.json', "", (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data inside data.json has been cleared');
-	// });
-
-	// fs.writeFile('departures.json', json, (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data written to file');
-	// });
-
-	// let json1 = JSON.stringify(trainsWithStops);
-
-	// fs.writeFile('trainsWithStops.json', "", (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data inside data.json has been cleared');
-	// });
-
-	// fs.writeFile('trainsWithStops.json', json1, (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data written to file');
-	// });
-
-	// let json2 = JSON.stringify(alreadyRegisteredStations);
-
-	// fs.writeFile('alreadyRegisteredStations.json', "", (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data inside data.json has been cleared');
-	// });
-
-	// fs.writeFile('alreadyRegisteredStations.json', json2, (err) => {
-	// 	if (err) throw err;
-	// 	console.log('Data written to file');
-	// });
-
-	console.log(alreadyRegisteredStations.length);
-
-	for (let i = 0; i < alreadyRegisteredStations.length; i++) {
-
-		setTimeout(async () => {
-			console.log(alreadyRegisteredStations[i].from, alreadyRegisteredStations[i].to);
-			await renderTrainAnnouncement(alreadyRegisteredStations[i].from, alreadyRegisteredStations[i].to);
-		}, 2000 * i);
-	}
-}
-
 
 async function matchStops(intervalStart, intervalStop) {
 	let departures = await index.sendAllDeparturesRequest();
@@ -339,7 +217,7 @@ async function matchStops(intervalStart, intervalStop) {
 								});
 
 
-								const dates = getDates(new Date(2022, 0, 3), new Date(2022, 0, 11))
+								const dates = getDates(new Date(2022, 4, 30), new Date(2022, 4, 31))
 								dates.forEach(function (date) {
 									Train.create({
 										from: startStop.from,
@@ -384,8 +262,8 @@ function getDates(startDate, endDate) {
 
 //// RUNNING THE METHODS
 
-matchStops('-16:25:00', '06:30:00');
+matchStops('-22:22:00', '01:30:00');
 // getAdvertisedLocationName('Hpbg');
 // trainStops();
-getAllStations();
+// getAllStations();
 // renderTrainAnnouncement('Örebro C', 'Hallsberg');
