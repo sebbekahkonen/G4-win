@@ -123,7 +123,8 @@ export default {
 	},
 	methods: {
 		...mapActions('receiptStore', ['addTrainId']),
-		...mapActions('stripeStore', ['checkout']),
+		...mapActions('ticketStore', ['checkout']),
+
 
 		redirect() {
 			console.log(this.dataSend);

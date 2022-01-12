@@ -7,7 +7,6 @@ import departureStore from './modules/departureStore.js';
 import ticketStore from './modules/ticketStore.js';
 import travelStore from './modules/travelStore.js';
 import receiptStore from './modules/receiptStore.js';
-import stripeStore from './modules/stripeStore.js';
 
 
 Vue.use(Vuex);
@@ -18,8 +17,7 @@ export default new Vuex.Store({
 		departureStore,
 		ticketStore,
 		travelStore,
-		receiptStore,
-		stripeStore
+		receiptStore
 	},
 	plugins: [
 		createPersistedState({
