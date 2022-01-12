@@ -2,10 +2,10 @@ const _ = require('underscore');
 const Price = require('./Sequelize/Price');
 const Train = require('./Sequelize/Train');
 
-let run = async () => { prices(JSON.parse(JSON.stringify(await Train.findAll()))) };
+let run = async () => { await prices(JSON.parse(JSON.stringify(await Train.findAll()))) };
 run();
-
-function prices(rows) {
+sequelize.sync({ force: false }).then(() => console.log('db is ready'));
+async function prices(rows) {
 	let registeredTrainsWithoutStops = new Array();
 
 	for (let train of rows) {
@@ -26,20 +26,19 @@ function prices(rows) {
 			});
 
 			let shortestTravelTime = Math.min(...travelArray);
-
-			calculatePrices(table, shortestTravelTime);
+			await calculatePrices(table, shortestTravelTime);
 		}
 	}
 }
 
 
-function calculatePrices(table, shortestTravelTime) {
+async function calculatePrices(table, shortestTravelTime) {
 	
-	let adultFee = 70;
+	let adultFee = 50;
 	let studentFee = 25;
 	let seniorFee = 23;
 
-	Object.keys(table).forEach(key => {
+	Object.keys(table).forEach(async key => {
 		let travelTime = table[key].travelTime;
 		
 		let hours = parseInt(travelTime[0]);
@@ -82,7 +81,7 @@ function calculatePrices(table, shortestTravelTime) {
 			priceStudent -= deduction * days;
 			priceSenior -= deduction * days;
 			
-			Price.create({
+			await Price.create({
 				train_id: table[key].id,
 				price_adult: priceAdult,
 				price_student: priceStudent,
