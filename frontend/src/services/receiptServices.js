@@ -1,7 +1,22 @@
 import axios from 'axios';
 
 export default {
+	deleteCurrentOrderNumber() {
+		return axios.delete('/api/current_orderNumber');
+	},
+	currentOrderNumber(data) {
+		console.log(data);
 
+		return axios.post('/api/current_orderNumber', {
+			order_number: `${data}`
+		})
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	},
 	getReceipt() {
 		return axios.get('/api/current_user', {
 			headers: {

@@ -8,7 +8,8 @@ export default {
 	state: {
 		receiptInformation: {},
 		receiptById: {},
-		deletedSeats: {}
+		deletedSeats: {},
+		currentOrderNumber: ''
 	},
 
 	mutations: {
@@ -20,15 +21,31 @@ export default {
 		},
 		setAllDeletedSeats(state, data) {
 			state.deletedSeats = data;
+		},
+		setCurrentOrderNumber(state, data) {
+			state.currentOrderNumber = data;
+		},
+		resetReceipt(state) {
+			state.receiptInformation = {};
+		},
+		resetCurrentOrderNumber(state) {
+			state.currentOrderNumber = '';
 		}
 	},
 
 	actions: {
+		resetReceipt({ commit }) {
+			commit('resetReceipt');
+		},
 		async getReceipt({ commit }) {
 			const receipt = await receiptServices.getReceipt();
 
 			commit('setReceipt', receipt);
 
+		},
+		changeReceipt({ commit }, data) {
+			console.log(data);
+			commit('setReceipt', data);
 		},
 		async getAllReceipts({ commit }) {
 			const receipt = await receiptServices.getAllReceipts();
@@ -46,6 +63,15 @@ export default {
 			await receiptServices.deleteSeats(data);
 
 			commit('setAllDeletedSeats', data);
+		},
+		async currentOrderNumber({ commit }, data) {
+			console.log(data);
+			await receiptServices.deleteCurrentOrderNumber();
+			await receiptServices.currentOrderNumber(data);
+			commit('setCurrentOrderNumber', data);
+		},
+		resetCurrentOrderNumber({ commit }) {
+			commit('resetCurrentOrderNumber');
 		}
 
 	},
@@ -59,6 +85,11 @@ export default {
 		},
 		getDeletedSeats(state) {
 			return state.deletedSeats;
+		},
+		getCurrentOrderNumber(state) {
+			console.log(state.currentOrderNumber);
+
+			return state.currentOrderNumber;
 		}
 	}
 };

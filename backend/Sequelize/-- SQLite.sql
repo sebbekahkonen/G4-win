@@ -1,4 +1,4 @@
 -- SQLite
 SELECT *
-FROM seats
-ORDER BY train_id DESC, seats_booked
+FROM trains
+ORDER BY trainId, `date`
