@@ -292,3 +292,19 @@ app.get('/api/:table/:from/:to', (req, res) => {
 		data: result
 	});
 })
+
+app.get('/api/:table/getPrices/fetchPrices/:train_id', (req, res) => {
+	let preparedStatement = db.prepare(`
+	SELECT *
+	FROM ${req.params.table}
+	WHERE ${req.params.table}."train_id" = :train_id
+	`);
+	let result = preparedStatement.all({
+		train_id: req.params.train_id
+	});
+
+	res.status(200).json({
+		message: 'success',
+		data: result
+	});
+})
