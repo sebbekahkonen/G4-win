@@ -48,7 +48,7 @@
 										one-line
 										class="grey--text text--darken-1 pa-0"
 									>
-										<v-row class="pl-3 grey--text text--darken-1">
+										<v-row class="pl-0 grey--text text--darken-1">
 											Tågnummer: {{ tickets[0].train_id }}
 										</v-row>
 					
@@ -74,23 +74,6 @@
 									</v-layout>
 								</v-list>
 							</v-col>
-							<!-- <td v-for="item in wagonAndSeat" :key="item.message" style="text-decoration: none">
-								<tr>
-									{{ item }}
-								</tr>
-							</td> -->
-							<!-- <v-layout v-for="item in wagonAndSeat" :key="item.message" class="pt-5 text-center">
-								<tr>
-									{{ item }}
-								</tr>
-								<div class="ulDiv">
-									<ul id="example-1" class="testClass">
-										<li v-for="item in wagonAndSeat" :key="item.message">
-											{{ item }}
-										</li>
-									</ul>
-								</div>
-							</v-layout> -->
 						</v-layout>
 					</v-layout>
 					<v-col class="mt-4">
