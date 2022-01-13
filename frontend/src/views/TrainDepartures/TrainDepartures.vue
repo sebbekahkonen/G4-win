@@ -4,25 +4,14 @@
 			<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 			Tillbaka
 		</v-btn>
-		<v-btn @click="trainIdFetch">test</v-btn>
-		{{ testPrices }}
 		<v-layout column justify-center>
 			<span class="text-center">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</span>
-			<!-- <v-flex xs6>
-				<h3 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h3>
-				<h3 class="text-center">Från: Göteborg</h3>
-			</v-flex>
-			<v-flex xs6>
-				<h3 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h3>
-				<h3 class="text-center">Till: Stockholm</h3>
-			</v-flex> -->
 			<span class="text-center">{{ formatDate }}</span>
 		</v-layout>
-		
-		<!-- <h3 class="pt-10 text-center mb-4">Valt datum: 2022-01-04</h3> -->
+
 		<v-data-table
 			:headers="trainHeaders"
-			:items="trainsArray"
+			:items="trainInformation.trainsArray"
 			:single-expand="singleExpand"
 			:expanded.sync="expanded"
 			item-key="id"
@@ -36,37 +25,34 @@
 				<td :colspan="headers.length">
 					<v-col>
 						<v-layout row wrap class="pt-2 flex text-right" justify-space-between>
-							<h4>Ungdom/Student(100kr/st):</h4>
-							<v-icon ref="student" value="-100" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
-							{{ tickets.student.value }}
-							<v-icon ref="student" value="+100" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
+							<h4>Ungdom/Student({{ studentPrice }}kr/st):</h4>
+							<v-icon ref="student" :value="-studentPrice" color="red" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
+							{{ tickets.student.amount }}
+							<v-icon ref="student" :value="+studentPrice" color="green" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
 						</v-layout>
-					</v-col>
-					<v-col>
+	
+
 						<v-layout row wrap class="pt-5 flex text-right" justify-space-between>
-							<h4 class="mr-16">Vuxen(139kr/st):</h4>
-							<v-icon ref="adult" value="-139" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
-							{{ tickets.adult.value }}
-							<v-icon ref="adult" value="+139" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
+							<h4 class="mr-16">Vuxen({{ adultPrice }}kr/st):</h4>
+							<v-icon ref="adult" :value="-adultPrice" color="red" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
+							{{ tickets.adult.amount }}
+							<v-icon ref="adult" :value="+adultPrice" color="green" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
 						</v-layout>
-					</v-col>
-					<v-col>
+
 						<v-layout row wrap class="pt-5 flex text-right" justify-space-between>
-							<h4 class="mr-12">Pensionär(79kr/st):</h4>
-							<v-icon ref="senior" value="-79" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
-							{{ tickets.senior.value }}
-							<v-icon ref="senior" value="79" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
+							<h4 class="mr-12">Pensionär({{ seniorPrice }}kr/st):</h4>
+							<v-icon ref="senior" :value="-seniorPrice" color="red" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
+							{{ tickets.senior.amount }}
+							<v-icon ref="senior" :value="+seniorPrice" color="green" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
 						</v-layout>
-					</v-col>
-					<v-col>
+
 						<v-layout row wrap class="pt-5">
 							<h4 style="color: red;">{{ errorCode }}</h4>
 						</v-layout>
-					</v-col>
-					<v-col>
+	
 						<v-layout row wrap class="pt-10 pb-3">
 							<h2 class="flex text-left">Pris: {{ price }}kr</h2>	 
-							<v-btn align-content="right" @click="nextView">Nästa</v-btn>
+							<v-btn align-content="right" class="mr-1" color="primary" @click="nextView">Nästa</v-btn>
 						</v-layout>
 					</v-col>
 				</td>
@@ -90,10 +76,17 @@ export default {
 			senior: {id: 3, price: 0, amount: 0, title: 'senior_biljett'}
 		},
 		price: 0,
+		seniorPrice: 0,
+		studentPrice: 0,
+		adultPrice: 0,
 		testTrainId: [],
 		errorCode: '',
-		trainsArray: [],
-		testPrices: [],
+		trainInformation: {
+			trainsArray: [],
+			adultPrices: [],
+			seniorPrices: [],
+			studentPrices: []
+		},
 		trainHeaders: [
 			{
 				text: 'Tågnr',
@@ -141,38 +134,19 @@ export default {
 		returnPage() {
 			this.$router.push('/');
 		},
-		trainIdFetch() {
-			for(let trainIdString of this.testTrainId) {
-				console.log('test');
-				fetch('/api/prices/')
-					.then(res => res.json())
-					.then(data => Object.keys(data.data).forEach(key => {
-						if(data.data[key].train_id === trainIdString) {
-							console.log(data.data[key].price_senior);
-							this.testPrices.push(data.data[key].price_senior);
-						}
-					}));
-			}
-		},
 		testFetch() {
 			fetch(`/api/trains/${this.travelObj.departure.departureDestination}/${this.travelObj.departure.arrivalDestination}`)
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
 					if(data.data[key].date === this.date) {
-						this.trainsArray.push(data.data[key]);
+						this.trainInformation.trainsArray.push(data.data[key]);
 						console.log((data.data[key]));
 						this.testTrainId.push(data.data[key].id);
 
 
 					}				
 				})
-				);
-			this.trainIdFetch();
-			// Object.keys(this.testTrainId).forEach(key => {
-			// 	console.log(this.testTrainId[key]);
-			// });
-			
-			
+				);			
 		},
 
 		dateFormatter() {
@@ -197,6 +171,17 @@ export default {
 			this.price = 0;
 
 			if(value.id === undefined) {
+				fetch(`/api/prices/getPrices/fetchPrices/${value.item.id}`)
+					.then(res => res.json())
+					.then(data => Object.keys(data.data).forEach(key => {
+						if(data.data[key].train_id === value.item.id) {
+							console.log(data.data[key].price_adult);
+							this.adultPrice = data.data[key].price_adult;
+							this.studentPrice = data.data[key].price_student;
+							this.seniorPrice = data.data[key].price_senior;
+						}
+					}));
+
 				this.$store.commit('travelStore/setTrainId', value.item.id);
 				
 				if(value.item.service === 'Ja') {
@@ -208,6 +193,17 @@ export default {
 				console.log('Bistro: ',this.hasBistro);
 				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
 			} else {
+				fetch(`/api/prices/getPrices/fetchPrices/${value.id}`)
+					.then(res => res.json())
+					.then(data => Object.keys(data.data).forEach(key => {
+						if(data.data[key].train_id === value.id) {
+							console.log(data.data[key].price_adult);
+							this.adultPrice = data.data[key].price_adult;
+							this.studentPrice = data.data[key].price_student;
+							this.seniorPrice = data.data[key].price_senior;
+						}
+					}));
+
 				this.$store.commit('travelStore/setTrainId', value.id);
 
 				if(value.service === 'Ja') {
@@ -220,9 +216,6 @@ export default {
 				this.$store.commit('travelStore/setHasBistro', this.hasBistro);
 
 			}
-			// console.log(value.item.id);
-			// this.$store.commit('travelStore/setTrainId', value.item.id);
-
 		},
 		expandRow(e) {
 			this.onExpand(e);
@@ -333,5 +326,14 @@ export default {
 }
 .v-application--is-ltr .v-data-footer__select {
 	margin-right: 0px !important;
+}
+.row {
+    margin: 0;
+}
+
+@media screen and (min-width: 1024px) {
+	.container {
+		width: 60%;
+	}
 }
 </style>
