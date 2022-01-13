@@ -42,12 +42,12 @@ async function sendEmail(email, name) {
 		html: `<body style="background: linear-gradient(to bottom, #2F4F4F, #20B2AA);";>
 				<br>
 				<br>
-				<h2 style="text-align:center;color:white;">Hej ${name}!<h2>
-				<h3 style="text-align:center;color:white;">Tack för att du valde att resa med G4-win</h3>
-				<h3 style="text-align:center;color:white;">Här är ditt ordernummer: ${result[0].order_number}</h3>
-				<h3 style="text-align:center;color:white;">Du kan få mer information om din bokning genom att ange ditt ordernummer <a href="http://localhost:8080/ticket">här<a><h3>
+				<h2 style="text-align:center;">Hej ${name}!<h2>
+				<h3 style="text-align:center;">Tack för att du valde att resa med G4-win</h3>
+				<h3 style="text-align:center;">Här är ditt ordernummer: ${result[0].order_number}</h3>
+				<h3 style="text-align:center;">Du kan få mer information om din bokning genom att ange ditt ordernummer <a href="http://localhost:8080/ticket">här<a><h3>
 				<br>
-				<h3 style="text-align:center;color:white;">Trevlig resa!<h3>
+				<h3 style="text-align:center;">Trevlig resa!<h3>
 				<br>
 				<br>
 				<br>

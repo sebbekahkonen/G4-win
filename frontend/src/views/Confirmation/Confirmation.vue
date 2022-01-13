@@ -143,20 +143,31 @@ export default {
 
 		},
 		postData() {
-			this.receiptData = {name: '', email: '', order_number: null, train_id: null, seats: ''};
+			this.receiptData = {name: '', email: '', order_number: null, train_id: null, seats: '', seatAndWagon: '', departure: null, arrival: null, departureDestination: '', arrivalDestination: ''};
 			let seatsBooked = '';
-
+			let seatAndWagon = '';
 			
 
 			Object.keys(this.bookedSeats).forEach((key)=> {
+				console.log('Vagn:',this.bookedSeats[key].wagon.toString(), 'Säte:',this.bookedSeats[key].seat);
+				seatAndWagon = seatAndWagon.concat('Vagn: ' + this.bookedSeats[key].wagon.toString() + ' ' + 'Säte: ' + this.bookedSeats[key].seat + ',');
 				seatsBooked = seatsBooked.concat(this.bookedSeats[key].seat.toString() + ',');	
 			});
 			seatsBooked = seatsBooked.replace(/,\s*$/, '');
+			seatAndWagon = seatAndWagon.replace(/,\s*$/, '');
+			console.log(seatAndWagon);
 			this.receiptData.name = this.getTheReceipt.name;
 			this.receiptData.email = this.getTheReceipt.email;
 			this.receiptData.order_number = this.getCurrentOrderNumber;
 			this.receiptData.train_id = this.dataSend.train_id;
 			this.receiptData.seats = seatsBooked;
+			this.receiptData.seatAndWagon = seatAndWagon;
+			this.receiptData.departure = this.getPickedTrain[0].departure;
+			this.receiptData.arrival = this.getPickedTrain[0].arrival;
+			console.log(this.travelObj.departure.departureDestination);
+			console.log(this.travelObj.departure.arrivalDestination);
+			this.receiptData.departureDestination = this.travelObj.departure.departureDestination;
+			this.receiptData.arrivalDestination = this.travelObj.departure.arrivalDestination;
 			fetch('/api/receipts', {
 				method: 'POST',
 				headers: {
