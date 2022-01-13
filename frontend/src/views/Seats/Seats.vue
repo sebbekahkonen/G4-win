@@ -10,10 +10,6 @@
 				<!-- Från: Göteborg -->
 			</v-col>
 			<v-col align="center">
-				<!-- Till: {{ travelObj.departure.arrivalDestination }} -->
-				Mellanstation: Jönköping
-			</v-col>
-			<v-col align="center">
 				Till: {{ travelObj.departure.arrivalDestination }}
 				<!-- Till: Stockholm -->
 			</v-col>

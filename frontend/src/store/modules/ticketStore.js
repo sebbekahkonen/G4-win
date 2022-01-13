@@ -41,6 +41,9 @@ export default {
 			state.pickedTrain = data;
 		},
 		resetCart(state) {
+			state.studentTickets = null;
+			state.adultTickets = null;
+			state.seniorTickets = null;
 			state.cartItems = [];
 		}
 	},

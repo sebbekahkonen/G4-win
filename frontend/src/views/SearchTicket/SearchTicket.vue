@@ -37,13 +37,43 @@
 			<template v-slot:expanded-item="{ headers }">
 				<td :colspan="headers.length">
 					<v-layout column justify-center>
-						<v-layout row wrap class="pt-5 text-center">
-							<v-flex xs6>
-								<span class="text-center">Namn: {{ firstAndLast }}</span>
-							</v-flex>
-							<v-flex xs6>
-								<span class="text-center">Platser: {{ seatsBooked }}</span>
-							</v-flex>
+						<v-layout class="pt-0 text-center">
+							<v-col>
+								<v-list>
+									<v-subheader class="payment-header">Dina valda biljetter</v-subheader>
+									<v-divider />
+									<v-list-item
+										v-for="(seats, i) in wagonAndSeat"
+										:key="i"
+										one-line
+										class="grey--text text--darken-1 pa-0"
+									>
+										<v-row class="pl-0 grey--text text--darken-1">
+											Tågnummer: {{ tickets[0].train_id }}
+										</v-row>
+					
+										<v-list-item-content>
+											<v-list-item-title>
+												{{ seats }}
+											</v-list-item-title>
+										</v-list-item-content>
+										<v-list-item-icon>
+											<v-icon class="payment-checkbox">
+												mdi-checkbox-marked-circle
+											</v-icon>
+										</v-list-item-icon>
+									</v-list-item>
+									<v-divider />
+									<v-layout row wrap class="pt-5 text-center">
+										<v-flex xs5>
+											<span class="text-center">Namn: {{ tickets[0].name }}</span>
+										</v-flex>
+										<v-flex xs6>
+											<span class="text-center">Email: {{ tickets[0].email }}</span>
+										</v-flex>
+									</v-layout>
+								</v-list>
+							</v-col>
 						</v-layout>
 					</v-layout>
 					<v-col class="mt-4">
@@ -74,20 +104,23 @@ export default {
 		expanded: [],
 		singleExpand: true,
 		seatsToRemove: [],
+		wagonAndSeat: [],
 		ticketHeaders: [
-		
 			{
-				text: 'Email',
-				value: 'email'
+				text: 'Från',
+				value: 'departureDestination'
 			},
-			
 			{
-				text: 'Ordernummer',
-				value: 'order_number'
+				text: 'Till',
+				value: 'arrivalDestination'
 			},
-			{ 
-				text: 'Säten',
-				value: 'seats'
+			{
+				text: 'Avgång',
+				value: 'departure'
+			},
+			{
+				text: 'Ankomst',
+				value: 'arrival'
 			}
 		],
 		tickets: [
@@ -120,6 +153,9 @@ export default {
 			});
 			this.seatsBooked = this.tickets[0].seats;
 			this.seatsToRemove = this.seatsBooked.split(',');
+			this.wagonAndSeat = this.tickets[0].seatAndWagon.split(',');
+			console.log(this.wagonAndSeat[0]);
+			console.log(this.wagonAndSeat);
 			Object.keys(this.seatsToRemove).forEach(key => {
 				this.seatsToRemove[key] = parseInt(this.seatsToRemove[key]);
 			});
@@ -164,5 +200,12 @@ export default {
 	}
 	tr:nth-child(even) {
 		background-color: rgb(236, 236, 236);
+	}
+	.testClass{
+		text-align: center;
+		list-style-type: none;
+	}
+	.ulDiv{
+		margin-left: 25%;
 	}
 </style>

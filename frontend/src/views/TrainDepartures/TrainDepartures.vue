@@ -327,9 +327,9 @@ export default {
 .v-application--is-ltr .v-data-footer__select {
 	margin-right: 0px !important;
 }
-.row {
+/* .row {
     margin: 0;
-}
+} */
 
 @media screen and (min-width: 1024px) {
 	.container {
