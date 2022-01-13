@@ -67,49 +67,21 @@
 			<h2 class="text-center pb-5 font-italic">Pris: {{ getPrice }}kr</h2>
 
 			<v-col class="text-center">
-				<stripe-checkout v-if="isTrue"
-					ref="checkoutRef"
-					mode="payment"
-					:pk="publishableKey"
-					:line-items="lineItems"
-					:success-url="successUrl"
-					:cancel-url="cancelUrl"
-					@loading="v => loading = v"
-				/>
-				<v-btn color="primary" @click="redirect">Betala</v-btn>
+				<v-btn color="primary" :loading="loading1" @click="redirect">Betala</v-btn>
 			</v-col>
 		</v-container>
 	</div>
 </template>
 <script>
-import { StripeCheckout } from '@vue-stripe/vue-stripe';
-import { publishableKey } from '@/../shared/config.json';
 import { mapGetters, mapState, mapActions } from 'vuex';
+import vue from 'vue';
 
 export default {
-	components: {
-		StripeCheckout
-	},
 	data: () => ({
+		loading1: false,
 		departure: '10:00',
 		arrival: '13:00',
 		isTrue: false,
-		successUrl: 'http://localhost:8080/confirmation',
-		cancelUrl: 'http://localhost:8080/payment',
-		lineItems: [
-			// {
-			// 	'price':{
-			// 		unit_amount: 1000,
-			// 		'currency': 'sek',
-			// 		'name': 'test'
-			// 	},
-			// 	quantity: 1
-			// },
-			{price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: 3}
-		],
-			
-		
-		publishableKey:  publishableKey,
 		dataSend: {}
 	}),
 	computed: {
@@ -117,70 +89,19 @@ export default {
 		...mapGetters('ticketStore', ['getSeniorTickets', 'getAdultTickets', 'getStudentTickets', 'getPrice', 'getPickedTrain'])
 	},
 	created() {
-	},
-	mounted() {
-		this.isTrue = true;
+		vue.nextTick(this.resetCurrentOrderNumber);
 	},
 	methods: {
-		...mapActions('receiptStore', ['addTrainId']),
+		...mapActions('receiptStore', ['addTrainId', 'currentOrderNumber', 'resetCurrentOrderNumber']),
 		...mapActions('ticketStore', ['checkout']),
 
 
 		redirect() {
-			console.log(this.dataSend);
+			let orderNum = Math.floor(Math.random() * 100000000);
 
-			// if(this.getSeniorTickets != 0) {
-			// 	//Senior ticket
-			// 	this.lineItems.push({price: 'price_1KDAuMAsS2e6kWH4nB12fPda', quantity: this.getSeniorTickets});
-			// }
-
-			// if(this.getAdultTickets != 0) {
-			// 	//Adult ticket
-			// 	this.lineItems.push({price: 'price_1KDAv0AsS2e6kWH4FZ6qrLXJ', quantity: this.getAdultTickets});
-			// }
-
-			// if(this.getStudentTickets != 0) {
-			// 	//Student ticket
-			// 	this.lineItems.push({price: 'price_1KDAvTAsS2e6kWH4adHlU5fH', quantity: this.getStudentTickets});
-			// }
-
-			fetch('/api/current_trainId', {
-				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			})
-				.then(res => res.json())
-				.catch((error) => {
-					console.error('Error:', error);
-				});
-
-			for(let seats of this.bookedSeats) {
-				this.dataSend = { train_id: this.trainId, seats_booked: seats.seat, date: this.date  };
-
-				fetch('/api/current_trainId', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(this.dataSend)
-				})
-					.then(res => res.json())
-					.then(data => {
-						console.log('Success:', data);
-					})
-					.catch((error) => {
-						console.error('Error:', error);
-					});
-				
-			}
+			this.currentOrderNumber(orderNum);
+			this.loading1 = true;
 			this.checkout(100);
-			// this.$refs.checkoutRef.redirectToCheckout();			
-
-			console.log('Train_id:', this.trainId);
-			console.log('Biljetter:', this.bookedSeats);
-			console.log('date:', this.date);
-			console.log('wagon:', this.wagon);
 		},
 		returnPage() {
 			this.$router.push('/seats');

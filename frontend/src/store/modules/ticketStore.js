@@ -23,12 +23,15 @@ export default {
 			state.tickets.push(data);
 		},
 		setStudentTickets(state, data) {
+			state.studentTickets = data.amount;
 			state.cartItems.push(data);
 		},
 		setAdultTickets(state, data) {
+			state.adultTickets = data.amount;
 			state.cartItems.push(data);
 		},
 		setSeniorTickets(state, data) {
+			state.seniorTickets = data.amount;
 			state.cartItems.push(data);
 		},
 		setPrice(state, data) {
@@ -67,6 +70,7 @@ export default {
 				)
 			});
 			let result = await response.json();
+
 
 			console.log('Redirecting to stripe checkout..', result);
 

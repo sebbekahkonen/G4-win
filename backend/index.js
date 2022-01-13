@@ -15,10 +15,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 require('dotenv').config();
 
-const endpointSecret = "whsec_NGovkQdxvYoTBXEpbtgaYGXZ0VFTzZZ0";
-const eventData = { name: '', email: '', receipt_url: '', order_number: null, train_id: null, seats: '' };
-
-async function sendEmail() {
+async function sendEmail(email, name) {
+	let preparedStatement4 = db.prepare(`
+			SELECT * FROM current_orderNumber
+			`);
+	let result = preparedStatement4.all();
+	console.log("RESULT: ", result);
 	// Generate test SMTP service account from ethereal.email
 	// Only needed if you don't have a real mail account for testing
 	let testAccount = await nodemailer.createTestAccount();
@@ -35,11 +37,23 @@ async function sendEmail() {
 	// send mail with defined transport object
 	let info = await transporter.sendMail({
 		from: 'gfourwin@gmail.com', // sender address
-		to: `${eventData.email}`, // list of receivers
+		to: `${email}`, // list of receivers
 		subject: "G4-Win Kvitto", // Subject line
-		html: `<h1>Tack för att du valde att resa med G4-win</h1>
-				<h3>Här är ditt ordernummer: ${eventData.order_number}</h3>
-				<h3>Klicka<a href="${eventData.receipt_url}"> här</a> för att se ditt kvitto</h3>`, // html body
+		html: `<body style="background: linear-gradient(to bottom, #2F4F4F, #20B2AA);";>
+				<br>
+				<br>
+				<h2 style="text-align:center;color:white;">Hej ${name}!<h2>
+				<h3 style="text-align:center;color:white;">Tack för att du valde att resa med G4-win</h3>
+				<h3 style="text-align:center;color:white;">Här är ditt ordernummer: ${result[0].order_number}</h3>
+				<h3 style="text-align:center;color:white;">Du kan få mer information om din bokning genom att ange ditt ordernummer <a href="http://localhost:8080/ticket">här<a><h3>
+				<br>
+				<h3 style="text-align:center;color:white;">Trevlig resa!<h3>
+				<br>
+				<br>
+				<br>
+				<br>
+				<body>
+				`
 	});
 
 	console.log("Message sent: %s", info.messageId);
@@ -53,11 +67,9 @@ async function sendEmail() {
 
 const Stripe = require('stripe')
 const stripe = new Stripe('sk_test_51K9H37AsS2e6kWH4AIHR0ScpXCHb9hOp5tzuap7Z0sYlTB8UTmKBqmdvYYKHEguf6D8O2jlisJZ2lWryBKYh9QIE00Znby8jdh') // stripe.com api secret key
-
 // route for checkout
+let SESSIONID = '';
 app.post('/api/checkout', async (req, res) => {
-	console.log("test");
-	console.log("BODY FRONTEND: ", req.body);
 	let line_items = req.body.items.map(item => {
 		return {
 			price_data: {
@@ -74,117 +86,24 @@ app.post('/api/checkout', async (req, res) => {
 		payment_method_types: ['card'],
 		line_items: line_items,
 		mode: 'payment',
-		success_url: 'http://localhost:8080/confirmation',
+		success_url: 'http://localhost:8080/confirmation?session_id={CHECKOUT_SESSION_ID}',
 		cancel_url: 'http://localhost:8080/payment',
-	});
-
+	})
+	SESSIONID = session.id;
 	res.json({ id: session.id });
 });
 
 
+app.get('/api/confirmation', async (req, res) => {
+	const session2 = await stripe.checkout.sessions.retrieve(SESSIONID);
+	const customer = await stripe.customers.retrieve(session2.customer);
 
-
-
-
-
-
-
-
-
-// app.post('/api/receipts', express.raw({ type: 'application/json' }), (req, res) => {
-// 	const sig = req.headers['stripe-signature'];
-
-// 	let event;
-
-// 	try {
-// 		event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-// 		console.log(event);
-// 	} catch (err) {
-// 		res.status(400).send(`Webhook Error: ${err.message}`);
-// 		return;
-// 	}
-// 	// Handle the event
-// 	switch (event.type) {
-// 		// case 'payment_intent.created':
-
-// 		// 	// let preparedStatement6 = db.prepare(`
-// 		// 	// SELECT * FROM seats
-// 		// 	// WHERE seats."train_id" = ${result[0].train_id}
-// 		// 	// `);
-// 		// 	// let result2 = preparedStatement6.all();
-// 		// 	// console.log(result2);
-// 		// 	break;
-// 		case 'payment_intent.succeeded':
-// 			console.log("paymentIntentSuccess");
-// 			let seatsBooked = '';
-// 			let preparedStatement4 = db.prepare(`
-// 			SELECT * FROM current_trainId
-// 			`);
-// 			let result = preparedStatement4.all();
-// 			Object.keys(result).forEach(key => {
-// 				console.log(result[key]);
-// 				seatsBooked = seatsBooked.concat(result[key].seats_booked.toString() + ",");
-// 			});
-// 			seatsBooked = seatsBooked.replace(/,\s*$/, "");
-// 			eventData.train_id = result[0].train_id
-// 			eventData.seats = seatsBooked;
-
-// 			let query5 = `DELETE FROM current_trainId;`
-// 			let preparedStatement5 = db.prepare(query5);
-// 			preparedStatement5.run();
-// 			break;
-// 		case 'customer.created':
-// 			let orderNumber = Math.floor(Math.random() * 100000000);
-
-// 			eventData.name = event.data.object.name;
-// 			eventData.email = event.data.object.email;
-// 			eventData.order_number = orderNumber;
-// 			let query1 = `DELETE FROM current_user;`
-// 			let preparedStatement1 = db.prepare(query1);
-// 			preparedStatement1.run();
-// 			break;
-// 		case 'charge.succeeded':
-// 			eventData.receipt_url = event.data.object.receipt_url;
-// 			let columnNames = Object.keys(eventData);
-// 			let columnParamaters = columnNames.map((colName) => ':' + colName);
-
-// 			let query =
-// 				`
-// 				INSERT INTO receipts
-// 				(${columnNames})
-// 				VALUES (${columnParamaters})
-// 				`;
-// 			let preparedStatement = db.prepare(query);
-// 			preparedStatement.run(eventData);
-// 			sendEmail();
-// 			res.status(200).json({
-// 				message: 'success',
-// 				data: eventData
-// 			});
-// 			let columnNames3 = Object.keys(eventData);
-// 			let columnParamaters3 = columnNames3.map((colName) => ':' + colName);
-// 			let query3 =
-// 				`
-// 				INSERT INTO current_user
-// 				(${columnNames3})
-// 				VALUES (${columnParamaters3})
-// 				`;
-// 			let preparedStatement3 = db.prepare(query3);
-// 			preparedStatement3.run(eventData);
-// 			break;
-// 		case 'checkout.session.completed':
-
-
-// 			break;
-// 		default:
-// 			console.log(`Unhandled event type ${event.type}`);
-// 	}
-
-// 	// Return a 200 response to acknowledge receipt of the event
-
-// 	res.send();
-// });
-
+	res.status(200).json({
+		message: 'success',
+		data: customer
+	});
+	sendEmail(customer.email, customer.name);
+});
 
 
 //Listen on localhost:4000 and start webserver
@@ -200,29 +119,29 @@ app.get('/', (req, res) => {
 });
 
 //Dynamic rest route:POST
-// app.post('/api/:table', (req, res) => {
-// 	// let data = {
-// 	// 	name: req.body.name,
-// 	// 	email: req.body.email,
-// 	// 	password: req.body.password
-// 	// };
-// 	/*test*/
-// 	let columnNames = Object.keys(req.body);
-// 	let columnParamaters = columnNames.map((colName) => ':' + colName);
-// 	let query =
-// 		`INSERT INTO ${req.params.table}
-// 		(${columnNames})
-// 		VALUES (${columnParamaters})
-// 		`;
+app.post('/api/:table', (req, res) => {
+	// let data = {
+	// 	name: req.body.name,
+	// 	email: req.body.email,
+	// 	password: req.body.password
+	// };
+	/*test*/
+	let columnNames = Object.keys(req.body);
+	let columnParamaters = columnNames.map((colName) => ':' + colName);
+	let query =
+		`INSERT INTO ${req.params.table}
+		(${columnNames})
+		VALUES (${columnParamaters})
+		`;
 
-// 	let preparedStatement = db.prepare(query);
-// 	preparedStatement.run(req.body);
+	let preparedStatement = db.prepare(query);
+	preparedStatement.run(req.body);
 
-// 	res.status(200).json({
-// 		message: 'success',
-// 		data: req.body
-// 	});
-// })
+	res.status(200).json({
+		message: 'success',
+		data: req.body
+	});
+})
 
 
 //Dynamic rest route:GET ALL
@@ -238,21 +157,21 @@ app.get('/api/:table', (req, res) => {
 })
 
 //Dynamic rest route:GET:ID
-app.get('/api/:table/:id', (req, res) => {
-	let preparedStatement = db.prepare(`
-	SELECT *
-	FROM ${req.params.table}
-	WHERE id = :id
-	`);
-	let result = preparedStatement.all({
-		id: req.params.id
-	});
+// app.get('/api/:table/:id', (req, res) => {
+// 	let preparedStatement = db.prepare(`
+// 	SELECT *
+// 	FROM ${req.params.table}
+// 	WHERE id = :id
+// 	`);
+// 	let result = preparedStatement.all({
+// 		id: req.params.id
+// 	});
 
-	res.status(200).json({
-		message: 'success',
-		data: result
-	});
-})
+// 	res.status(200).json({
+// 		message: 'success',
+// 		data: result
+// 	});
+// })
 
 //Dynamic rest route:PUT (update)
 app.put('/api/:table/:id', (req, res) => {

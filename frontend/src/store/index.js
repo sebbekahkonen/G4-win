@@ -21,7 +21,7 @@ export default new Vuex.Store({
 	},
 	plugins: [
 		createPersistedState({
-			paths: ['travelStore', 'ticketStore']
+			paths: ['travelStore', 'ticketStore', 'receiptStore']
 		})
 	]
 });

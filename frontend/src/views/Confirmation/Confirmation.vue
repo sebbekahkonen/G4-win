@@ -20,7 +20,7 @@
 					<v-col cols="8" class="ml-10">
 						<v-text-field
 							label="Avgång"
-							value="10:00"
+							:value="getPickedTrain[0].departure"
 							type="time"
 							suffix="CET"
 							readonly
@@ -31,7 +31,7 @@
 					<v-col cols="8" class="ml-10">
 						<v-text-field
 							label="Ankomst"
-							value="13:00"
+							:value="getPickedTrain[0].arrival"
 							type="time"
 							suffix="CET"
 							readonly
@@ -72,7 +72,7 @@
 			<v-row />
 		</v-container>
 		<v-col class="text-center">
-			<h3>Ordernummmer: {{ getTheReceipt.order_number }} </h3>
+			<h3>Ordernummmer: {{ getCurrentOrderNumber }} </h3>
 		</v-col>
 		<v-col class="text-center">
 			<h3>Tack för att du valde G4-Win!</h3>
@@ -81,7 +81,7 @@
 			<h3>Vi skickar ett kvitto till din email-adress</h3>
 		</v-col>
 		<v-col class="text-center">
-			<h3>Trevlig resa!</h3>	
+			<h3>Trevlig resa {{ getTheReceipt.name }}!</h3>	
 		</v-col>
 	</div>
 </template>
@@ -90,23 +90,25 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
-		dataSend: {}
+		dataSend: {},
+		receiptData: {},
+		orderNumber: ''
 	}),
 	computed: {
 		...mapGetters('ticketStore', ['getPrice', 'getPickedTrain']),
-		...mapGetters('receiptStore', ['getTheReceipt']),
+		...mapGetters('receiptStore', ['getTheReceipt', 'getCurrentOrderNumber']),
 		...mapState('travelStore', ['travelObj', 'date', 'formatDate', 'bookedSeats', 'trainId', 'wagon'])
 	},
 	created() {
-		vue.nextTick(this.getReceipt);
+		vue.nextTick(this.resetReceipt);
 		vue.nextTick(this.setSeats);
+		vue.nextTick(this.getCustomerInformation);
 	},
 	methods: {
-		...mapActions('receiptStore', ['getReceipt']),
+		...mapActions('receiptStore', ['getReceipt', 'changeReceipt', 'resetReceipt', 'currentOrderNumber']),
 		setSeats() {
 			for(let seats of this.bookedSeats) {
 				this.dataSend = { train_id: this.trainId, seats_booked: seats.seat, wagon: seats.wagon, date: this.date  };
-
 				fetch('/api/seats', {
 					method: 'POST',
 					headers: {
@@ -122,6 +124,68 @@ export default {
 						console.error('Error:', error);
 					});
 			}
+		},
+		getCustomerInformation() {
+			fetch('/api/current_user', {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(res => res.json())
+				.then(data => console.log(data));
+
+			fetch('/api/confirmation')
+				.then(res => res.json())
+				.then(data => this.changeReceipt(data.data));
+			setTimeout(this.postData, 2000);
+			
+
+		},
+		postData() {
+			this.receiptData = {name: '', email: '', order_number: null, train_id: null, seats: ''};
+			let seatsBooked = '';
+
+			
+
+			Object.keys(this.bookedSeats).forEach((key)=> {
+				seatsBooked = seatsBooked.concat(this.bookedSeats[key].seat.toString() + ',');	
+			});
+			seatsBooked = seatsBooked.replace(/,\s*$/, '');
+			this.receiptData.name = this.getTheReceipt.name;
+			this.receiptData.email = this.getTheReceipt.email;
+			this.receiptData.order_number = this.getCurrentOrderNumber;
+			this.receiptData.train_id = this.dataSend.train_id;
+			this.receiptData.seats = seatsBooked;
+			fetch('/api/receipts', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(this.receiptData)
+			})
+				.then(res => res.json())
+				.then(data => {
+					console.log('Success:', data);
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+			fetch('/api/current_user', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(this.receiptData)
+			})
+				.then(res => res.json())
+				.then(data => {
+					console.log('Success:', data);
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+
 		}
 	}
 };
