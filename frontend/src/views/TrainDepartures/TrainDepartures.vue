@@ -29,9 +29,9 @@
 								<h4>Ungdom/Student({{ studentPrice }}kr/st):</h4>
 							</v-flex>
 							<v-flex xs6 class="" justify="space-between">
-								<v-icon ref="student" class="pl-10 pr-10" :value="-studentPrice" color="red" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
-								<span class="pl-10 pr-10">{{ tickets.student.amount }}</span>
-								<v-icon ref="student" class="pl-10" :value="+studentPrice" color="green" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
+								<v-icon ref="student" class="mr-3" :value="-studentPrice" color="red" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
+								<span class="ml-3 mr-3">{{ tickets.student.amount }}</span>
+								<v-icon ref="student" class="ml-3" :value="+studentPrice" color="green" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
 							</v-flex>
 						</v-layout>
 	
@@ -41,9 +41,9 @@
 								<h4>Vuxen({{ adultPrice }}kr/st):</h4>
 							</v-flex>
 							<v-flex xs6 class="" justify="space-between">
-								<v-icon ref="adult" class="pl-10 pr-10" :value="-adultPrice" color="red" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
-								<span class="pl-10 pr-10">{{ tickets.adult.amount }}</span>
-								<v-icon ref="adult" class="pl-10" :value="+adultPrice" color="green" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
+								<v-icon ref="adult" class="mr-3" :value="-adultPrice" color="red" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
+								<span class="ml-3 mr-3">{{ tickets.adult.amount }}</span>
+								<v-icon ref="adult" class="ml-3" :value="+adultPrice" color="green" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
 							</v-flex>
 						</v-layout>
 
@@ -52,9 +52,9 @@
 								<h4>Pensionär({{ seniorPrice }}kr/st):</h4>
 							</v-flex>
 							<v-flex xs6 class="" justify="space-between">
-								<v-icon ref="senior" class="pl-10 pr-10" :value="-seniorPrice" color="red" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
-								<span class="pl-10 pr-10">{{ tickets.senior.amount }}</span>
-								<v-icon ref="senior" class="pl-10" :value="+seniorPrice" color="green" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
+								<v-icon ref="senior" class="mr-3" :value="-seniorPrice" color="red" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
+								<span class="ml-3 mr-3">{{ tickets.senior.amount }}</span>
+								<v-icon ref="senior" class="ml-3" :value="+seniorPrice" color="green" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
 							</v-flex>
 						</v-layout>
 
