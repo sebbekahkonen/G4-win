@@ -1,37 +1,43 @@
 <template>
-	<v-container>
-		<h1 class="text-center">Vart vill du resa?</h1>
-		<form>
-			<v-autocomplete
-				v-model="search.departureStation"
-				label="Från"
-				:items="stationsArr"
-				hint="Ange de tre första bokstäverna"
-				clearable
-				dense
-				filled
-				@change="testBtnDisabled"
-			/>
-			<v-autocomplete
-				v-model="search.arrivalStation"
-				label="Till"
-				:items="stationsArr"
-				hint="Ange de tre första bokstäverna"
-				clearable
-				dense
-				filled
-				@change="testBtnDisabled"
-			/>
-		</form>
-		<v-col align="center" class="pt-0">
-			<v-btn :disabled="btnDisabled" class="blue darken-1 white--text" min-width="50%" @click="testSearch">Sök resa</v-btn>
-		</v-col>	
+	<v-container class="width-responsive">
+		<div class="booking-responsive">
+			<h1 id="header-booking" class="text-center">Boka din nästa resa här!</h1>
+			<form class="form-responsive">
+				<v-autocomplete
+					v-model="search.departureStation"
+					label="Från"
+					:items="stationsArr"
+					hint="Ange de tre första bokstäverna"
+					clearable
+					dense
+					filled						
+					class="from"
+					@change="testBtnDisabled"
+				/>
+				<v-autocomplete
+					v-model="search.arrivalStation"
+					label="Till"
+					:items="stationsArr"
+					hint="Ange de tre första bokstäverna"
+					clearable
+					dense
+					filled
+					class="to"
+					@change="testBtnDisabled"
+				/>
+			</form>
+			<v-col align="center" class="pt-0">
+				<v-btn id="button-responsive" :disabled="btnDisabled" class="blue darken-1 white--text" @click="testSearch">Sök resa</v-btn>
+			</v-col>	
+		</div>
 		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto" @change="testBtnDisabled">
 			<v-col class="pa-0 mt-3">
 				<v-card>
 					<div class="flex-center">
 						<p class="mb-0 mt-2 ml-2 font-italic">Utresa</p>
-						<v-select :items="timePick" :label="timeFormatted" dense solo @change="setDepartureTime" />
+						<v-select class="select-responsive" :items="timePick" :label="timeFormatted" dense solo
+							@change="setDepartureTime"
+						/>
 					</div>
 					<v-radio-group v-model="selectedExit" row class="ma-0 pa-0">
 						<v-radio label="Avgång" value="Avgång" @click="getValueExit('Avgång')" />
@@ -58,7 +64,9 @@
 					</v-radio-group>
 					<vc-date-picker v-model="arrivalDate" :min-date="new Date()" class="mt-0" is-expanded @dayclick="arrivalDateClick" />
 				</v-card>
-				<v-btn class="blue darken-1 white--text mt-4" small depressed block @click="nextPage">
+				<v-btn class="blue darken-1 white--text mt-4" small depressed block
+					@click="nextPage"
+				>
 					Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
 				</v-btn>
 			</v-col>
@@ -109,13 +117,13 @@ export default {
 	},
 	created() {
 		vue.nextTick(this.testBtnDisabled());
-		vue.nextTick(this.fetchApi());
+		vue.nextTick(this.fetchStations());
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations', 'getSearched']),
 			
-		fetchApi() {
+		fetchStations() {
 			fetch('/api/stations')
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
@@ -123,19 +131,12 @@ export default {
 				})
 				);
 		},
-		increment() {
-			this.$store.commit('travelStore/increment');
-		},
-		decrement() {
-			this.$store.commit('travelStore/decrement');
-		},
 		getValueExit(v) {
 			this.selectedExit = v;
 		},
 		getValueEntry(v) {
 			this.selectedEntry = v;
 		},
-
 		testWithStore() {
 			this.getStations(this.search.departureStation);
 			console.log(this.getAllStations);
@@ -244,5 +245,65 @@ export default {
 }
 .v-input--radio-group__input {
 	justify-content: center;
+}
+#button-responsive {
+		width: 50%;
+}
+.vc-container {
+    border: none !important;
+		border-top: 1px solid rgb(206, 206, 206) !important;
+		border-radius: 0% !important;
+}
+#header-booking {
+	font-style: italic;	
+	font-weight: normal;
+	margin-top: 10px;
+	margin-bottom: 40px;
+}
+
+@media screen and (min-width: 1024px) {
+	.form-responsive {
+		max-width: 60%;
+		display: flex;
+		justify-content: space-around;
+		margin: auto;
+		padding-top: 40px;
+		padding-bottom: 20px;
+	}
+	.v-messages__message {		
+		background-color: transparent;
+		color: rgb(29, 29, 29);
+	}
+	.from {
+		margin-right: 20px !important;
+		border-radius: 0% !important;		
+	}
+	.to {
+		border-radius: 0% !important;
+	}
+	.v-application .primary--text {
+    color: #ffffff !important;
+    caret-color: #1976d2 !important;
+	}
+	#button-responsive {
+		width: 20%;
+		margin-bottom: 20px;
+	}
+	.select-responsive {
+		margin-right: 0px !important;
+		margin-top: 0px !important;
+		box-shadow: none !important;
+	}
+	.vc-container {
+    border: none !important;
+		border-top: 1px solid rgb(206, 206, 206) !important;
+		border-radius: 0% !important;
+	}
+	#header-booking {
+	font-style: italic;	
+	font-weight: normal;
+	margin-top: 10px;
+	margin-bottom: 0px;
+}
 }
 </style>

@@ -7,7 +7,7 @@
 				src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
 			>
 				<v-app-bar-nav-icon @click="drawer = true" />
-				<v-toolbar-title class="flex text-center mb-5"><h1>G4Win</h1></v-toolbar-title>
+				<v-toolbar-title class="flex text-center mb-5 mr-16"><h1>G4Win</h1></v-toolbar-title>
 			</v-toolbar>
 			<v-navigation-drawer
 				v-model="drawer"

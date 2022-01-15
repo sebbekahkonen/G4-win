@@ -264,7 +264,6 @@ export default {
 .bistro-seats {
 	display: flex;
 	justify-content: center;
-	/* background: repeating-linear-gradient(-45deg, #ffffff 5px, #ffffff 10px, #ffffff 11px, #000000 10px, #000000 15px); */
 	background: linear-gradient(-45deg, rgba(30,136,229, 0.1), rgb(30,136,229));
 	min-height: 60px;
 	border: 1px solid rgb(70, 70, 70);
@@ -297,7 +296,7 @@ export default {
 	display: none;
 	position: fixed;
 	left: 0;
-	top: 50%;
+	top: 40%;
 	z-index: 1;
 	width: 100%;
 	height: 25%;
@@ -307,12 +306,37 @@ export default {
 .modal-content {
 	text-align: center;
 	background-color: rgb(238, 238, 238);
-	margin: 8% auto;
+	margin: 12.5% auto;
 	border: 1px solid rgba(25,118,210, 1.0);
 	width: 80%;
 }
 .modal-content > p {
 	margin-top: 15px;
 	font-size: 18px;
+}
+
+@media screen and (min-width: 1024px) {
+	.modal {
+	display: none;
+	position: absolute;
+	left: 20.8%;
+	top: 35%;
+	z-index: 1;
+	width: 58.5%;
+	height: 50%;
+	overflow: hidden;
+	background-color: rgba(25,118,210, 0.8);
+}
+.modal-content {
+	text-align: center;
+	background-color: rgb(238, 238, 238);
+	margin: 20% auto;
+	border: 1px solid rgba(25,118,210, 1.0);
+	width: 50%;
+}
+.modal-content > p {
+	margin-top: 15px;
+	font-size: 18px;
+}
 }
 </style>
