@@ -56,7 +56,7 @@
 				<v-card v-if="displayArrival">
 					<div class="flex-center">
 						<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
-						<v-select :items="timePick" :label="timeFormatted" dense solo @change="setArrivalTime" />
+						<v-select :items="timePickArr" :label="timeFormattedArr" dense solo @change="setArrivalTime" />
 					</div>
 					<v-radio-group v-model="selectedEntry" row class="ma-3">
 						<v-radio label="Avgång" value="Avgång" @click="getValueEntry('Avgång')" />
@@ -90,7 +90,9 @@ export default {
 		isClicked: false,
 		displayArrival: false,
 		timeFormatted: '',
+		timeFormattedArr: '',
 		timePick: [],
+		timePickArr: [],
 		stationsArr: [],
 		depTime: '',
 		arrTime: '',
@@ -153,26 +155,50 @@ export default {
 			let minutes = new Date().getMinutes();
 
 			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+			this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
 
 			for (let i=hours; i<24; i++) {
 				this.timePick.push(`${hours++}:00`);
+				this.timePickArr.push(`${hours++}:00`);
 			}
 		},
-		departureDateClick() {
+		departureDateClick() {			
+			let hours = new Date().getHours();
+			let minutes = new Date().getMinutes();
 			let timePickReplace = [];
 
-			for (let i=0; i<24; i++) {
-				timePickReplace.push(this.timeFormatted = i < 10 ? `0${i}:00` : `${i}:00`);
-				this.timePick = timePickReplace.slice(0);
-			}
+			if(this.departureDate.toLocaleDateString() !== new Date().toLocaleDateString()) {
+				for (let i=0; i<24; i++) {
+					timePickReplace.push(this.timeFormatted = i < 10 ? `0${i}:00` : `${i}:00`);
+					this.timePick = timePickReplace.slice(0);
+				}
+			} else {
+				this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+
+				for (let i=hours; i<24; i++) {
+					timePickReplace.push(`${hours++}:00`);
+					this.timePick = timePickReplace.slice(0);
+				}
+			}	
 		},
 		arrivalDateClick() {
-			let timePickReplace = [];
+			let hours = new Date().getHours();
+			let minutes = new Date().getMinutes();
+			let timePickReplaceArr = [];
 
-			for (let i=0; i<24; i++) {
-				timePickReplace.push(this.timeFormatted = i < 10 ? `0${i}:00` : `${i}:00`);
-				this.timePick = timePickReplace.slice(0);
-			}				
+			if(this.arrivalDate.toLocaleDateString() !== new Date().toLocaleDateString()) {
+				for (let i=0; i<24; i++) {
+					timePickReplaceArr.push(this.timeFormattedArr = i < 10 ? `0${i}:00` : `${i}:00`);
+					this.timePickArr = timePickReplaceArr.slice(0);
+				}
+			} else {
+				this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+
+				for (let i=hours; i<24; i++) {
+					timePickReplaceArr.push(`${hours++}:00`);
+					this.timePickArr = timePickReplaceArr.slice(0);
+				}
+			}					
 		},
 		testSearch() {
 			if (!this.isClicked && !this.search.departureStation == '' && !this.search.arrivalStation == '') {
@@ -195,9 +221,11 @@ export default {
 			}
 		},
 		setDepartureTime(depTime) {
+			console.log(depTime);
 			this.depTime = depTime;
 		},
 		setArrivalTime(arrTime) {
+			console.log(arrTime);
 			this.arrTime = arrTime;
 		},
 		nextPage() {
