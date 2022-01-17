@@ -1,30 +1,6 @@
 <template>
 	<div>
-		<v-form>
-			<v-container>
-				<v-layout column justify-center>
-					<v-layout row wrap class="pt-5 text-center">
-						<v-flex xs6>
-							<h4 class="text-center">Från: {{ travelObj.departure.departureDestination }}</h4>
-						</v-flex>
-						<v-flex xs6>
-							<h4 class="text-center">Till: {{ travelObj.departure.arrivalDestination }}</h4>
-						</v-flex>
-					</v-layout>
-				</v-layout>
-			</v-container>
-		</v-form>
 		<v-container>
-			<v-layout row wrap class="pt-5 text-center">
-				<v-flex xs6>
-						<v-text-field
-							label="Avgång"
-							:value="getPickedTrain[0].departure"
-							type="time"
-							suffix="CET"
-							readonly
-						/>
-					</v-col>
 			<v-layout column justify-center class="">
 				<v-layout row wrap class="pt-5 mr-1 text-left">
 					<v-flex>
