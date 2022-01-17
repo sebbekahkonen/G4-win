@@ -2,13 +2,13 @@
 	<v-app>
 		<div>
 			<v-toolbar
-				dark
+				light
 				prominent
-				src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
 			>
-				<v-app-bar-nav-icon @click="drawer = true" />
-				<v-toolbar-title class="flex text-center mb-5 mr-16"><h1>G4Win</h1></v-toolbar-title>
+				<v-app-bar-nav-icon class="hamburgerIcon" @click="drawer = true" />
+				<v-toolbar-title class="flex text-center mr-16" @click="$router.push('/')"><v-img width="160" height="115" class="mx-auto" src="@/assets/G4Win-logo.png" /></v-toolbar-title>
 			</v-toolbar>
+			
 			<v-navigation-drawer
 				v-model="drawer"
 				absolute
@@ -24,14 +24,14 @@
 					>
 						<v-list-item @click="homePage">
 							<v-list-item-icon>
-								<v-icon>mdi-home</v-icon>
+								<v-icon class="navbuttons">mdi-home</v-icon>
 							</v-list-item-icon>
 							<v-list-item-title>Home</v-list-item-title>
 						</v-list-item>
 
 						<v-list-item @click="searchTicket">
 							<v-list-item-icon>
-								<v-icon>mdi-ticket-confirmation-outline</v-icon>
+								<v-icon class="navbuttons">mdi-ticket-confirmation-outline</v-icon>
 							</v-list-item-icon>
 							<v-list-item-title>Tickets</v-list-item-title>
 						</v-list-item>
@@ -39,7 +39,6 @@
 				</v-list>
 			</v-navigation-drawer>
 		</div>
-
 		<v-main>
 			<router-view />
 		</v-main>
@@ -106,7 +105,17 @@ export default {
 };
 </script>
 <style>
-.theme--dark.v-footer {
-	background-color: rgb(19, 37, 201);
+.theme--light.v-toolbar {
+    background-color: #eeeee4 !important;
+	box-shadow:0px 2px 4px -1px rgb(0 0 0 / 10%), 0px 4px 5px 0px rgb(0 0 0 / 7%), 0px 1px 10px 0px rgb(0 0 0 / 6%) !important;
+}
+/* .theme--light.v-icon {
+    color: rgb(0 0 0) !important;
+} */
+.hamburgerIcon{
+ color: rgb(0 0 0) !important;
+}
+.navbuttons{
+	color: black !important;
 }
 </style>
