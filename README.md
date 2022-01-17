@@ -1,18 +1,23 @@
+# För att köra programmet lokalt: 
+- Hämta hem kodmappen till din dator.
+- Öppna ny terminal i projektet > skriv in cd backend, kör npm install sen npm start.
+- Öppna ny terminal i projektet > skriv in cd frontend, kör npm install sen npm run serve.
+- När både backend och frontend mappen är igång, öppna din webbläsare och gå till http://localhost:8080
+
 # Dokumentering för onboarding utav nya medlemmar i teamet.
 
 ## Vilka tekniker har vi bestämt?
-- Backend: Node.js, express, sqlite3. (Kan tillkomma ORM, eller annat)
+- Backend: Node.js, express, sqlite3, sequelize.
 - Frontend: VUE.
-- CSS: Vuetify.
-- REST: Vi bygger egna REST-routes
-- Kryptering: Node.js crypto(finns inbyggd)? bCrypt? md5? 
-- NPM-moduler/bibliotek: Express, better-sqlite3.
+- CSS: Vuetify, vanilla CSS.
+- REST: Vi bygger egna REST-routes.
+- Kryptering: Ingen kryptering finns då vi inte har inlogg.
+- NPM-moduler/bibliotek: Se dokumentationen.
 
 #
 ## Teknisk dokumentation
 ### Länkar till diverse tekniker som kommer användas.
-- API: https://api.trafikinfo.trafikverket.se/API (Ej 100% bestämt)
-- API: http://tagtider.net/api/
+- API: https://api.trafikinfo.trafikverket.se/API 
 - Vue: https://vuejs.org/v2/guide/
 - Vuetify: https://vuetifyjs.com/en/getting-started/installation/
 - ESLint: https://eslint.org/docs/user-guide/getting-started
@@ -26,7 +31,7 @@
 # 
 ## Kodstandard och arbetsverktyg
 - ESLint: kodstandard för alla medlemmar.
-- VSCode extensions: ESLint, Vetur, vue(Om vi kör vue)
+- VSCode extensions: ESLint, Vetur, vue
 - Vi behöver ändra i settings.json i VSCode, vi tar det när alla är på plats.
 
 #
@@ -34,15 +39,15 @@
 ### Vad har vi tänkt?
 - TBD
 ### Tabeller i databas?
-- Användare(Resenärer), Avgångar, Stationer, Tåg, Bokningar, (Restaurang?),
+- Stationer, Tåg, Bokade säten, Vagnar, Kvitton, Order nummer, Priser
 ### Hur hör dessa samman?
-- Användare 1 -- N Bokningar
-- Bokningar M -- N Avgångar
-- Avgångar 1 -- 1 Stationer
+- Stationer 1 -- N Avgångar
 - Tåg 1 -- 1 Restaurang
 - Tåg 1 -- 1 Avgångar
-- Tåg 1 -- N Användare
-- Fler relationer tillkommer vid behov.
+- Tåg 1 -- N Vagnar
+- Tåg 1 -- N Säten
+- Priser 1 -- 1 Tåg
+- Ordernummer 1 -- 1 Kvitto
 
 # 
 ## Hur arbetar vi tillsammans
