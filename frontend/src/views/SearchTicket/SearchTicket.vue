@@ -8,19 +8,12 @@
 			solo
 			dense
 			color="blue"
+			height="50px"
 			label="Ordernummer"
 			append-icon="mdi-magnify"
 			@click:append="search"
 			@keydown.enter="search"
 		/>
-					
-		<v-select 
-			:items="sortArray"
-			label="Sort by"
-			clearable
-			class="pl-2 pr-2"
-		/>			
-			
 		<v-data-table
 			v-if="isTrue"
 			:headers="ticketHeaders"
