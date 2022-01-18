@@ -131,7 +131,7 @@ export default {
 	},
 
 	created() {
-		vue.nextTick(this.testFetch());
+		vue.nextTick(this.fetchTravelExit());
 		vue.nextTick(console.log(this.formatDate));
 		vue.nextTick(console.log(this.date));
 	},
@@ -146,11 +146,11 @@ export default {
 		returnPage() {
 			this.$router.push('/');
 		},
-		testFetch() {
+		fetchTravelExit() {
 			fetch(`/api/trains/${this.travelObj.departure.departureDestination}/${this.travelObj.departure.arrivalDestination}`)
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
-					if(data.data[key].date === this.date) {
+					if(data.data[key].date === this.date && data.data[key].departure > this.travelObj.departure.selectedTime) {
 						this.trainInformation.trainsArray.push(data.data[key]);
 						console.log((data.data[key]));
 						this.testTrainId.push(data.data[key].id);

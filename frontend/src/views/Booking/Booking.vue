@@ -103,13 +103,13 @@ export default {
 				departureDestination: '',
 				departureDateTime: '',
 				arrivalDestination: '',
-				arrivalDateTime: ''
+				selectedTime: ''
 			},
 			returnTrip: {
 				departureDestination: '',
 				departureDateTime: '',
 				arrivalDestination: '',
-				arrivalDateTime: ''
+				selectedTime: ''
 			}
 		}
 	}),
@@ -146,6 +146,15 @@ export default {
 		displayArrivalCalendar() {
 			if (!this.displayArrival) {
 				this.displayArrival = true;
+				let hours = new Date().getHours();
+				let minutes = new Date().getMinutes();
+
+				this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+
+				for (let i=hours; i<24; i++) {
+					this.timePickArr.push(`${hours++}:00`);
+				}
+				this.arrTime = this.timeFormattedArr;
 			} else {
 				this.displayArrival = false;
 			}
@@ -155,12 +164,11 @@ export default {
 			let minutes = new Date().getMinutes();
 
 			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
-			this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
 
 			for (let i=hours; i<24; i++) {
 				this.timePick.push(`${hours++}:00`);
-				this.timePickArr.push(`${hours++}:00`);
 			}
+			this.depTime = this.timeFormatted;
 		},
 		departureDateClick() {			
 			let hours = new Date().getHours();
@@ -233,12 +241,12 @@ export default {
 			this.bookingInformation.departure.departureDestination = this.search.departureStation;
 			this.bookingInformation.departure.arrivalDestination = this.search.arrivalStation;
 			this.bookingInformation.departure.departureDateTime = `${this.selectedExit} ${this.departureDate.toLocaleDateString('sv-SE')} ${this.depTime}`;		
-			this.bookingInformation.departure.arrivalDateTime = '';
+			this.bookingInformation.departure.selectedTime = this.depTime;
 			/* RETURN TRIP INFORMATION */
 			this.bookingInformation.returnTrip.departureDestination = this.search.arrivalStation;
 			this.bookingInformation.returnTrip.arrivalDestination = this.search.departureStation;
 			this.bookingInformation.returnTrip.departureDateTime = `${this.selectedEntry} ${this.arrivalDate.toLocaleDateString('sv-SE')} ${this.arrTime}`;
-			this.bookingInformation.returnTrip.arrivalDateTime = '';
+			this.bookingInformation.returnTrip.selectedTime = this.arrTime;
 
 			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
 			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString('sv-SE'));
