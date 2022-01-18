@@ -101,15 +101,15 @@ export default {
 		bookingInformation: {
 			departure: {
 				departureDestination: '',
-				departureDateTime: '',
 				arrivalDestination: '',
-				arrivalDateTime: ''
+				departureOrReturn: '',
+				selectedTime: ''
 			},
 			returnTrip: {
 				departureDestination: '',
-				departureDateTime: '',
 				arrivalDestination: '',
-				arrivalDateTime: ''
+				departureOrReturn: '',
+				selectedTime: ''
 			}
 		}
 	}),
@@ -121,6 +121,7 @@ export default {
 		vue.nextTick(this.testBtnDisabled());
 		vue.nextTick(this.fetchStations());
 		vue.nextTick(this.showTimeLabel());
+		vue.nextTick(localStorage.clear());
 	},
 	methods: {
 		...mapActions('bookingStore', ['getStations', 'getSearched']),
@@ -139,28 +140,35 @@ export default {
 		getValueEntry(v) {
 			this.selectedEntry = v;
 		},
-		testWithStore() {
-			this.getStations(this.search.departureStation);
-			console.log(this.getAllStations);
-		},
 		displayArrivalCalendar() {
 			if (!this.displayArrival) {
 				this.displayArrival = true;
+				let hours = new Date().getHours();
+				let minutes = new Date().getMinutes();
+
+				this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
+			
+				for (let i=hours; i<24; i++) {
+					this.timePickArr.push(`${hours++}:00`);
+				}
+				this.arrTime = this.timeFormattedArr;
 			} else {
 				this.displayArrival = false;
 			}
+
+			this.$store.commit('travelStore/setArrivalTrip', this.displayArrival);
 		},
 		showTimeLabel() {
 			let hours = new Date().getHours();
 			let minutes = new Date().getMinutes();
 
 			this.timeFormatted = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
-			this.timeFormattedArr = minutes < 10 ? `${hours}:0${minutes}` : `${hours}:${minutes}`;
 
 			for (let i=hours; i<24; i++) {
-				this.timePick.push(`${hours++}:00`);
-				this.timePickArr.push(`${hours++}:00`);
+				this.timePick.push(`${hours++}:00`);			
 			}
+			this.depTime = this.timeFormatted;
+			
 		},
 		departureDateClick() {			
 			let hours = new Date().getHours();
@@ -232,16 +240,17 @@ export default {
 			/* DEPARTURE INFORMATION */
 			this.bookingInformation.departure.departureDestination = this.search.departureStation;
 			this.bookingInformation.departure.arrivalDestination = this.search.arrivalStation;
-			this.bookingInformation.departure.departureDateTime = `${this.selectedExit} ${this.departureDate.toLocaleDateString('sv-SE')} ${this.depTime}`;		
-			this.bookingInformation.departure.arrivalDateTime = '';
+			this.bookingInformation.departure.departureOrReturn = this.selectedExit;
+			this.bookingInformation.departure.selectedTime = this.depTime;			 
 			/* RETURN TRIP INFORMATION */
 			this.bookingInformation.returnTrip.departureDestination = this.search.arrivalStation;
 			this.bookingInformation.returnTrip.arrivalDestination = this.search.departureStation;
-			this.bookingInformation.returnTrip.departureDateTime = `${this.selectedEntry} ${this.arrivalDate.toLocaleDateString('sv-SE')} ${this.arrTime}`;
-			this.bookingInformation.returnTrip.arrivalDateTime = '';
+			this.bookingInformation.returnTrip.departureOrReturn = this.selectedEntry;
+			this.bookingInformation.returnTrip.selectedTime = this.arrTime;
 
 			this.$store.commit('travelStore/setTravelObj', this.bookingInformation);
 			this.$store.commit('travelStore/setDate', this.departureDate.toLocaleDateString('sv-SE'));
+			this.$store.commit('travelStore/setReturnDate', this.arrivalDate.toLocaleDateString('sv-SE'));
 
 			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
 			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
@@ -251,7 +260,16 @@ export default {
 			let year = this.departureDate.getFullYear();
 			
 			this.departureDate = `${day} ${dateNr} ${month} ${year}`;
+
+			let dayReturn = days[this.arrivalDate.getDay()];
+			let monthReturn = months[this.arrivalDate.getMonth()];
+			let dateNrReturn = this.arrivalDate.getDate();
+			let yearReturn = this.arrivalDate.getFullYear();
+
+			this.arrivalDate = `${dayReturn} ${dateNrReturn} ${monthReturn} ${yearReturn}`;
+
 			this.$store.commit('travelStore/setFormatDate', this.departureDate);
+			this.$store.commit('travelStore/setReturnFormatDate', this.arrivalDate);
 			this.$router.push({name: 'TrainDepartures'});
 			
 		}

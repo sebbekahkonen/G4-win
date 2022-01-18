@@ -330,7 +330,7 @@ export default {
 .modal-content {
 	text-align: center;
 	background-color: rgb(238, 238, 238);
-	margin: 20% auto;
+	margin: 10% auto;
 	border: 1px solid rgba(25,118,210, 1.0);
 	width: 50%;
 }

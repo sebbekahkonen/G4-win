@@ -1,10 +1,11 @@
 <template>
-	<v-container>
+	<v-container class="test">
 		<v-btn depressed small class="pl-0 white" @click="returnPage">
 			<v-icon>{{ 'mdi-chevron-left' }}</v-icon>
 			Tillbaka
 		</v-btn>
 		<v-layout column justify-center>
+			<span class="return-text">Utresa</span>
 			<span class="text-center">{{ travelObj.departure.departureDestination }} - {{ travelObj.departure.arrivalDestination }}</span>
 			<span class="text-center">{{ formatDate }}</span>
 		</v-layout>
@@ -15,6 +16,7 @@
 			:single-expand="singleExpand"
 			:expanded.sync="expanded"
 			item-key="id"
+			:items-per-page="5"
 			show-expand
 			mobile-breakpoint="0"
 			@click:row="expandRow"
@@ -70,6 +72,77 @@
 				</td>
 			</template>
 		</v-data-table>
+	
+		<div v-if="arrivalTrip" class="return-trip">
+			<v-layout column justify-center>
+				<span class="return-text">Återresa</span>
+				<span class="text-center">{{ travelObj.returnTrip.departureDestination }} - {{ travelObj.returnTrip.arrivalDestination }}</span>
+				<span class="text-center">{{ returnFormatDate }}</span>
+			</v-layout>
+
+			<v-data-table
+				:headers="trainHeaders"
+				:items="trainInformation.trainsReturnArray"
+				:single-expand="singleExpand"
+				:expanded.sync="expanded2"
+				item-key="id"
+				:items-per-page="5"
+				show-expand
+				mobile-breakpoint="0"
+				@click:row="expandRow"
+				@item-expanded="onExpand"
+				@row-clicked="onExpand"
+			>
+				<template v-slot:expanded-item="{ headers }">
+					<td :colspan="headers.length">
+						<v-col>
+							<v-layout row wrap class="pt-3 flex text-right" justify-space-between>
+								<v-flex xs6 class="text-left">
+									<h4>Ungdom/Student({{ studentPrice }}kr/st):</h4>
+								</v-flex>
+								<v-flex xs6 class="" justify="space-between">
+									<v-icon ref="student" class="mr-3" :value="-studentPrice" color="red" @click="changePrice($event, 'student')">mdi-account-minus-outline</v-icon>
+									<span class="ml-3 mr-3">{{ tickets.student.amount }}</span>
+									<v-icon ref="student" class="ml-3" :value="+studentPrice" color="green" @click="changePrice($event, 'student')">mdi-account-plus-outline</v-icon>
+								</v-flex>
+							</v-layout>
+	
+
+							<v-layout row wrap class="pt-3 flex text-right" justify-space-between>
+								<v-flex xs6 class="text-left">
+									<h4>Vuxen({{ adultPrice }}kr/st):</h4>
+								</v-flex>
+								<v-flex xs6 class="" justify="space-between">
+									<v-icon ref="adult" class="mr-3" :value="-adultPrice" color="red" @click="changePrice($event, 'adult')">mdi-account-minus-outline</v-icon>
+									<span class="ml-3 mr-3">{{ tickets.adult.amount }}</span>
+									<v-icon ref="adult" class="ml-3" :value="+adultPrice" color="green" @click="changePrice($event, 'adult')">mdi-account-plus-outline</v-icon>
+								</v-flex>
+							</v-layout>
+
+							<v-layout row wrap class="pt-3 flex text-right" justify-space-between>
+								<v-flex xs6 class="text-left">
+									<h4>Pensionär({{ seniorPrice }}kr/st):</h4>
+								</v-flex>
+								<v-flex xs6 class="" justify="space-between">
+									<v-icon ref="senior" class="mr-3" :value="-seniorPrice" color="red" @click="changePrice($event, 'senior')">mdi-account-minus-outline</v-icon>
+									<span class="ml-3 mr-3">{{ tickets.senior.amount }}</span>
+									<v-icon ref="senior" class="ml-3" :value="+seniorPrice" color="green" @click="changePrice($event, 'senior')">mdi-account-plus-outline</v-icon>  
+								</v-flex>
+							</v-layout>
+
+							<v-layout row wrap class="pt-5">
+								<h4 style="color: red;">{{ errorCode }}</h4>
+							</v-layout>
+	
+							<v-layout row wrap class="pt-3 pb-3">
+								<h2 class="flex text-left">Pris: {{ price }}kr</h2>	 
+								<v-btn align-content="right" class="mr-1" color="primary" @click="nextView">Nästa</v-btn>
+							</v-layout>
+						</v-col>
+					</td>
+				</template>
+			</v-data-table>
+		</div>
 	</v-container>
 </template>
 
@@ -81,6 +154,7 @@ export default {
 		chosen: false,
 		hasBistro: false,
 		expanded: [],
+		expanded2: [],
 		singleExpand: true,
 		tickets: {
 			student: {id: 1, price: 0, amount: 0, title: 'student_biljett'},
@@ -95,6 +169,7 @@ export default {
 		errorCode: '',
 		trainInformation: {
 			trainsArray: [],
+			trainsReturnArray: [],
 			adultPrices: [],
 			seniorPrices: [],
 			studentPrices: []
@@ -127,13 +202,15 @@ export default {
 		]	
 	}),
 	computed: {
-		...mapState('travelStore', ['travelObj', 'date', 'formatDate'])
+		...mapState('travelStore', ['travelObj', 'date', 'returnDate', 'formatDate', 'returnFormatDate', 'arrivalTrip'])
 	},
 
 	created() {
-		vue.nextTick(this.testFetch());
+		vue.nextTick(this.fetchTravelExit());
 		vue.nextTick(console.log(this.formatDate));
 		vue.nextTick(console.log(this.date));
+		vue.nextTick(console.log(this.arrivalTrip));
+		vue.nextTick(console.log(this.returnFormatDate));
 	},
 
 	mounted() {
@@ -142,26 +219,35 @@ export default {
 
 	methods: {
 		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice', 'changePickedTrain', 'resetCart']),
-		...mapActions('travelStore', ['changeFormatDate']),
+		...mapActions('travelStore', ['changeFormatDate', 'changeReturnFormatDate']),
 		returnPage() {
 			this.$router.push('/');
 		},
-		testFetch() {
+		fetchTravelExit() {
 			fetch(`/api/trains/${this.travelObj.departure.departureDestination}/${this.travelObj.departure.arrivalDestination}`)
 				.then(res => res.json())
 				.then(data => Object.keys(data.data).forEach(key => {
-					if(data.data[key].date === this.date) {
+					if(data.data[key].date === this.date && data.data[key].departure > this.travelObj.departure.selectedTime) {
 						this.trainInformation.trainsArray.push(data.data[key]);
-						console.log((data.data[key]));
+						// console.log((data.data[key]));
 						this.testTrainId.push(data.data[key].id);
-
-
 					}				
 				})
-				);			
-		},
+				);
 
+			if(this.arrivalTrip === true) {
+				fetch(`/api/trains/${this.travelObj.returnTrip.departureDestination}/${this.travelObj.returnTrip.arrivalDestination}`)
+					.then(res => res.json())
+					.then(data => Object.keys(data.data).forEach(key => {
+						if(data.data[key].date === this.returnDate && data.data[key].departure > this.travelObj.returnTrip.selectedTime) {
+							this.trainInformation.trainsReturnArray.push(data.data[key]);					
+						}
+					}));
+				console.log('KÖRS DENNA FUNKTIONEN?????? ', this.arrivalTrip);
+			}		
+		},
 		dateFormatter() {
+			/* UTRESA */
 			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
 			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
 			let day = days[this.formatDate.getDay()];
@@ -171,6 +257,13 @@ export default {
 			
 			this.changeFormatDate(this.datumTest = `${day} ${dateNr} ${month} ${year}`);
 
+			/* ÅTERRESA */
+			let dayReturn = days[this.returnFormatDate.getDay()];
+			let monthReturn = months[this.returnFormatDate.getMonth()];
+			let dateNrReturn = this.returnFormatDate.getDate();
+			let yearReturn = this.returnFormatDate.getFullYear();
+			
+			this.changeReturnFormatDate(this.datumTest = `${dayReturn} ${dateNrReturn} ${monthReturn} ${yearReturn}`);
 		},
 		onExpand(value) {
 			Object.keys(this.tickets).forEach(key => {
@@ -232,7 +325,6 @@ export default {
 		expandRow(e) {
 			this.onExpand(e);
 			this.expanded = [e];
-
 		},
 		nextView() {
 			Object.keys(this.tickets).forEach(key => {
@@ -339,10 +431,15 @@ export default {
 .v-application--is-ltr .v-data-footer__select {
 	margin-right: 0px !important;
 }
-/* .row {
-    margin: 0;
-} */
-
+.return-trip {
+	width: 100%;
+}
+.return-text {
+	margin-top: 20px;
+	font-style: oblique;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+}
 @media screen and (min-width: 1024px) {
 	.container {
 		width: 60%;
