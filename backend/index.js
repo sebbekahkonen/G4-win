@@ -7,6 +7,7 @@ const driver = require('better-sqlite3');
 const db = driver('./database/traindb.sqlite3');
 // const stripe = require('stripe');
 const nodemailer = require("nodemailer");
+
 //Bodyparser för att parsa ihop object
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
@@ -20,7 +21,11 @@ async function sendEmail(email, name) {
 			SELECT * FROM current_orderNumber
 			`);
 	let result = preparedStatement4.all();
-	console.log("RESULT: ", result);
+	let preparedStatement2 = db.prepare(`
+			SELECT * FROM current_user
+			`);
+	let result2 = preparedStatement2.all();
+
 	// Generate test SMTP service account from ethereal.email
 	// Only needed if you don't have a real mail account for testing
 	let testAccount = await nodemailer.createTestAccount();
@@ -34,25 +39,76 @@ async function sendEmail(email, name) {
 		}
 	});
 
+	let ticketsStudentArray = [];
+	let ticketsAdultArray = [];
+	let ticketsSeniorArray = [];
+	let ticketsStudent = '';
+	let ticketsAdult = '';
+	let ticketsSenior = '';
+	let price = 0;
+	ticketsStudentArray = result2[0].ticketsStudent.split(',');
+	ticketsStudentArray.forEach((item) => {
+		ticketsStudent += item + "&emsp;&emsp;&emsp;&emsp;";
+	});
+
+	ticketsAdultArray = result2[0].ticketsAdult.split(',');
+	ticketsAdultArray.forEach((item) => {
+		ticketsAdult += item + "&emsp;&emsp;&emsp;&emsp;";
+	});
+
+	ticketsSeniorArray = result2[0].ticketsSenior.split(',');
+	ticketsSeniorArray.forEach((item) => {
+		ticketsSenior += item + "&emsp;&emsp;&emsp;&emsp;";
+	});
+	if (ticketsStudentArray[0] !== '') {
+		price = price + parseInt(ticketsStudentArray[0].replace('kr', ''))
+	}
+	if (ticketsAdultArray[0] !== '') {
+		price = price + parseInt(ticketsAdultArray[0].replace('kr', ''))
+	}
+	if (ticketsSeniorArray[0] !== '') {
+		price = price + parseInt(ticketsSeniorArray[0].replace('kr', ''))
+	}
 	// send mail with defined transport object
 	let info = await transporter.sendMail({
 		from: 'gfourwin@gmail.com', // sender address
 		to: `${email}`, // list of receivers
 		subject: "G4-Win Kvitto", // Subject line
-		html: `<body style="background: linear-gradient(to bottom, #2F4F4F, #20B2AA);";>
+		attachments: [{
+			filename: 'G4Win-logo.png',
+			path: './assets/G4Win-logo.png',
+			cid: 'G4Win-logo@logo.se' //same cid value as in the html img src
+		}],
+		html: `
+				<div>
+				<img src="cid:G4Win-logo@logo.se" style="position: relative; width: 160px; height: 118px;"/>
+				<h1 style="float:left;">Ditt kvitto för ${result[0].order_number}<h1>
+				<h4>Order status: <span style="font-weight: lighter">Genomförd</span><br>
+				Ordernummer: <span style="font-weight: lighter">${result[0].order_number}</span><br>
+				Order datum: <span style="font-weight: lighter">${new Date().toLocaleDateString()}</span><br>
+				Betalningsmetod: <span style="font-weight: lighter">Kortbetalning</span><br>
+				Från: <span style="font-weight: lighter">${result2[0].departureDestination}</span><br>
+				Till: <span style="font-weight: lighter">${result2[0].arrivalDestination}</span><br>
+				Avgång: <span style="font-weight: lighter">${result2[0].departure}</span><br>
+				Ankomst: <span style="font-weight: lighter">${result2[0].arrival}</span>
+				</h4>
+				<div>				
+				<hr style="border-top: 3px solid #0000;">
+				<br>
+				<h1>Summering:</h1>
+				<hr style="border-top: 3px solid #0000;">
+				<h4>Summa&emsp;&emsp;&emsp;Antal&emsp;&emsp;&emsp;Typ</h4>
+				<p>${ticketsStudent}</p>
+				<p>${ticketsAdult}</p>
+				<p>${ticketsSenior}</p>
+				<hr style="border-top: 3px solid #0000;">
+				<h4><span style="font-weight: lighter">${price}kr</span>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Summa totalt</h4>
+				<hr style="border-top: 3px solid #0000;">
 				<br>
 				<br>
-				<h2 style="text-align:center;">Hej ${name}!<h2>
-				<h3 style="text-align:center;">Tack för att du valde att resa med G4-win</h3>
-				<h3 style="text-align:center;">Här är ditt ordernummer: ${result[0].order_number}</h3>
-				<h3 style="text-align:center;">Du kan få mer information om din bokning genom att ange ditt ordernummer <a href="http://localhost:8080/ticket">här<a><h3>
-				<br>
-				<h3 style="text-align:center;">Trevlig resa!<h3>
-				<br>
-				<br>
-				<br>
-				<br>
-				<body>
+				<h3 style="text-align:left;">Tack för att du valde att resa med G4-win!</h3>
+				<h3 style="text-align:left;">Här är ditt ordernummer: ${result[0].order_number}</h3>
+				<h3 style="text-align:left;">Du kan få mer information om din bokning genom att ange ditt ordernummer <a href="http://localhost:8080/ticket">här<a><h3>
 				`
 	});
 

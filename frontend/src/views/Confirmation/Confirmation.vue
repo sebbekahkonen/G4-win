@@ -95,59 +95,6 @@
 				</v-flex>
 			</v-layout>
 		</v-container>
-		
-			
-		<!-- <v-layout column justify-center>
-				<v-layout row wrap class="pt-5 text-center">
-					<v-flex xs6>
-						<h3 class="text-center">Från: <br>{{ travelObj.departure.departureDestination }}</h3>
-					</v-flex>
-					<v-flex xs6>
-						<h3 class="text-center">Till: <br>{{ travelObj.departure.arrivalDestination }}</h3>
-					</v-flex>
-				</v-layout>
-			</v-layout>
-			<v-layout column justify-center>
-				<v-layout row wrap class="mt-10 text-center">
-					<v-flex xs6>
-						<h3 class="text-center">Ankomst: {{ getPickedTrain[0].departure }}</h3>
-					</v-flex>
-					<v-flex xs6>
-						<h3 class="text-center">Avgång: {{ getPickedTrain[0].arrival }}</h3>
-					</v-flex>
-				</v-layout>
-			</v-layout>
-			
-			<v-layout column justify-center>
-				<v-layout row wrap class="mt-10">
-					<v-flex>
-						<h3 class="text-center">Valt datum: {{ formatDate }}</h3>
-					</v-flex>
-				</v-layout>
-			</v-layout>
-			<v-layout column justify-center>
-				<v-layout row wrap class="mt-10">
-					<v-flex>
-						<h3 class="text-center">Email-adress: {{ getTheReceipt.email }}</h3>
-					</v-flex>
-				</v-layout>
-			</v-layout>
-			<v-layout column justify-center>
-				<v-layout row wrap class="mt-10">
-					<v-flex>
-						<h3 class="text-center">Ordernummmer: {{ getCurrentOrderNumber }}</h3>
-					</v-flex>
-				</v-layout>
-			</v-layout>
-			<v-col class="text-center mt-16">
-				<h3>Tack för att du valde G4-Win!</h3>
-			</v-col>
-			<v-col class="text-center">
-				<h3>Vi skickar ett kvitto till din email-adress</h3>
-			</v-col>
-			<v-col class="text-center">
-				<h3>Trevlig resa {{ getTheReceipt.name }}!</h3>	
-			</v-col> -->
 	</div>
 </template>
 <script>
@@ -158,6 +105,9 @@ export default {
 		dataSend: {},
 		receiptData: {},
 		orderNumber: '',
+		ticketsStudent: '',
+		ticketsAdult: '',
+		ticketsSenior: '',
 		todaysDate: new Date().toLocaleDateString()
 	}),
 	computed: {
@@ -168,6 +118,7 @@ export default {
 	created() {
 		vue.nextTick(this.resetReceipt);
 		vue.nextTick(this.setSeats);
+		vue.nextTick(this.postData);
 		vue.nextTick(this.getCustomerInformation);
 	},
 	methods: {
@@ -191,7 +142,8 @@ export default {
 					});
 			}
 		},
-		getCustomerInformation() {
+	
+		async postData() {
 			fetch('/api/current_user', {
 				method: 'DELETE',
 				headers: {
@@ -200,40 +152,92 @@ export default {
 			})
 				.then(res => res.json())
 				.then(data => console.log(data));
-
-			fetch('/api/confirmation')
-				.then(res => res.json())
-				.then(data => this.changeReceipt(data.data));
-			setTimeout(this.postData, 2000);
-			
-
-		},
-		postData() {
-			this.receiptData = {name: '', email: '', order_number: null, train_id: null, seats: '', seatAndWagon: '', departure: null, arrival: null, departureDestination: '', arrivalDestination: ''};
+			this.receiptData = {name: '', email: '', order_number: null, train_id: null, seats: '', seatAndWagon: '', departure: null, arrival: null, departureDestination: '', arrivalDestination: '', ticketsStudent: '', ticketsAdult: '', ticketsSenior: ''};
 			let seatsBooked = '';
 			let seatAndWagon = '';
-			
+
+			this.ticketsStudent = '';
+			this.ticketsAdult = '';
+			this.ticketsSenior = '';	
 
 			Object.keys(this.bookedSeats).forEach((key)=> {
-				console.log('Vagn:',this.bookedSeats[key].wagon.toString(), 'Säte:',this.bookedSeats[key].seat);
 				seatAndWagon = seatAndWagon.concat('Vagn: ' + this.bookedSeats[key].wagon.toString() + ' ' + 'Säte: ' + this.bookedSeats[key].seat + ',');
 				seatsBooked = seatsBooked.concat(this.bookedSeats[key].seat.toString() + ',');	
 			});
+			Object.keys(this.getCartItems).forEach((key)=> {
+				Object.keys(this.getCartItems[key]).forEach((val) => {
+					if(this.getCartItems[key]['id'] === 1) {
+						if(val === 'price' || val === 'amount' || val === 'title') {
+							if(val === 'price') {
+								this.ticketsStudent += this.getCartItems[key][val] + 'kr,';
+							}else{
+								this.ticketsStudent += this.getCartItems[key][val] + ',';
+							}
+						}
+					}
+
+					if(this.getCartItems[key]['id'] === 2) {
+						if(val === 'price' || val === 'amount' || val === 'title') {
+							if(val === 'price') {
+								this.ticketsAdult += this.getCartItems[key][val] + 'kr,';
+							}else{
+								this.ticketsAdult += this.getCartItems[key][val] + ',';
+							}
+						}
+					}
+
+					if(this.getCartItems[key]['id'] === 3) {
+						if(val === 'price' || val === 'amount' || val === 'title') {
+							if(val === 'price') {
+								this.ticketsSenior += this.getCartItems[key][val] + 'kr,';
+							}else{
+								this.ticketsSenior += this.getCartItems[key][val] + ',';
+							}
+						}
+					}
+
+				});
+			});
+			this.ticketsStudent = this.ticketsStudent.replace(/,\s*$/, '');
+			this.ticketsAdult = this.ticketsAdult.replace(/,\s*$/, '');
+			this.ticketsSenior = this.ticketsSenior.replace(/,\s*$/, '');
 			seatsBooked = seatsBooked.replace(/,\s*$/, '');
 			seatAndWagon = seatAndWagon.replace(/,\s*$/, '');
-			console.log(seatAndWagon);
-			this.receiptData.name = this.getTheReceipt.name;
-			this.receiptData.email = this.getTheReceipt.email;
+			
 			this.receiptData.order_number = this.getCurrentOrderNumber;
 			this.receiptData.train_id = this.dataSend.train_id;
 			this.receiptData.seats = seatsBooked;
 			this.receiptData.seatAndWagon = seatAndWagon;
 			this.receiptData.departure = this.getPickedTrain[0].departure;
 			this.receiptData.arrival = this.getPickedTrain[0].arrival;
-			console.log(this.travelObj.departure.departureDestination);
-			console.log(this.travelObj.departure.arrivalDestination);
 			this.receiptData.departureDestination = this.travelObj.departure.departureDestination;
 			this.receiptData.arrivalDestination = this.travelObj.departure.arrivalDestination;
+			this.receiptData.ticketsStudent = this.ticketsStudent;
+			this.receiptData.ticketsAdult = this.ticketsAdult;
+			this.receiptData.ticketsSenior = this.ticketsSenior;
+			
+			fetch('/api/current_user', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(this.receiptData)
+			})
+				.then(res => res.json())
+				.then(data => {
+					console.log('Success:', data);
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+				});
+
+			await fetch('/api/confirmation')
+				.then(res => res.json())
+				.then(data => this.changeReceipt(data.data));
+			
+			this.receiptData.name = this.getTheReceipt.name;
+			this.receiptData.email = this.getTheReceipt.email;
+			
 			fetch('/api/receipts', {
 				method: 'POST',
 				headers: {
@@ -248,22 +252,8 @@ export default {
 				.catch((error) => {
 					console.error('Error:', error);
 				});
-			fetch('/api/current_user', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(this.receiptData)
-			})
-				.then(res => res.json())
-				.then(data => {
-					console.log('Success:', data);
-				})
-				.catch((error) => {
-					console.error('Error:', error);
-				});
-
 		}
+
 	}
 };
 </script>
