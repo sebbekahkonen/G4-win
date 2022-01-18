@@ -31,45 +31,69 @@
 			</v-col>	
 		</div>
 		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto" @change="testBtnDisabled">
-			<v-col class="pa-0 mt-3">
-				<v-card>
-					<div class="flex-center">
-						<p class="mb-0 mt-2 ml-2 font-italic">Utresa</p>
-						<v-select class="select-responsive" :items="timePick" :label="timeFormatted" dense solo
-							@change="setDepartureTime"
-						/>
-					</div>
-					<v-radio-group v-model="selectedExit" row class="ma-0 pa-0">
-						<v-radio label="Avgång" value="Avgång" @click="getValueExit('Avgång')" />
-						<v-radio label="Ankomst" value="Ankomst" @click="getValueExit('Ankomst')" />
-					</v-radio-group>
-					<vc-date-picker v-model="departureDate" :min-date="new Date()" is-expanded @dayclick="departureDateClick" />
-				</v-card>
-			</v-col>
-			<v-col class="pa-0 mt-3">
-				<v-card-actions class="justify-center">
-					<v-btn color="blue" class="mb-4" outlined plain @click="displayArrivalCalendar">
-						Vill du boka återresa?
-						<v-icon right>{{ displayArrival ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-					</v-btn>
-				</v-card-actions>
-				<v-card v-if="displayArrival">
-					<div class="flex-center">
-						<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
-						<v-select :items="timePickArr" :label="timeFormattedArr" dense solo @change="setArrivalTime" />
-					</div>
-					<v-radio-group v-model="selectedEntry" row class="ma-3">
-						<v-radio label="Avgång" value="Avgång" @click="getValueEntry('Avgång')" />
-						<v-radio label="Ankomst" value="Ankomst" @click="getValueEntry('Ankomst')" />
-					</v-radio-group>
-					<vc-date-picker v-model="arrivalDate" :min-date="new Date()" class="mt-0" is-expanded @dayclick="arrivalDateClick" />
-				</v-card>
-				<v-btn class="blue darken-1 white--text mt-4" small depressed block
-					@click="nextPage"
+			<v-row justify="center" class="mt-5">
+				<v-btn color="blue" class="mb-4" outlined plain
+					@click="displayArrivalCalendar"
 				>
-					Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
+					Vill du boka återresa?
+					<v-icon right>{{ displayArrival ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 				</v-btn>
-			</v-col>
+			</v-row>
+			
+			<v-row v-if="!returnTrip" class="mb-2">
+				<v-col class="pa-0 mt-3">
+					<v-card class="ml-5 mr-5">
+						<div class="flex-center">
+							<p class="mb-0 mt-2 ml-2 font-italic">Utresa</p>
+							<v-select class="select-responsive" :items="timePick" :label="timeFormatted" dense solo
+								@change="setDepartureTime"
+							/>
+						</div>
+						<v-radio-group v-model="selectedExit" row class="ma-0 pa-0">
+							<v-radio label="Avgång" value="Avgång" @click="getValueExit('Avgång')" />
+							<v-radio label="Ankomst" value="Ankomst" @click="getValueExit('Ankomst')" />
+						</v-radio-group>
+						<vc-date-picker v-model="departureDate" :min-date="new Date()" is-expanded @dayclick="departureDateClick" />
+					</v-card>
+				</v-col>
+			</v-row>
+			
+			<v-row v-if="returnTrip" class="mb-2">
+				<v-col class="pa-0 mt-3">
+					<v-card class="ml-5 mr-5">
+						<div class="flex-center">
+							<p class="mb-0 mt-2 ml-2 font-italic">Utresa</p>
+							<v-select class="select-responsive" :items="timePick" :label="timeFormatted" dense solo
+								@change="setDepartureTime"
+							/>
+						</div>
+						<v-radio-group v-model="selectedExit" row class="ma-0 pa-0">
+							<v-radio label="Avgång" value="Avgång" @click="getValueExit('Avgång')" />
+							<v-radio label="Ankomst" value="Ankomst" @click="getValueExit('Ankomst')" />
+						</v-radio-group>
+						<vc-date-picker v-model="departureDate" :min-date="new Date()" is-expanded @dayclick="departureDateClick" />
+					</v-card>
+				</v-col>
+				<v-col class="pa-0 mt-3">
+					<!-- <v-card-actions class="justify-center" /> -->
+					<v-card v-if="displayArrival" class="ml-5 mr-5">
+						<div class="flex-center">
+							<p class="mb-0 mt-2 ml-2 font-italic">Återresa</p>
+							<v-select :items="timePickArr" :label="timeFormattedArr" dense solo @change="setArrivalTime" />
+						</div>
+						<v-radio-group v-model="selectedEntry" row class="ma-0 pa-0">
+							<v-radio label="Avgång" value="Avgång" @click="getValueEntry('Avgång')" />
+							<v-radio label="Ankomst" value="Ankomst" @click="getValueEntry('Ankomst')" />
+						</v-radio-group>
+						<vc-date-picker v-model="arrivalDate" :min-date="new Date()" is-expanded @dayclick="arrivalDateClick" />
+					</v-card>
+				</v-col>
+			</v-row>
+			<v-btn class="blue darken-1 white--text mt-4" small depressed block
+				@click="nextPage"
+			>
+				Fortsätt <v-icon right>{{ 'mdi-chevron-right' }}</v-icon>
+			</v-btn>
 		</v-container>
 	</v-container>
 </template>
@@ -85,6 +109,7 @@ export default {
 		},
 		btnDisabled: true,
 		singleStation: '',
+		returnTrip: false,
 		departureDate: new Date(),
 		arrivalDate: new Date(),
 		isClicked: false,
@@ -145,6 +170,7 @@ export default {
 		},
 		displayArrivalCalendar() {
 			if (!this.displayArrival) {
+				this.returnTrip = true;
 				this.displayArrival = true;
 				let hours = new Date().getHours();
 				let minutes = new Date().getMinutes();
@@ -156,6 +182,7 @@ export default {
 				}
 				this.arrTime = this.timeFormattedArr;
 			} else {
+				this.returnTrip = false;
 				this.displayArrival = false;
 			}
 		},
