@@ -42,7 +42,7 @@
 										one-line
 										class="grey--text text--darken-1 pa-0"
 									>
-										<v-row class="pl-0 grey--text text--darken-1">
+										<v-row style="margin-right: -30px" class="pl-0 grey--text text--darken-1">
 											Tågnummer: {{ tickets[0].train_id }}
 										</v-row>
 					
@@ -51,7 +51,7 @@
 												{{ seats }}
 											</v-list-item-title>
 										</v-list-item-content>
-										<v-list-item-icon>
+										<v-list-item-icon class="pa-0">
 											<v-icon class="payment-checkbox">
 												mdi-checkbox-marked-circle
 											</v-icon>

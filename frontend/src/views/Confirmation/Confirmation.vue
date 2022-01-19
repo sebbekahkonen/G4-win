@@ -2,12 +2,12 @@
 	<div>
 		<v-container>
 			<v-layout column justify-center class="">
-				<v-layout row wrap class="pt-5 mr-1 text-left">
+				<v-layout row wrap class="pt-5 ml-1 text-left">
 					<v-flex>
 						<h2>Ditt kvitto för {{ getCurrentOrderNumber }}</h2>
 					</v-flex>
 				</v-layout>
-				<v-layout row wrap class="mt-16 mb-5 ml-0 text-left">
+				<v-layout row wrap class="mt-16 mb-5 ml-5 text-left">
 					<v-flex xs6>
 						<v-row>
 							<h4>Order status:</h4>
