@@ -14,6 +14,7 @@
 			@click:append="search"
 			@keydown.enter="search"
 		/>
+		<h4 class="text-center" style="color: green">{{ successMessage }}</h4>
 		<v-data-table
 			v-if="isTrue"
 			:headers="ticketHeaders"
@@ -98,6 +99,7 @@ export default {
 		singleExpand: true,
 		seatsToRemove: [],
 		wagonAndSeat: [],
+		successMessage: '',
 		ticketHeaders: [
 			{
 				text: 'Från',
@@ -137,6 +139,7 @@ export default {
 		...mapActions('ticketStore', ['getTickets']),
 		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt', 'deleteSeats']),
 		search() {
+			this.successMessage = '';
 			this.tickets = [];
 			this.seatsToRemove = [];
 			Object.keys(this.getAllTheReceipts).forEach(key => {
@@ -156,6 +159,7 @@ export default {
 		},
 
 		removeTicket() {
+			this.successMessage = 'Du har nu avbokat resan med ordernummer:  '+ this.tickets[0].order_number;
 			this.deleteReceipt(this.tickets[0].id);
 			Object.keys(this.seatsToRemove).forEach(key => {
 				let seatAndTrainId = {train_id: this.tickets[0].train_id, seat: this.seatsToRemove[key]};
@@ -163,6 +167,7 @@ export default {
 				this.deleteSeats(seatAndTrainId);
 			});
 			this.ticketInput = '';
+			
 			this.isTrue = false;
 		},
 
