@@ -46,20 +46,27 @@ async function sendEmail(email, name) {
 	let ticketsAdult = '';
 	let ticketsSenior = '';
 	let price = 0;
-	ticketsStudentArray = result2[0].ticketsStudent.split(',');
-	ticketsStudentArray.forEach((item) => {
-		ticketsStudent += item + "&emsp;&emsp;&emsp;&emsp;";
-	});
+	if (result2[0].ticketsStudent !== null) {
+		ticketsStudentArray = result2[0].ticketsStudent.split(',');
+		ticketsStudentArray.forEach((item) => {
+			ticketsStudent += item + "&emsp;&emsp;&emsp;&emsp;";
+		});
+	}
 
-	ticketsAdultArray = result2[0].ticketsAdult.split(',');
-	ticketsAdultArray.forEach((item) => {
-		ticketsAdult += item + "&emsp;&emsp;&emsp;&emsp;";
-	});
+	if (result2[0].ticketsAdult !== null) {
+		ticketsAdultArray = result2[0].ticketsAdult.split(',');
+		ticketsAdultArray.forEach((item) => {
+			ticketsAdult += item + "&emsp;&emsp;&emsp;&emsp;";
+		});
+	}
 
-	ticketsSeniorArray = result2[0].ticketsSenior.split(',');
-	ticketsSeniorArray.forEach((item) => {
-		ticketsSenior += item + "&emsp;&emsp;&emsp;&emsp;";
-	});
+	if (result2[0].ticketsSenior !== null) {
+		ticketsSeniorArray = result2[0].ticketsSenior.split(',');
+		ticketsSeniorArray.forEach((item) => {
+			ticketsSenior += item + "&emsp;&emsp;&emsp;&emsp;";
+
+		});
+	}
 	if (ticketsStudentArray[0] !== '') {
 		price = price + parseInt(ticketsStudentArray[0].replace('kr', ''))
 	}

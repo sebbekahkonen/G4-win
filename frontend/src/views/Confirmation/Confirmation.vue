@@ -91,7 +91,7 @@
 				</v-flex>
 				<v-flex xs5 />
 				<v-flex xs3>
-					<span>{{ getPrice }}</span>
+					<span>{{ getPrice }}kr</span>
 				</v-flex>
 			</v-layout>
 		</v-container>
