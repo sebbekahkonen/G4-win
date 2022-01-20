@@ -7,7 +7,6 @@ const driver = require('better-sqlite3');
 const db = driver('./database/traindb.sqlite3');
 // const stripe = require('stripe');
 const nodemailer = require("nodemailer");
-
 //Bodyparser för att parsa ihop object
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
@@ -219,23 +218,6 @@ app.get('/api/:table', (req, res) => {
 	});
 })
 
-//Dynamic rest route:GET:ID
-// app.get('/api/:table/:id', (req, res) => {
-// 	let preparedStatement = db.prepare(`
-// 	SELECT *
-// 	FROM ${req.params.table}
-// 	WHERE id = :id
-// 	`);
-// 	let result = preparedStatement.all({
-// 		id: req.params.id
-// 	});
-
-// 	res.status(200).json({
-// 		message: 'success',
-// 		data: result
-// 	});
-// })
-
 //Dynamic rest route:PUT (update)
 app.put('/api/:table/:id', (req, res) => {
 	let updateParameters = Object.keys(req.body).map(parameter =>
@@ -305,39 +287,6 @@ app.delete('/api/:table/deleteSeats/:train_id/:seat', (req, res) => {
 		data: result
 	});
 })
-// app.get('/api/:table/from/:from', (req, res) => {
-// 	let preparedStatement = db.prepare(`
-// 	SELECT *
-// 	FROM ${req.params.table}
-// 	WHERE trains."from" LIKE :from
-// 	`);
-// 	let result = preparedStatement.all({
-// 		from: req.params.from
-// 	});
-
-// 	res.status(200).json({
-// 		message: 'success',
-// 		data: result
-// 	});
-// })
-
-
-
-// app.get('/api/:table/to/:to', (req, res) => {
-// 	let preparedStatement = db.prepare(`
-// 	SELECT *
-// 	FROM ${req.params.table}
-// 	WHERE trains."to" LIKE :to
-// 	`);
-// 	let result = preparedStatement.all({
-// 		to: req.params.to
-// 	});
-
-// 	res.status(200).json({
-// 		message: 'success',
-// 		data: result
-// 	});
-// })
 
 app.get('/api/:table/:from/:to', (req, res) => {
 	let preparedStatement = db.prepare(`

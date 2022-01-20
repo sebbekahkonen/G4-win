@@ -1,8 +1,4 @@
-import ticketServices from '@/services/ticketServices';
 import { loadStripe } from '@stripe/stripe-js';
-
-// import Vue from 'vue';
-
 
 export default {
 	namespaced: true,
@@ -51,13 +47,6 @@ export default {
 	actions: {
 		resetCart({ commit }) {
 			commit('resetCart');
-		},
-		async getTickets({ commit }, data) {
-			const ticket = await ticketServices.searchTickets(data);
-
-			commit('setTickets', ticket);
-
-			return ticket;
 		},
 		// eslint-disable-next-line
 		async checkout({ commit, state }, total) {

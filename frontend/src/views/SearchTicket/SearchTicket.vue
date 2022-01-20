@@ -136,7 +136,6 @@ export default {
 	},
 
 	methods: {
-		...mapActions('ticketStore', ['getTickets']),
 		...mapActions('receiptStore', ['getAllReceipts', 'deleteReceipt', 'deleteSeats']),
 		search() {
 			this.successMessage = '';

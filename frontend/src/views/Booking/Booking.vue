@@ -12,7 +12,7 @@
 					dense
 					filled						
 					class="from"
-					@change="testBtnDisabled"
+					@change="buttonDisabled"
 				/>
 				<v-autocomplete
 					v-model="search.arrivalStation"
@@ -23,14 +23,14 @@
 					dense
 					filled
 					class="to"
-					@change="testBtnDisabled"
+					@change="buttonDisabled"
 				/>
 			</form>
 			<v-col align="center" class="pt-0">
-				<v-btn id="button-responsive" :disabled="btnDisabled" class="blue darken-1 white--text" @click="testSearch">Sök resa</v-btn>
+				<v-btn id="button-responsive" :disabled="btnDisabled" class="blue darken-1 white--text" @click="formValidation">Sök resa</v-btn>
 			</v-col>	
 		</div>
-		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto" @change="testBtnDisabled">
+		<v-container v-show="isClicked" fluid style="margin: 0px; padding: 0px;" class="justify-center mx-auto" @change="buttonDisabled">
 			<v-row justify="center" class="mt-5">
 				<v-btn color="blue" class="mb-4" outlined plain
 					@click="displayArrivalCalendar"
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import vue from 'vue';
 export default {
 	data: () => ({
@@ -139,17 +139,14 @@ export default {
 		}
 	}),
 	computed: {
-		...mapGetters('bookingStore', ['getAllStations']),
 		...mapState('travelStore', [ 'count' ])
 	},
 	created() {
-		vue.nextTick(this.testBtnDisabled());
+		vue.nextTick(this.buttonDisabled());
 		vue.nextTick(this.fetchStations());
 		vue.nextTick(this.showTimeLabel());
 	},
 	methods: {
-		...mapActions('bookingStore', ['getStations', 'getSearched']),
-			
 		fetchStations() {
 			fetch('/api/stations')
 				.then(res => res.json())
@@ -163,10 +160,6 @@ export default {
 		},
 		getValueEntry(v) {
 			this.selectedEntry = v;
-		},
-		testWithStore() {
-			this.getStations(this.search.departureStation);
-			console.log(this.getAllStations);
 		},
 		displayArrivalCalendar() {
 			if (!this.displayArrival) {
@@ -235,14 +228,14 @@ export default {
 				}
 			}					
 		},
-		testSearch() {
+		formValidation() {
 			if (!this.isClicked && !this.search.departureStation == '' && !this.search.arrivalStation == '') {
 				this.isClicked = true;
 			} else {
 				this.isClicked = false;
 			}
 		},
-		testBtnDisabled() {
+		buttonDisabled() {
 			if (!this.search.departureStation == '' && !this.search.arrivalStation == '') {
 				this.btnDisabled = false;		
 			} else {

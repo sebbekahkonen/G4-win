@@ -91,7 +91,7 @@ export default {
 		seniorPrice: 0,
 		studentPrice: 0,
 		adultPrice: 0,
-		testTrainId: [],
+		trainIdArr: [],
 		errorCode: '',
 		trainInformation: {
 			trainsArray: [],
@@ -142,7 +142,6 @@ export default {
 
 	methods: {
 		...mapActions('ticketStore', ['changeStudentTickets', 'changeAdultTickets', 'changeSeniorTickets', 'changeThePrice', 'changePickedTrain', 'resetCart']),
-		...mapActions('travelStore', ['changeFormatDate']),
 		returnPage() {
 			this.$router.push('/');
 		},
@@ -153,24 +152,12 @@ export default {
 					if(data.data[key].date === this.date && data.data[key].departure > this.travelObj.departure.selectedTime) {
 						this.trainInformation.trainsArray.push(data.data[key]);
 						console.log((data.data[key]));
-						this.testTrainId.push(data.data[key].id);
+						this.trainIdArr.push(data.data[key].id);
 
 
 					}				
 				})
 				);			
-		},
-
-		dateFormatter() {
-			const months = ['Jan', 'Feb', 'Mars', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
-			const days = ['Sön', 'Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör'];
-			let day = days[this.formatDate.getDay()];
-			let month = months[this.formatDate.getMonth()];
-			let dateNr = this.formatDate.getDate();
-			let year = this.formatDate.getFullYear();
-			
-			this.changeFormatDate(this.datumTest = `${day} ${dateNr} ${month} ${year}`);
-
 		},
 		onExpand(value) {
 			Object.keys(this.tickets).forEach(key => {
